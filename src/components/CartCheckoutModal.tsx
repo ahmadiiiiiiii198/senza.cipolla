@@ -349,7 +349,6 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
   const isFormValid = () => {
     return customerData.customerName.trim() &&
            customerData.customerEmail.trim() &&
-           customerData.customerPhone.trim() &&
            customerData.deliveryAddress.trim() &&
            addressValidation?.isValid &&
            addressValidation?.isWithinZone;
@@ -536,6 +535,11 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
               
               <Button
                 onClick={async () => {
+                  console.log('🔄 Conferma Ordine clicked!');
+                  console.log('📋 Customer data:', customerData);
+                  console.log('📍 Address validation:', addressValidation);
+                  console.log('🛒 Cart items:', cartItems);
+
                   setIsSubmitting(true);
                   try {
                     await createPayLaterOrder();
@@ -546,7 +550,14 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
                     });
                     onClose();
                   } catch (error) {
-                    console.error('Pay later order error:', error);
+                    console.error('❌ Pay later order error:', error);
+                    console.error('❌ Error details:', {
+                      message: error instanceof Error ? error.message : 'Unknown error',
+                      stack: error instanceof Error ? error.stack : undefined,
+                      customerData,
+                      addressValidation,
+                      cartItems
+                    });
                     toast({
                       title: 'Errore nell\'ordine',
                       description: error instanceof Error ? error.message : 'Si è verificato un errore',

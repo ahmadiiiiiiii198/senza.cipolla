@@ -703,7 +703,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
                     </Button>
                     <Button
                       type="button"
-                      disabled={isSubmitting || !orderData.customerName || !orderData.customerEmail || !orderData.customerPhone || !orderData.deliveryAddress ||
+                      disabled={isSubmitting || !orderData.customerName || !orderData.customerEmail || !orderData.deliveryAddress ||
                                !addressValidation?.isValid || !addressValidation?.isWithinZone}
                       onClick={async () => {
                         setIsSubmitting(true);

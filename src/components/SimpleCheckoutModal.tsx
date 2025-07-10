@@ -185,7 +185,6 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
   const isFormValid = () => {
     const basicFormValid = customerData.customerName.trim() &&
                           customerData.customerEmail.trim() &&
-                          customerData.customerPhone.trim() &&
                           customerData.deliveryAddress.trim() &&
                           addressValidation?.isValid;
 
