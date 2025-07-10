@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Plus, Minus, ShoppingCart, Trash2 } from 'lucide-react';
 import { useSimpleCart } from '@/hooks/use-simple-cart';
 import SimpleCheckoutModal from './SimpleCheckoutModal';
+import { safeFormatPrice } from '@/utils/priceUtils';
 
 const SimpleCart: React.FC = () => {
   const {
@@ -140,7 +141,7 @@ const SimpleCart: React.FC = () => {
             <div className="border-t p-4 space-y-4">
               <div className="flex justify-between items-center text-lg font-bold">
                 <span>Totale:</span>
-                <span>€{getTotalPrice().toFixed(2)}</span>
+                <span>{safeFormatPrice(getTotalPrice())}</span>
               </div>
               
               <div className="space-y-2">

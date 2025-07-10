@@ -594,23 +594,23 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotale:</span>
-                    <span>€{(product.price * orderData.quantity).toFixed(2)}</span>
+                    <span>€{((typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0)) * orderData.quantity).toFixed(2)}</span>
                   </div>
                   {addressValidation.deliveryFee > 0 && (
                     <div className="flex justify-between text-sm">
                       <span>Consegna:</span>
-                      <span>€{addressValidation.deliveryFee.toFixed(2)}</span>
+                      <span>€{(addressValidation.deliveryFee || 0).toFixed(2)}</span>
                     </div>
                   )}
                   <div className="flex justify-between items-center text-lg font-semibold border-t pt-2">
                     <span>Totale:</span>
-                    <span className="text-emerald-600">€{calculateTotal().toFixed(2)}</span>
+                    <span className="text-emerald-600">€{(calculateTotal() || 0).toFixed(2)}</span>
                   </div>
                 </div>
               ) : (
                 <div className="flex justify-between items-center text-lg font-semibold">
                   <span>Subtotale:</span>
-                  <span className="text-emerald-600">€{(product.price * orderData.quantity).toFixed(2)}</span>
+                  <span className="text-emerald-600">€{((typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0)) * orderData.quantity).toFixed(2)}</span>
                 </div>
               )}
             </div>

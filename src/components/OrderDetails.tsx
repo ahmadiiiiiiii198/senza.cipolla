@@ -317,7 +317,7 @@ const OrderDetails = ({ order, onUpdate, onDelete }: OrderDetailsProps) => {
           <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
               <strong className="text-gray-700">Importo Totale:</strong>
-              <span className="text-lg sm:text-xl font-bold text-emerald-700">€{Number(order.total_amount).toFixed(2)}</span>
+              <span className="text-lg sm:text-xl font-bold text-emerald-700">€{(Number(order.total_amount) || 0).toFixed(2)}</span>
             </div>
             <div className="break-words"><strong className="text-gray-700">Creato:</strong> <span className="text-gray-800">{formatDate(order.created_at)}</span></div>
             <div className="break-words"><strong className="text-gray-700">Ultimo Aggiornamento:</strong> <span className="text-gray-800">{formatDate(order.updated_at)}</span></div>

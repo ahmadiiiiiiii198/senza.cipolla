@@ -466,23 +466,23 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
               {cartItems.map((item) => (
                 <div key={item.id} className="flex justify-between">
                   <span>{item.product.name} x{item.quantity}</span>
-                  <span>€{(item.product.price * item.quantity).toFixed(2)}</span>
+                  <span>€{((typeof item.product.price === 'string' ? parseFloat(item.product.price) : (item.product.price || 0)) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
               <div className="border-t pt-2 space-y-1">
                 <div className="flex justify-between">
                   <span>Subtotale:</span>
-                  <span>€{totalAmount.toFixed(2)}</span>
+                  <span>€{(totalAmount || 0).toFixed(2)}</span>
                 </div>
                 {addressValidation?.deliveryFee && (
                   <div className="flex justify-between text-blue-600">
                     <span>Costo consegna ({addressValidation.zone}):</span>
-                    <span>€{addressValidation.deliveryFee.toFixed(2)}</span>
+                    <span>€{(addressValidation.deliveryFee || 0).toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-semibold text-lg border-t pt-1">
                   <span>Totale:</span>
-                  <span>€{calculateTotal().toFixed(2)}</span>
+                  <span>€{(calculateTotal() || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -672,7 +672,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
                   ) : (
                     <>
                       <CreditCard className="mr-2 h-4 w-4" />
-                      Paga €{calculateTotal().toFixed(2)}
+                      Paga €{(calculateTotal() || 0).toFixed(2)}
                     </>
                   )}
                 </Button>

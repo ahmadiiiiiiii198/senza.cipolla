@@ -262,7 +262,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
         ) : (
           <>
             <CreditCard className="h-5 w-5 mr-2" />
-            {children || `Paga €${totalAmount.toFixed(2)} con Stripe`}
+            {children || `Paga €${(totalAmount || 0).toFixed(2)} con Stripe`}
           </>
         )}
       </Button>

@@ -126,7 +126,7 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({ children }) => {
                 <div className="border-t pt-4 space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Totale:</span>
-                    <span className="font-bold text-lg">€{cart.getTotalPrice().toFixed(2)}</span>
+                    <span className="font-bold text-lg">{safeFormatPrice(cart.getTotalPrice())}</span>
                   </div>
                   
                   <div className="flex gap-2">

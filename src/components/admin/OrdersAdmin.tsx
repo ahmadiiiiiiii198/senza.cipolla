@@ -513,12 +513,12 @@ const OrdersAdmin = () => {
                     {selectedOrder.order_items?.map((item) => (
                       <div key={item.id} className="flex justify-between text-sm">
                         <span>{item.quantity}x {item.product_name}</span>
-                        <span>€{(item.subtotal || item.product_price * item.quantity).toFixed(2)}</span>
+                        <span>€{((item.subtotal || (item.product_price * item.quantity)) || 0).toFixed(2)}</span>
                       </div>
                     ))}
                     <div className="border-t pt-2 flex justify-between font-semibold">
                       <span>Totale:</span>
-                      <span>€{selectedOrder.total_amount.toFixed(2)}</span>
+                      <span>€{(selectedOrder.total_amount || 0).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

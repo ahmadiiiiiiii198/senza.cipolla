@@ -360,15 +360,15 @@ const EnhancedOrderForm = () => {
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span>Subtotal:</span>
-              <span>€{(calculateEstimatedPrice() - addressValidation.deliveryFee).toFixed(2)}</span>
+              <span>€{((calculateEstimatedPrice() || 0) - (addressValidation.deliveryFee || 0)).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Delivery Fee:</span>
-              <span>€{addressValidation.deliveryFee.toFixed(2)}</span>
+              <span>€{(addressValidation.deliveryFee || 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between font-semibold border-t pt-1">
               <span>Total:</span>
-              <span>€{calculateEstimatedPrice().toFixed(2)}</span>
+              <span>€{(calculateEstimatedPrice() || 0).toFixed(2)}</span>
             </div>
           </div>
         </div>

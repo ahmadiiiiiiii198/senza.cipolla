@@ -205,7 +205,7 @@ const AddressValidator = ({ onValidAddress, orderAmount = 0, initialAddress = ''
                     <Truck className="w-4 h-4 text-gray-500" />
                     <div>
                       <p className="font-medium">Distance</p>
-                      <p className="text-gray-600">{validationResult.distance.toFixed(2)} km</p>
+                      <p className="text-gray-600">{(validationResult.distance || 0).toFixed(2)} km</p>
                     </div>
                   </div>
 
@@ -223,7 +223,7 @@ const AddressValidator = ({ onValidAddress, orderAmount = 0, initialAddress = ''
                       <p className="font-medium">Delivery Fee</p>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-600">
-                          ${validationResult.deliveryFee.toFixed(2)}
+                          ${(validationResult.deliveryFee || 0).toFixed(2)}
                         </span>
                         {validationResult.deliveryFee === 0 && orderAmount >= settings.freeDeliveryThreshold && (
                           <Badge variant="secondary" className="text-xs">
@@ -239,7 +239,7 @@ const AddressValidator = ({ onValidAddress, orderAmount = 0, initialAddress = ''
                 {validationResult.deliveryFee > 0 && orderAmount < settings.freeDeliveryThreshold && (
                   <div className="bg-blue-50 p-3 rounded border border-blue-200">
                     <p className="text-sm text-blue-800">
-                      💡 Add ${(settings.freeDeliveryThreshold - orderAmount).toFixed(2)} more to your order for free delivery!
+                      💡 Add ${((settings.freeDeliveryThreshold || 0) - (orderAmount || 0)).toFixed(2)} more to your order for free delivery!
                     </p>
                   </div>
                 )}
@@ -254,7 +254,7 @@ const AddressValidator = ({ onValidAddress, orderAmount = 0, initialAddress = ''
             <h5 className="font-medium text-sm text-blue-800 mb-2">Delivery Information</h5>
             <ul className="text-sm text-blue-700 space-y-1">
               <li>• We deliver within {settings.maxDeliveryDistance}km of our restaurant</li>
-              <li>• Free delivery on orders over ${settings.freeDeliveryThreshold.toFixed(2)}</li>
+              <li>• Free delivery on orders over ${(settings.freeDeliveryThreshold || 0).toFixed(2)}</li>
               <li>• Delivery fees vary by distance from restaurant</li>
               <li>• Address validation ensures accurate delivery</li>
             </ul>
