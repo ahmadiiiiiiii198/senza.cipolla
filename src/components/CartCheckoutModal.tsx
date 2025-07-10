@@ -113,7 +113,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         order_number: orderNumber,
         customer_name: customerData.customerName,
         customer_email: customerData.customerEmail,
-        customer_phone: customerData.customerPhone,
+        customer_phone: customerData.customerPhone || 'Non fornito',
         customer_address: customerData.deliveryAddress,
         total_amount: finalTotal,
         status: 'payment_pending',
@@ -139,7 +139,10 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       .select()
       .single();
 
-    if (orderError) throw orderError;
+    if (orderError) {
+      console.error('Order creation error:', orderError);
+      throw new Error(`Errore nella creazione dell'ordine: ${orderError.message}`);
+    }
 
     // Create order items
     const orderItems = cartItems.map(item => ({
@@ -246,6 +249,17 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       throw new Error('Indirizzo non valido o fuori zona di consegna');
     }
 
+    // Validate required customer data
+    if (!customerData.customerName?.trim()) {
+      throw new Error('Nome cliente è richiesto');
+    }
+    if (!customerData.customerEmail?.trim()) {
+      throw new Error('Email cliente è richiesta');
+    }
+    if (!customerData.deliveryAddress?.trim()) {
+      throw new Error('Indirizzo di consegna è richiesto');
+    }
+
     const orderNumber = generateOrderNumber();
     const deliveryFee = addressValidation.deliveryFee || 0;
     const finalTotal = totalAmount + deliveryFee;
@@ -257,7 +271,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         order_number: orderNumber,
         customer_name: customerData.customerName,
         customer_email: customerData.customerEmail,
-        customer_phone: customerData.customerPhone,
+        customer_phone: customerData.customerPhone || 'Non fornito',
         customer_address: customerData.deliveryAddress,
         total_amount: finalTotal,
         status: 'pending',
@@ -282,7 +296,10 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       .select()
       .single();
 
-    if (orderError) throw orderError;
+    if (orderError) {
+      console.error('Order creation error:', orderError);
+      throw new Error(`Errore nella creazione dell'ordine: ${orderError.message}`);
+    }
 
     // Create order items (same as Stripe order)
     const orderItems = cartItems.map(item => ({

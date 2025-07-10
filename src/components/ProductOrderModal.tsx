@@ -54,7 +54,7 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
         .insert({
           customer_name: orderData.customerName,
           customer_email: orderData.customerEmail,
-          customer_phone: orderData.customerPhone,
+          customer_phone: orderData.customerPhone || 'Non fornito',
           customer_address: orderData.deliveryAddress,
           total_amount: totalAmount,
           status: 'payment_pending',
@@ -140,7 +140,7 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
         metadata: {
           order_id: order.id,
           customer_name: orderData.customerName,
-          customer_phone: orderData.customerPhone,
+          customer_phone: orderData.customerPhone || 'Non fornito',
           source: 'francesco_fiori_website',
           order_type: 'product_order',
         }
@@ -371,7 +371,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
         order_number: orderNumber,
         customer_name: orderData.customerName,
         customer_email: orderData.customerEmail,
-        customer_phone: orderData.customerPhone,
+        customer_phone: orderData.customerPhone || 'Non fornito',
         customer_address: orderData.deliveryAddress, // Use customer_address column
         total_amount: totalAmount,
         status: 'pending', // Pay later orders start as pending

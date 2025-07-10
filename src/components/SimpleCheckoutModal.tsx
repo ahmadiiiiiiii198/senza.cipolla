@@ -216,7 +216,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         order_number: generateOrderNumber(),
         customer_name: customerData.customerName,
         customer_email: customerData.customerEmail,
-        customer_phone: customerData.customerPhone,
+        customer_phone: customerData.customerPhone || 'Non fornito',
         total_amount: calculateTotal(),
         status: 'pending',
         payment_status: 'pending'
@@ -317,7 +317,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         metadata: {
           order_id: order.id,
           customer_name: customerData.customerName,
-          customer_phone: customerData.customerPhone,
+          customer_phone: customerData.customerPhone || 'Non fornito',
           source: 'francesco_fiori_website',
           order_type: 'cart_order',
         }
@@ -388,7 +388,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         order_number: generateOrderNumber(),
         customer_name: customerData.customerName,
         customer_email: customerData.customerEmail,
-        customer_phone: customerData.customerPhone,
+        customer_phone: customerData.customerPhone || 'Non fornito',
         total_amount: calculateTotal(),
         status: 'confirmed',
         payment_status: 'pending'
