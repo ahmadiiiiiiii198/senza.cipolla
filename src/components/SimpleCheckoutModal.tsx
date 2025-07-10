@@ -218,7 +218,8 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         customer_phone: customerData.customerPhone || 'Non fornito',
         total_amount: calculateTotal(),
         status: 'pending',
-        payment_status: 'pending'
+        payment_status: 'pending',
+        payment_method: 'stripe'
       };
 
       const { data: order, error: orderError } = await supabase
@@ -390,7 +391,8 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         customer_phone: customerData.customerPhone || 'Non fornito',
         total_amount: calculateTotal(),
         status: 'confirmed',
-        payment_status: 'pending'
+        payment_status: 'pending',
+        payment_method: 'cash_on_delivery'
       };
 
       const { data: order, error: orderError } = await supabase

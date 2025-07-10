@@ -116,7 +116,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         customer_phone: customerData.customerPhone || 'Non fornito',
         customer_address: customerData.deliveryAddress,
         total_amount: finalTotal,
-        status: 'payment_pending',
+        status: 'pending',
         payment_status: 'pending',
         payment_method: 'stripe',
         metadata: {
@@ -276,6 +276,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         total_amount: finalTotal,
         status: 'pending',
         payment_status: 'pending',
+        payment_method: 'cash_on_delivery',
         metadata: {
           deliveryFee,
           estimatedTime: addressValidation.estimatedTime,
