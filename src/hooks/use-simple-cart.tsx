@@ -1,0 +1,146 @@
+import React, { createContext, useContext, useState } from 'react';
+import { Product } from '@/types/category';
+
+export interface PizzaExtra {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  quantity: number;
+}
+
+export interface CartItem {
+  id: string;
+  product: Product;
+  quantity: number;
+  specialRequests?: string;
+  extras?: PizzaExtra[];
+}
+
+interface SimpleCartContextType {
+  items: CartItem[];
+  isOpen: boolean;
+  addItem: (product: Product, quantity?: number, extras?: PizzaExtra[], specialRequests?: string) => void;
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+  getTotalItems: () => number;
+  getTotalPrice: () => number;
+  openCart: () => void;
+  closeCart: () => void;
+}
+
+const SimpleCartContext = createContext<SimpleCartContextType | null>(null);
+
+export const useSimpleCart = () => {
+  const context = useContext(SimpleCartContext);
+  if (!context) {
+    throw new Error('useSimpleCart must be used within a SimpleCartProvider');
+  }
+  return context;
+};
+
+interface SimpleCartProviderProps {
+  children: React.ReactNode;
+}
+
+export const SimpleCartProvider: React.FC<SimpleCartProviderProps> = ({ children }) => {
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const addItem = (product: Product, quantity = 1, extras: PizzaExtra[] = [], specialRequests = '') => {
+    setItems(prev => {
+      // For pizzas with extras, always create a new cart item (don't merge)
+      // This allows customers to have the same pizza with different extras
+      if (extras.length > 0 || specialRequests) {
+        return [...prev, {
+          id: `${product.id}-${Date.now()}-${Math.random()}`,
+          product,
+          quantity,
+          extras,
+          specialRequests
+        }];
+      }
+
+      // For simple products without extras, merge with existing items
+      const existing = prev.find(item =>
+        item.product.id === product.id &&
+        (!item.extras || item.extras.length === 0) &&
+        !item.specialRequests
+      );
+
+      if (existing) {
+        return prev.map(item =>
+          item.id === existing.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+
+      return [...prev, {
+        id: `${product.id}-${Date.now()}`,
+        product,
+        quantity,
+        extras,
+        specialRequests
+      }];
+    });
+  };
+
+  const removeItem = (itemId: string) => {
+    setItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const updateQuantity = (itemId: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeItem(itemId);
+      return;
+    }
+    setItems(prev =>
+      prev.map(item =>
+        item.id === itemId ? { ...item, quantity } : item
+      )
+    );
+  };
+
+  const clearCart = () => {
+    setItems([]);
+  };
+
+  const getTotalItems = () => {
+    return items.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  const getTotalPrice = () => {
+    return items.reduce((total, item) => {
+      const productPrice = item.product.price * item.quantity;
+      const extrasPrice = item.extras ?
+        item.extras.reduce((extrasTotal, extra) =>
+          extrasTotal + (extra.price * extra.quantity * item.quantity), 0
+        ) : 0;
+      return total + productPrice + extrasPrice;
+    }, 0);
+  };
+
+  const openCart = () => setIsOpen(true);
+  const closeCart = () => setIsOpen(false);
+
+  const contextValue: SimpleCartContextType = {
+    items,
+    isOpen,
+    addItem,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    getTotalItems,
+    getTotalPrice,
+    openCart,
+    closeCart
+  };
+
+  return (
+    <SimpleCartContext.Provider value={contextValue}>
+      {children}
+    </SimpleCartContext.Provider>
+  );
+};
