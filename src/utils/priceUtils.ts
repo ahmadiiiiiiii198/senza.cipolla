@@ -74,6 +74,34 @@ export const isValidPrice = (price: number): boolean => {
 };
 
 /**
+ * Safely converts a price value to a number, handling string inputs from database
+ * @param price - The price value (string or number)
+ * @returns The price as a number, or 0 if invalid
+ */
+export const ensureNumber = (price: string | number | null | undefined): number => {
+  if (price === null || price === undefined) return 0;
+  if (typeof price === 'string') {
+    const parsed = parseFloat(price);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  if (typeof price === 'number') {
+    return isNaN(price) ? 0 : price;
+  }
+  return 0;
+};
+
+/**
+ * Safely formats a price for display, handling string inputs from database
+ * @param price - The price value (string or number)
+ * @param currency - The currency symbol (default: '€')
+ * @returns Formatted price string
+ */
+export const safeFormatPrice = (price: string | number | null | undefined, currency: string = '€'): string => {
+  const numericPrice = ensureNumber(price);
+  return formatPrice(numericPrice, currency);
+};
+
+/**
  * Converts price from cents to euros (for Stripe integration)
  * @param cents - Price in cents
  * @returns Price in euros rounded to 2 decimal places

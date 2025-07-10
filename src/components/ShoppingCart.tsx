@@ -9,6 +9,7 @@ import { ShoppingCart, Plus, Minus, Trash2, CreditCard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import CartCheckoutModal from './CartCheckoutModal';
+import { safeFormatPrice } from '@/utils/priceUtils';
 
 interface ShoppingCartProps {
   children: React.ReactNode;
@@ -70,7 +71,7 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({ children }) => {
                         />
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-sm truncate">{item.product.name}</h4>
-                          <p className="text-sm text-gray-600">€{item.product.price.toFixed(2)} cad.</p>
+                          <p className="text-sm text-gray-600">{safeFormatPrice(item.product.price)} cad.</p>
                           <div className="flex items-center gap-2 mt-2">
                             <Button
                               variant="outline"

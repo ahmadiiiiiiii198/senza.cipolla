@@ -95,7 +95,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const getTotalPrice = () => {
-    return items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+    return items.reduce((total, item) => {
+      const price = typeof item.product.price === 'string' ? parseFloat(item.product.price) : (item.product.price || 0);
+      return total + (price * item.quantity);
+    }, 0);
   };
 
   const value: CartContextType = {

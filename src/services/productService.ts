@@ -67,6 +67,8 @@ class ProductService {
       // Transform database products to match frontend interface
       const transformedProducts: Product[] = data.map(product => ({
         ...product,
+        // Ensure price is a number (database returns string for DECIMAL)
+        price: typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0),
         // Add computed fields for frontend compatibility
         category: (product as any).categories?.name || 'Unknown',
         category_slug: (product as any).categories?.slug || 'unknown',
@@ -78,7 +80,7 @@ class ProductService {
         is_active: product.is_active ?? true,
         is_featured: product.is_featured ?? false,
         stock_quantity: product.stock_quantity ?? 0,
-        compare_price: product.compare_price ?? 0,
+        compare_price: typeof product.compare_price === 'string' ? parseFloat(product.compare_price) : (product.compare_price ?? 0),
         sort_order: product.sort_order ?? 0,
         meta_title: product.meta_title || '',
         meta_description: product.meta_description || '',

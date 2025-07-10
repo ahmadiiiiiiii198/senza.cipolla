@@ -176,7 +176,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
                           {product.name}
                         </p>
                         <p className="text-sm font-bold text-pizza-red">
-                          €{product.price.toFixed(2)}
+                          €{(typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0)).toFixed(2)}
                         </p>
                       </div>
                       <p className="text-xs text-gray-500 truncate">

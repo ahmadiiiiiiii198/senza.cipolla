@@ -26,7 +26,7 @@ const MenuSection = ({ title, items }: { title: string; items: Product[] }) => {
           <div key={index} className="border-b border-gray-200 pb-4">
             <div className="flex justify-between items-baseline mb-2">
               <h4 className="text-lg font-semibold text-pizza-dark">{item.name}</h4>
-              <span className="text-pizza-red font-bold">€{item.price.toFixed(2)}</span>
+              <span className="text-pizza-red font-bold">€{(typeof item.price === 'string' ? parseFloat(item.price) : (item.price || 0)).toFixed(2)}</span>
             </div>
             <p className="text-gray-600 text-sm">{item.description}</p>
           </div>
