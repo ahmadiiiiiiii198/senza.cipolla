@@ -156,34 +156,45 @@ const BulkStockManager: React.FC = () => {
   const applyBulkStockUpdate = async () => {
     try {
       setIsSaving(true);
-      
-      const updates = products.map(product => ({
-        id: product.id,
-        stock_quantity: bulkStockQuantity
-      }));
 
-      const { error } = await supabase
+      console.log('🔄 Starting bulk stock update...', {
+        quantity: bulkStockQuantity,
+        productsCount: products.length
+      });
+
+      // Use a simple update query instead of upsert for bulk operations
+      const { data, error, count } = await supabase
         .from('products')
-        .upsert(updates);
+        .update({ stock_quantity: bulkStockQuantity })
+        .eq('is_active', true)
+        .select('id, name, stock_quantity');
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase error details:', error);
+        throw error;
+      }
+
+      console.log('✅ Bulk update successful:', {
+        updatedCount: data?.length || count,
+        sampleData: data?.slice(0, 3)
+      });
 
       // Update local state
       setProducts(prev => prev.map(product => ({
         ...product,
         stock_quantity: bulkStockQuantity
       })));
-      
+
       toast({
         title: 'Stock Aggiornato',
-        description: `Stock di ${products.length} prodotti aggiornato a ${bulkStockQuantity} unità.`,
+        description: `Stock di ${data?.length || products.length} prodotti aggiornato a ${bulkStockQuantity} unità.`,
       });
 
     } catch (error) {
-      console.error('Error updating bulk stock:', error);
+      console.error('❌ Error updating bulk stock:', error);
       toast({
         title: 'Errore',
-        description: 'Impossibile aggiornare lo stock in massa.',
+        description: `Impossibile aggiornare lo stock in massa: ${error.message || 'Errore sconosciuto'}`,
         variant: 'destructive'
       });
     } finally {
@@ -194,20 +205,23 @@ const BulkStockManager: React.FC = () => {
   const resetAllStock = async () => {
     try {
       setIsSaving(true);
-      
+
       const { error } = await supabase
         .from('products')
         .update({ stock_quantity: 0 })
         .eq('is_active', true);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
 
       // Update local state
       setProducts(prev => prev.map(product => ({
         ...product,
         stock_quantity: 0
       })));
-      
+
       toast({
         title: 'Stock Azzerato',
         description: 'Lo stock di tutti i prodotti è stato azzerato.',
@@ -217,7 +231,7 @@ const BulkStockManager: React.FC = () => {
       console.error('Error resetting stock:', error);
       toast({
         title: 'Errore',
-        description: 'Impossibile azzerare lo stock.',
+        description: `Impossibile azzerare lo stock: ${error.message || 'Errore sconosciuto'}`,
         variant: 'destructive'
       });
     } finally {
