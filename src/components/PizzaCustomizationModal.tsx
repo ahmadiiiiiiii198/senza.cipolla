@@ -55,21 +55,22 @@ const PizzaCustomizationModal: React.FC<PizzaCustomizationModalProps> = ({
     try {
       setIsLoading(true);
 
-      // First get the category ID for 'extra'
-      const { data: categoryData, error: categoryError } = await supabase
+      // Get category IDs for both 'extra' and 'bevande'
+      const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
-        .select('id')
-        .eq('slug', 'extra')
-        .single();
+        .select('id, slug')
+        .in('slug', ['extra', 'bevande']);
 
-      if (categoryError) throw categoryError;
+      if (categoriesError) throw categoriesError;
 
-      // Then get products with that category_id
+      const categoryIds = categoriesData.map(cat => cat.id);
+
+      // Then get products with those category_ids
       const { data: extrasData, error } = await supabase
         .from('products')
         .select('id, name, price, description')
         .eq('is_active', true)
-        .eq('category_id', categoryData.id)
+        .in('category_id', categoryIds)
         .order('name');
 
       if (error) throw error;
@@ -143,7 +144,7 @@ const PizzaCustomizationModal: React.FC<PizzaCustomizationModalProps> = ({
     
     toast({
       title: 'Pizza aggiunta al carrello! 🍕',
-      description: `${pizza.name} con ${selectedExtras.length} extra è stata aggiunta al carrello.`,
+      description: `${pizza.name} con ${selectedExtras.length} extra/bevande è stata aggiunta al carrello.`,
     });
   };
 
@@ -207,7 +208,7 @@ const PizzaCustomizationModal: React.FC<PizzaCustomizationModalProps> = ({
 
           {/* Extras Section */}
           <div>
-            <h4 className="font-semibold mb-3">Aggiungi Extra:</h4>
+            <h4 className="font-semibold mb-3">Aggiungi Extra e Bevande:</h4>
             {isLoading ? (
               <div className="text-center py-4">Caricamento extra...</div>
             ) : (
