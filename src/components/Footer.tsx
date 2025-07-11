@@ -42,7 +42,7 @@ const Footer = () => {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <MapPin size={16} className="text-pizza-orange" />
-                <p>Via Roma, 123 - 10100 Torino TO</p>
+                <p>Corso Regina Margherita, 53, 10152 Torino TO</p>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={16} className="text-pizza-orange" />
