@@ -661,12 +661,14 @@
       min-width: 100vw !important;
     }
 
-    /* Prevent video overflow on mobile */
+    /* Prevent video overflow on mobile - but allow content to flow */
     .hero-container-mobile {
-      overflow: hidden !important;
+      overflow-x: hidden !important;
       position: relative !important;
-      width: 100vw !important;
-      height: 100vh !important;
+      /* Remove fixed height to allow content to show */
+      min-height: 100vh !important;
+      /* Allow content to extend beyond viewport if needed */
+      overflow-y: visible !important;
     }
 
     /* Better mobile video performance */
@@ -675,6 +677,23 @@
       transform: translateZ(0);
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
+    }
+
+    /* Ensure hero content is visible on mobile */
+    .hero-container-mobile .container {
+      position: relative !important;
+      z-index: 10 !important;
+    }
+
+    /* Mobile logo optimizations */
+    .hero-container-mobile img {
+      max-width: 90vw !important;
+      height: auto !important;
+    }
+
+    /* Mobile decorative elements visibility */
+    .hero-container-mobile .absolute {
+      z-index: 5 !important;
     }
   }
 

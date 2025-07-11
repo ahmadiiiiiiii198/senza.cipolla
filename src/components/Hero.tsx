@@ -67,9 +67,9 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen overflow-hidden hero-container-mobile">
+    <section className="relative min-h-screen overflow-x-hidden hero-container-mobile">
       {/* Pizza background video - Mobile Optimized */}
-      <div className="absolute inset-0 overflow-hidden hero-container-mobile">
+      <div className="absolute inset-0 overflow-hidden -z-10">
         {!videoError ? (
           <video
             autoPlay
