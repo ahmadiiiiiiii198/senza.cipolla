@@ -210,6 +210,10 @@ const OrderNotificationSystem = () => {
   const startNotificationSound = () => {
     try {
       console.log('🔊 [OrderNotification] ===== STARTING SOUND =====');
+      console.log('🔊 [OrderNotification] Mobile check:', {
+        isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+        userAgent: navigator.userAgent
+      });
 
       if (!audioRef.current) {
         console.error('🔊 [OrderNotification] ❌ No audio reference');
@@ -230,21 +234,43 @@ const OrderNotificationSystem = () => {
         paused: audioRef.current.paused,
         currentTime: audioRef.current.currentTime,
         volume: audioRef.current.volume,
-        loop: audioRef.current.loop
+        loop: audioRef.current.loop,
+        src: audioRef.current.src,
+        readyState: audioRef.current.readyState
       });
 
       setIsPlaying(true);
       audioRef.current.loop = true;
-      audioRef.current.volume = 0.5;
+      audioRef.current.volume = 0.8; // Increase volume for mobile
 
-      audioRef.current.play()
-        .then(() => {
-          console.log('🔊 [OrderNotification] ✅ Sound started successfully');
-        })
-        .catch(error => {
-          console.error('🔊 [OrderNotification] ❌ Play error:', error);
-          setIsPlaying(false);
-        });
+      // For mobile, try to play with user gesture context
+      const playPromise = audioRef.current.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('🔊 [OrderNotification] ✅ Sound started successfully');
+            // Update header controls after successful play
+            populateHeaderControls();
+          })
+          .catch(error => {
+            console.error('🔊 [OrderNotification] ❌ Play error:', error);
+            console.error('🔊 [OrderNotification] Error details:', {
+              name: error.name,
+              message: error.message,
+              code: error.code
+            });
+
+            // On mobile, audio might be blocked - show user interaction needed
+            if (error.name === 'NotAllowedError' || error.message.includes('user interaction')) {
+              console.log('🔊 [OrderNotification] 📱 Mobile audio blocked - need user interaction');
+              setError('Tap the notification button to enable sound');
+            }
+
+            setIsPlaying(false);
+            populateHeaderControls();
+          });
+      }
 
     } catch (error) {
       console.error('🔊 [OrderNotification] ❌ Start sound error:', error);
@@ -280,6 +306,23 @@ const OrderNotificationSystem = () => {
       console.error('🔊 [OrderNotification] Stop sound error:', error);
       // Force state update even if there's an error
       setIsPlaying(false);
+    }
+  };
+
+  // Manual sound trigger for mobile (requires user interaction)
+  const triggerSoundWithUserGesture = () => {
+    console.log('🔊 [OrderNotification] ===== MANUAL SOUND TRIGGER (USER GESTURE) =====');
+
+    // Enable sound first
+    setIsSoundEnabled(true);
+
+    // If there are notifications, start sound
+    const unreadCount = notifications.filter(n => !n.is_read).length;
+    if (unreadCount > 0) {
+      console.log('🔊 [OrderNotification] Starting sound with user gesture');
+      startNotificationSound();
+    } else {
+      console.log('🔊 [OrderNotification] No notifications to play sound for');
     }
   };
 
@@ -434,8 +477,23 @@ const OrderNotificationSystem = () => {
       }
 
       stopButton.onclick = () => {
-        console.log('🔇 [OrderNotification] Header stop button clicked');
-        forceStopSound();
+        console.log('🔇 [OrderNotification] Header button clicked');
+
+        // If sound is playing, stop it
+        if (isPlaying) {
+          console.log('🔇 [OrderNotification] Stopping sound');
+          forceStopSound();
+        }
+        // If there are notifications but no sound, try to start sound (mobile fix)
+        else if (unreadCount > 0 && !isPlaying) {
+          console.log('🔊 [OrderNotification] Starting sound with user gesture (mobile fix)');
+          triggerSoundWithUserGesture();
+        }
+        // If no notifications, just stop any remaining sounds
+        else {
+          console.log('🔇 [OrderNotification] Force stopping any remaining sounds');
+          forceStopSound();
+        }
       };
 
       return stopButton;
@@ -568,19 +626,42 @@ const OrderNotificationSystem = () => {
         <div className="fixed bottom-4 right-4 z-50">
           <button
             onClick={() => {
-              console.log('🔇 [OrderNotification] Fallback stop button clicked');
-              forceStopSound();
+              console.log('🔇 [OrderNotification] Fallback button clicked');
+
+              const unreadCount = notifications.filter(n => !n.is_read).length;
+
+              // If sound is playing, stop it
+              if (isPlaying) {
+                console.log('🔇 [OrderNotification] Stopping sound');
+                forceStopSound();
+              }
+              // If there are notifications but no sound, try to start sound (mobile fix)
+              else if (unreadCount > 0 && !isPlaying) {
+                console.log('🔊 [OrderNotification] Starting sound with user gesture (mobile fix)');
+                triggerSoundWithUserGesture();
+              }
+              // If no notifications, just stop any remaining sounds
+              else {
+                console.log('🔇 [OrderNotification] Force stopping any remaining sounds');
+                forceStopSound();
+              }
             }}
             className={`px-4 py-2 rounded-xl shadow-lg transition-all duration-300 font-bold text-sm border-2 ${
               isPlaying
                 ? 'bg-red-600 text-white animate-pulse border-red-400 hover:bg-red-700'
+                : notifications.filter(n => !n.is_read).length > 0
+                ? 'bg-orange-600 text-white border-orange-400 hover:bg-orange-700'
                 : 'bg-gray-600 text-white border-gray-400 hover:bg-gray-700'
             }`}
-            title="Emergency stop for all sounds and notifications"
+            title={isPlaying ? "Stop notification sound" : notifications.filter(n => !n.is_read).length > 0 ? "Start notification sound" : "Emergency stop for all sounds"}
           >
             <div className="flex items-center space-x-2">
-              <span>🔇</span>
-              <span>{isPlaying ? 'STOP SUONO' : 'STOP AUDIO'}</span>
+              <span>{isPlaying ? '🔇' : notifications.filter(n => !n.is_read).length > 0 ? '🔊' : '🔇'}</span>
+              <span>
+                {isPlaying ? 'STOP SUONO' :
+                 notifications.filter(n => !n.is_read).length > 0 ? 'PLAY SUONO' :
+                 'STOP AUDIO'}
+              </span>
             </div>
           </button>
         </div>
