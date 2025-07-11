@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import OrderOptionsModal from "./OrderOptionsModal";
 import BusinessHoursStatus from "./BusinessHoursStatus";
 import { useBusinessHours } from "@/hooks/useBusinessHours";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ContactContent {
   address: string;
@@ -36,13 +37,41 @@ const Contact = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [contactContent, setContactContent] = useState<ContactContent>({
     address: "Corso Regina Margherita, 53, 10152 Torino TO",
-    phone: "+393498851455",
-    email: "Dbrfnc56m31@gmail.com",
+    phone: "0110769211",
+    email: "anilamyzyri@gmail.com",
     mapUrl: "https://maps.google.com",
-    hours: formattedHours || "Lun-Dom: 08:00 - 19:00"
+    hours: "Lun-Gio: 12:00-14:30, 18:00-00:00\nVen: 12:00-14:30, 18:30-02:00\nSab: 18:30-02:00\nDom: 12:00-14:30, 18:00-00:00"
   });
   
+  // Load contact content from database
+  const loadContactContent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'contactContent')
+        .single();
+
+      if (error) {
+        console.error('Error loading contact content:', error);
+        return;
+      }
+
+      if (data?.value) {
+        setContactContent(prev => ({
+          ...prev,
+          ...data.value
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load contact content:', error);
+    }
+  };
+
   useEffect(() => {
+    // Load contact content from database
+    loadContactContent();
+
     // Get restaurant settings from localStorage if available
     const settings = localStorage.getItem('restaurantSettings');
     if (settings) {
@@ -55,18 +84,7 @@ const Contact = () => {
         console.error('Failed to parse restaurant settings');
       }
     }
-    
-    // Get contact content from localStorage
-    const storedContent = localStorage.getItem('contactContent');
-    if (storedContent) {
-      try {
-        const parsedContent = JSON.parse(storedContent);
-        setContactContent(prev => ({...prev, ...parsedContent}));
-      } catch (e) {
-        console.error('Failed to parse contact content');
-      }
-    }
-    
+
     // Get today's date for min date
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('date') as HTMLInputElement;
@@ -227,7 +245,7 @@ const Contact = () => {
                   <Clock className="text-persian-gold mr-3 mt-1 flex-shrink-0" size={20} />
                   <div>
                     <h4 className="font-medium">Hours</h4>
-                    <p className="text-gray-300">{formattedHours || contactContent.hours}</p>
+                    <p className="text-gray-300 whitespace-pre-line">{contactContent.hours || formattedHours}</p>
                   </div>
                 </div>
               </div>

@@ -73,8 +73,8 @@ const ContactInfoEditor = () => {
   // Create default contact information
   const createDefaultContactInfo = async () => {
     const defaultContact = {
-      phone: '+393498851455',
-      email: 'Dbrfnc56m31@gmail.com',
+      phone: '0110769211',
+      email: 'anilamyzyri@gmail.com',
       address: 'Corso Regina Margherita, 53, 10152 Torino TO',
       hours: 'Lun-Dom: 08:00 - 19:00'
     };

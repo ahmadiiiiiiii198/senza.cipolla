@@ -194,9 +194,9 @@ const FrontendConnectionTester = () => {
         {
           key: 'contactContent',
           value: {
-            address: "Via Roma 123, Torino",
-            phone: "+39 011 123 4567",
-            email: "info@pizzeriaregina2000.it",
+            address: "Corso Regina Margherita, 53, 10152 Torino TO",
+            phone: "0110769211",
+            email: "anilamyzyri@gmail.com",
             hours: "Lun-Dom: 18:00-24:00"
           }
         }

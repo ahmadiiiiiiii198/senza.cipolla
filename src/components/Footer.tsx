@@ -1,10 +1,33 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Pizza, ChefHat, Clock, MapPin, Phone, Mail } from 'lucide-react';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { supabase } from '@/integrations/supabase/client';
 
 const Footer = () => {
   const { formattedHours } = useBusinessHours();
+  const [contactHours, setContactHours] = useState<string>('');
+
+  // Load contact hours from database
+  useEffect(() => {
+    const loadContactHours = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'contactContent')
+          .single();
+
+        if (data?.value?.hours) {
+          setContactHours(data.value.hours);
+        }
+      } catch (error) {
+        console.error('Failed to load contact hours:', error);
+      }
+    };
+
+    loadContactHours();
+  }, []);
 
   return (
     <footer className="bg-gradient-to-br from-pizza-dark via-gray-800 to-pizza-dark text-white py-16 relative overflow-hidden">
@@ -46,11 +69,11 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={16} className="text-pizza-orange" />
-                <p>Tel: +39 011 123 4567</p>
+                <p>Tel: 0110769211</p>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail size={16} className="text-pizza-orange" />
-                <p>Email: info@pizzeriaregina2000.it</p>
+                <p>Email: anilamyzyri@gmail.com</p>
               </div>
             </div>
           </div>
@@ -79,8 +102,8 @@ const Footer = () => {
 
           <div>
             <h3 className="font-semibold mb-4">Orari di Apertura</h3>
-            <div className="text-gray-300 text-sm leading-relaxed">
-              {formattedHours || 'Lun-Dom: 08:00 - 19:00'}
+            <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
+              {contactHours || formattedHours || 'Lun-Dom: 08:00 - 19:00'}
             </div>
           </div>
         </div>

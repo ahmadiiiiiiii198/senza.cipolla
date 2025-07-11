@@ -170,9 +170,9 @@ CREATE POLICY "Allow public read access to order_items"
       {
         key: 'contactContent',
         value: {
-          phone: "+393498851455",
-          email: "Dbrfnc56m31@gmail.com",
-          address: "Piazza della Repubblica, 10100 Torino TO",
+          phone: "0110769211",
+          email: "anilamyzyri@gmail.com",
+          address: "Corso Regina Margherita, 53, 10152 Torino TO",
           hours: "Lun-Dom: 08:00 - 19:00"
         }
       },

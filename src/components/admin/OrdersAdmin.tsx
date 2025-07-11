@@ -27,6 +27,16 @@ interface OrderItem {
   unit_price: number;
   product_price: number;
   subtotal: number;
+  special_requests?: string;
+  toppings?: string[];
+  metadata?: any;
+  products?: {
+    id: string;
+    name: string;
+    description?: string;
+    ingredients?: string[];
+    price: number;
+  };
 }
 
 interface Order {
@@ -34,6 +44,7 @@ interface Order {
   customer_name: string;
   customer_email: string;
   customer_phone?: string;
+  customer_address?: string;
   delivery_address?: string;
   order_status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
@@ -75,7 +86,17 @@ const OrdersAdmin = () => {
             quantity,
             unit_price,
             product_price,
-            subtotal
+            subtotal,
+            special_requests,
+            toppings,
+            metadata,
+            products (
+              id,
+              name,
+              description,
+              ingredients,
+              price
+            )
           )
         `)
         .order('created_at', { ascending: false });
@@ -598,10 +619,12 @@ const OrdersAdmin = () => {
                         <span>{selectedOrder.customer_phone}</span>
                       </div>
                     )}
-                    {selectedOrder.delivery_address && (
+                    {(selectedOrder.delivery_address || selectedOrder.customer_address) && (
                       <div className="flex items-start space-x-2">
                         <MapPin size={12} className="mt-0.5 flex-shrink-0" />
-                        <span className="text-xs leading-tight">{selectedOrder.delivery_address}</span>
+                        <span className="text-xs leading-tight">
+                          {selectedOrder.delivery_address || selectedOrder.customer_address}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -610,16 +633,71 @@ const OrdersAdmin = () => {
                 {/* Order Items */}
                 <div>
                   <h5 className="text-sm sm:text-base font-semibold mb-2">Articoli Ordinati</h5>
-                  <div className="space-y-1 sm:space-y-2">
+                  <div className="space-y-3 sm:space-y-4">
                     {selectedOrder.order_items?.map((item) => (
-                      <div key={item.id} className="flex justify-between text-xs sm:text-sm">
-                        <span className="truncate mr-2">{item.quantity}x {item.product_name}</span>
-                        <span className="font-medium">€{((item.subtotal || (item.product_price * item.quantity)) || 0).toFixed(2)}</span>
+                      <div key={item.id} className="bg-gray-50 p-3 rounded-lg border">
+                        {/* Product Name and Price */}
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <h6 className="font-semibold text-sm text-gray-900">
+                              {item.quantity}x {item.product_name}
+                            </h6>
+                            <div className="text-xs text-gray-600">
+                              €{(item.product_price || 0).toFixed(2)} cad.
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-semibold text-sm text-green-600">
+                              €{((item.subtotal || (item.product_price * item.quantity)) || 0).toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Ingredients from description */}
+                        {item.products?.description && (
+                          <div className="mb-2">
+                            <span className="text-xs font-medium text-gray-700">Ingredienti: </span>
+                            <span className="text-xs text-gray-600">
+                              {item.products.description}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Extras - Show metadata extras with prices, or toppings if no metadata */}
+                        {(item.metadata?.extras && item.metadata.extras.length > 0) ? (
+                          <div className="mb-2">
+                            <span className="text-xs font-medium text-orange-700">Extra: </span>
+                            <div className="text-xs text-orange-600">
+                              {item.metadata.extras.map((extra: any, index: number) => (
+                                <span key={index}>
+                                  {extra.name} (+€{extra.price?.toFixed(2) || '0.00'})
+                                  {index < item.metadata.extras.length - 1 ? ', ' : ''}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (item.toppings && item.toppings.length > 0) && (
+                          <div className="mb-2">
+                            <span className="text-xs font-medium text-orange-700">Extra: </span>
+                            <span className="text-xs text-orange-600">
+                              {item.toppings.join(', ')}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Special Requests */}
+                        {item.special_requests && (
+                          <div className="mb-2">
+                            <span className="text-xs font-medium text-blue-700">Richieste Speciali: </span>
+                            <span className="text-xs text-blue-600">{item.special_requests}</span>
+                          </div>
+                        )}
                       </div>
                     ))}
-                    <div className="border-t pt-2 flex justify-between font-semibold text-sm">
-                      <span>Totale:</span>
-                      <span>€{(selectedOrder.total_amount || 0).toFixed(2)}</span>
+
+                    <div className="border-t pt-2 flex justify-between font-semibold text-sm bg-green-50 p-2 rounded">
+                      <span>Totale Ordine:</span>
+                      <span className="text-green-700">€{(selectedOrder.total_amount || 0).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

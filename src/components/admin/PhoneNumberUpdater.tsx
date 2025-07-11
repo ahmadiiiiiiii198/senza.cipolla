@@ -10,7 +10,7 @@ const PhoneNumberUpdater = () => {
   const [updateResults, setUpdateResults] = useState<string[]>([]);
   const { toast } = useToast();
 
-  const newPhoneNumber = '+393498851455';
+  const newPhoneNumber = '0110769211';
 
   const updatePhoneNumber = async () => {
     setIsUpdating(true);
@@ -63,9 +63,9 @@ const PhoneNumberUpdater = () => {
         } else {
           // Create new localStorage entry
           const newContact = {
-            address: "Piazza della Repubblica, 10100 Torino TO",
+            address: "Corso Regina Margherita, 53, 10152 Torino TO",
             phone: newPhoneNumber,
-            email: "Dbrfnc56m31@gmail.com",
+            email: "anilamyzyri@gmail.com",
             mapUrl: "https://maps.google.com",
             hours: "Lun-Dom: 08:00 - 19:00"
           };

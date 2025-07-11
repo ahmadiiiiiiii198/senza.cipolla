@@ -15,7 +15,7 @@ const testItems = [{
 const testCustomer = {
   name: 'Test Customer',
   email: 'test@example.com',
-  phone: '+393498851455',
+  phone: '0110769211',
   address: {
     street: 'Via Test 123',
     city: 'Milano',

@@ -87,8 +87,8 @@ const PaymentCancel = () => {
                     <h4 className="font-semibold text-amber-800 mb-2">Need Help?</h4>
                     <p className="text-amber-700 text-sm">
                       If you're experiencing issues with payment, please contact us at{' '}
-                      <a href="mailto:Dbrfnc56m31@gmail.com" className="underline">
-                        Dbrfnc56m31@gmail.com
+                      <a href="mailto:anilamyzyri@gmail.com" className="underline">
+                        anilamyzyri@gmail.com
                       </a>{' '}
                       or call us directly. We're here to help!
                     </p>

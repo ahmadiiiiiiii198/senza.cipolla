@@ -236,7 +236,7 @@ const OrderOptionsModal: React.FC<OrderOptionsModalProps> = ({ isOpen, onClose }
               </Label>
               <Textarea
                 id="description"
-                placeholder="Descrivi quello che stai cercando: tipo di fiori, occasione, colori preferiti, budget approssimativo, ecc."
+                placeholder="Descrivi quello che desideri: tipo di pizza, ingredienti speciali, dimensioni, quantità, preferenze particolari, ecc."
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 required

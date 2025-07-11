@@ -38,9 +38,9 @@ const ContactSection = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
-    address: 'Via Roma, 123 - 10100 Torino TO',
-    phone: '+39 011 123 4567',
-    email: 'info@pizzeriaregina2000.it',
+    address: 'Corso Regina Margherita, 53, 10152 Torino TO',
+    phone: '0110769211',
+    email: 'anilamyzyri@gmail.com',
     hours: 'Lun-Dom: 12:00 - 24:00'
   });
 

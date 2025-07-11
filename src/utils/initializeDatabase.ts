@@ -294,8 +294,8 @@ async function initializeDefaultSettings(): Promise<boolean> {
         key: 'contactContent',
         value: {
           address: "Corso Regina Margherita, 53, 10152 Torino TO",
-          phone: "+393498851455",
-          email: "Dbrfnc56m31@gmail.com",
+          phone: "0110769211",
+          email: "anilamyzyri@gmail.com",
           mapUrl: "https://maps.google.com",
           hours: "Lun-Dom: 08:00 - 19:00"
         }

@@ -291,7 +291,7 @@ const Hero = () => {
 
               <button
                 onClick={() => {
-                  window.open('tel:+390111234567', '_self');
+                  window.open('tel:0110769211', '_self');
                 }}
                 className="group bg-gradient-to-r from-pizza-green to-pizza-basil text-white px-8 py-4 rounded-full font-bold font-fredoka text-xl hover:from-pizza-green hover:to-pizza-green transform hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-3xl hover-lift animate-bounce-gentle border-2 border-pizza-cream/50"
               >
