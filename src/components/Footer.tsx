@@ -36,7 +36,7 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-gray-300 mb-6 max-w-md font-roboto">
-              Autentica pizza napoletana nel cuore di Torino dal 2000.
+              Autentica pizza italiana nel cuore di Torino dal 2000.
               Tradizione, qualità e passione in ogni morso.
             </p>
             <div className="space-y-2 text-sm text-gray-400">

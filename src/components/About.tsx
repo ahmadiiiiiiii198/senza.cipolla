@@ -33,13 +33,13 @@ const About = () => {
     it: {
       title: 'Chi Siamo - Pizzeria Regina 2000',
       storyTitle: 'La Nostra Storia',
-      paragraph1: 'Pizzeria Regina 2000 nasce dalla passione per l\'autentica tradizione napoletana e dall\'esperienza culinaria tramandata nel tempo. Dal 2000, offriamo pizza napoletana preparata con amore, ingredienti freschi e il nostro forno a legna tradizionale.',
-      paragraph2: 'Le nostre pizze nascono da una profonda passione per la tradizione culinaria italiana. Solo ingredienti selezionati, solo autenticità made in Torino. 🍕 Situati nel cuore di Torino, offriamo esperienza artigianale e passione per la vera pizza napoletana.',
-      quote: '📍 Trovaci nel centro di Torino – dove la tradizione napoletana incontra l\'ospitalità piemontese.',
+      paragraph1: 'Pizzeria Regina 2000 nasce dalla passione per l\'autentica tradizione italiana e dall\'esperienza culinaria tramandata nel tempo. Dal 2000, offriamo pizza italiana preparata con amore, ingredienti freschi e il nostro forno a legna tradizionale.',
+      paragraph2: 'Le nostre pizze nascono da una profonda passione per la tradizione culinaria italiana. Solo ingredienti selezionati, solo autenticità made in Torino. 🍕 Situati nel cuore di Torino, offriamo esperienza artigianale e passione per la vera pizza italiana.',
+      quote: '📍 Trovaci nel centro di Torino – dove la tradizione italiana incontra l\'ospitalità piemontese.',
       quoteAuthor: 'Un viaggio tra sapori, tradizione e autenticità',
       servicesTitle: 'Nella nostra pizzeria puoi trovare:',
       services: [
-        'Pizza napoletana cotta nel forno a legna',
+        'Pizza italiana cotta nel forno a legna',
         'Ingredienti freschi e di prima qualità',
         'Impasto preparato quotidianamente con lievitazione naturale',
         'Servizio per eventi, feste e catering personalizzato'
@@ -49,7 +49,7 @@ const About = () => {
         customers: 'Clienti Soddisfatti',
         varieties: 'Varietà di Pizze'
       },
-      closingMessage: 'Vieni a trovarci alla Pizzeria Regina 2000 e scopri il vero sapore della tradizione napoletana.',
+      closingMessage: 'Vieni a trovarci alla Pizzeria Regina 2000 e scopri il vero sapore della tradizione italiana.',
       tagline: 'Creiamo bellezza, un fiore alla volta'
     },
     en: {

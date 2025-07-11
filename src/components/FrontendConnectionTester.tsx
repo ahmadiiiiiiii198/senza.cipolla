@@ -177,8 +177,8 @@ const FrontendConnectionTester = () => {
             offers: [
               {
                 id: 1,
-                title: "Pizza Napoletana",
-                description: "Autentica pizza napoletana cotta nel forno a legna",
+                title: "Pizza Italiana",
+                description: "Autentica pizza italiana cotta nel forno a legna",
                 image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400"
               }
             ]

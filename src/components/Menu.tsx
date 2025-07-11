@@ -101,7 +101,7 @@ const Menu = () => {
             <Pizza className="h-8 w-8 text-pizza-red" />
           </h2>
           <p className="text-gray-600 max-w-3xl mx-auto">
-            Autentica pizza napoletana preparata con ingredienti freschi e forno a legna tradizionale
+            Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale
           </p>
         </div>
 

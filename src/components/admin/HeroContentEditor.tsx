@@ -13,7 +13,7 @@ const HeroContentEditor = () => {
   const [heroContent, updateHeroContent, isLoading] = useHeroContent();
   const [localContent, setLocalContent] = useState({
     heading: '🍕 PIZZERIA Regina 2000',
-    subheading: 'Autentica pizza napoletana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
+    subheading: 'Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
     backgroundImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
     heroImage: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
   });
@@ -24,7 +24,7 @@ const HeroContentEditor = () => {
     if (heroContent && !isLoading) {
       setLocalContent({
         heading: heroContent.heading || '🍕 PIZZERIA Regina 2000',
-        subheading: heroContent.subheading || 'Autentica pizza napoletana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
+        subheading: heroContent.subheading || 'Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
         backgroundImage: heroContent.backgroundImage || 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
         heroImage: heroContent.heroImage || 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
       });
@@ -73,7 +73,7 @@ const HeroContentEditor = () => {
     if (heroContent) {
       setLocalContent({
         heading: heroContent.heading || '🍕 PIZZERIA Regina 2000',
-        subheading: heroContent.subheading || 'Autentica pizza napoletana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
+        subheading: heroContent.subheading || 'Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
         backgroundImage: heroContent.backgroundImage || 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
         heroImage: heroContent.heroImage || 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
       });

@@ -36,7 +36,7 @@ const LogoLoadingTest = () => {
       // Load hero content
       const heroData = await settingsService.getSetting('heroContent', {
         heading: '🍕 PIZZERIA Regina 2000',
-        subheading: 'Autentica pizza napoletana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
+        subheading: 'Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
         backgroundImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
       });
       

@@ -11,7 +11,7 @@ const Products = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [heading, setHeading] = useState("Le Nostre Pizze");
-  const [subheading, setSubheading] = useState("Autentica pizza napoletana preparata con ingredienti freschi e forno a legna tradizionale");
+  const [subheading, setSubheading] = useState("Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale");
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchActive, setIsSearchActive] = useState(false);
 
@@ -230,7 +230,7 @@ const Products = () => {
               🍕 {heading || "Le Nostre Pizze"}
             </h2>
             <p className="text-xl text-pizza-brown max-w-2xl mx-auto font-roboto animate-fade-in-up animate-stagger-1">
-              {subheading || "Autentica pizza napoletana preparata con ingredienti freschi e di qualità"}
+              {subheading || "Autentica pizza italiana preparata con ingredienti freschi e di qualità"}
             </p>
             <div className="flex items-center justify-center space-x-4 mt-4 text-pizza-orange animate-fade-in-up animate-stagger-2">
               <Sparkles className="animate-wiggle" size={20} />
