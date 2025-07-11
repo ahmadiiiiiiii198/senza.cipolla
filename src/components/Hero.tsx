@@ -247,7 +247,7 @@ const Hero = () => {
                 Regina 2000
               </h2>
               <h3 className="text-2xl md:text-3xl font-roboto text-pizza-yellow drop-shadow-md animate-fade-in-up animate-stagger-2 mt-2">
-                Torino • Autentica Pizza Napoletana
+                Torino • Autentica Pizza Italiana
               </h3>
             </div>
 
@@ -266,7 +266,7 @@ const Hero = () => {
               </div>
               <div className="flex items-center space-x-2 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
                 <Pizza className="animate-pizza-spin text-pizza-red" size={24} />
-                <span className="font-roboto font-medium">Pizza Napoletana</span>
+                <span className="font-roboto font-medium">Pizza Italiana</span>
               </div>
             </div>
           </div>
