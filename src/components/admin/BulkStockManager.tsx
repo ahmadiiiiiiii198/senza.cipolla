@@ -69,11 +69,27 @@ const BulkStockManager: React.FC = () => {
 
       settingsData.forEach(setting => {
         if (setting.key === 'stock_management_enabled') {
-          setStockManagementEnabled(JSON.parse(setting.value) === 'true');
+          // Handle both old double-encoded and new single-encoded values
+          let enabled = false;
+          try {
+            const parsed = JSON.parse(setting.value);
+            enabled = parsed === true || parsed === 'true';
+          } catch {
+            enabled = setting.value === 'true';
+          }
+          setStockManagementEnabled(enabled);
+          console.log('📦 Stock management loaded:', enabled);
         } else if (setting.key === 'default_stock_quantity') {
-          const quantity = parseInt(JSON.parse(setting.value));
+          let quantity = 100;
+          try {
+            const parsed = JSON.parse(setting.value);
+            quantity = parseInt(typeof parsed === 'string' ? parsed : parsed.toString());
+          } catch {
+            quantity = parseInt(setting.value) || 100;
+          }
           setDefaultStockQuantity(quantity);
           setBulkStockQuantity(quantity);
+          console.log('📦 Default stock quantity loaded:', quantity);
         }
       });
 
@@ -92,21 +108,28 @@ const BulkStockManager: React.FC = () => {
   const toggleStockManagement = async (enabled: boolean) => {
     try {
       setIsSaving(true);
-      
+
+      console.log('🔄 Toggling stock management to:', enabled);
+
       const { error } = await supabase
         .from('settings')
         .upsert({
           key: 'stock_management_enabled',
-          value: JSON.stringify(enabled.toString())
+          value: JSON.stringify(enabled) // Store as boolean, not string
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error updating stock management:', error);
+        throw error;
+      }
 
       setStockManagementEnabled(enabled);
-      
+
+      console.log('✅ Stock management updated successfully:', enabled);
+
       toast({
         title: enabled ? 'Stock Management Abilitato' : 'Stock Management Disabilitato',
-        description: enabled 
+        description: enabled
           ? 'La gestione dello stock è ora attiva per tutti i prodotti.'
           : 'La gestione dello stock è stata disattivata.',
       });
@@ -115,7 +138,7 @@ const BulkStockManager: React.FC = () => {
       console.error('Error updating stock management setting:', error);
       toast({
         title: 'Errore',
-        description: 'Impossibile aggiornare le impostazioni di stock.',
+        description: `Impossibile aggiornare le impostazioni di stock: ${error.message || 'Errore sconosciuto'}`,
         variant: 'destructive'
       });
     } finally {
@@ -126,16 +149,23 @@ const BulkStockManager: React.FC = () => {
   const updateDefaultStockQuantity = async () => {
     try {
       setIsSaving(true);
-      
+
+      console.log('🔄 Updating default stock quantity to:', defaultStockQuantity);
+
       const { error } = await supabase
         .from('settings')
         .upsert({
           key: 'default_stock_quantity',
-          value: JSON.stringify(defaultStockQuantity.toString())
+          value: JSON.stringify(defaultStockQuantity) // Store as number, not string
         });
 
-      if (error) throw error;
-      
+      if (error) {
+        console.error('❌ Error updating default stock quantity:', error);
+        throw error;
+      }
+
+      console.log('✅ Default stock quantity updated successfully:', defaultStockQuantity);
+
       toast({
         title: 'Quantità Default Aggiornata',
         description: `La quantità di stock predefinita è ora ${defaultStockQuantity}.`,
@@ -145,7 +175,7 @@ const BulkStockManager: React.FC = () => {
       console.error('Error updating default stock quantity:', error);
       toast({
         title: 'Errore',
-        description: 'Impossibile aggiornare la quantità predefinita.',
+        description: `Impossibile aggiornare la quantità predefinita: ${error.message || 'Errore sconosciuto'}`,
         variant: 'destructive'
       });
     } finally {

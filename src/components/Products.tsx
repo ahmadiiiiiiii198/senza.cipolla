@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import ProductCard from './ProductCard';
 
 import { Product, ProductsByCategory } from '@/types/category';
+import { useStockManagement } from '@/hooks/useStockManagement';
 
 const Products = () => {
   const [products, setProducts] = useState<ProductsByCategory>({});
@@ -13,6 +14,7 @@ const Products = () => {
   const [heading, setHeading] = useState("Le Nostre Pizze");
   const [subheading, setSubheading] = useState("Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale");
   const [searchTerm, setSearchTerm] = useState("");
+  const { isProductAvailable } = useStockManagement();
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   useEffect(() => {
@@ -77,7 +79,7 @@ const Products = () => {
             ...product,
             category: product.categories?.name || 'Uncategorized',
             category_slug: categorySlug,
-            is_available: product.is_active && (product.stock_quantity === null || product.stock_quantity > 0),
+            is_available: product.is_active && isProductAvailable(product.stock_quantity),
             images: product.gallery ? (Array.isArray(product.gallery) ? product.gallery : [product.image_url].filter(Boolean)) : [product.image_url].filter(Boolean)
           };
 

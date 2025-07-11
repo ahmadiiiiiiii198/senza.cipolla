@@ -8,6 +8,7 @@ import { useSimpleCart, PizzaExtra } from '@/hooks/use-simple-cart';
 import { Badge } from '@/components/ui/badge';
 import PizzaCustomizationModal from './PizzaCustomizationModal';
 import { formatPrice } from '@/utils/priceUtils';
+import { useStockManagement } from '@/hooks/useStockManagement';
 
 interface ProductCardProps {
   product?: Product;
@@ -31,6 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const { toast } = useToast();
   const { addItem } = useSimpleCart();
+  const { isProductAvailable, getStockStatus, getStockMessage, isStockManagementEnabled } = useStockManagement();
   const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
 
   // Use product data if available, otherwise fall back to legacy props
@@ -38,8 +40,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const productPrice = product ? formatPrice(product.price) : price || '';
   const productImage = product?.image_url || image || '';
   const productDescription = product?.description || description || '';
-  const isAvailable = product?.is_available !== false;
   const stockQuantity = product?.stock_quantity || 0;
+
+  // Use stock management logic to determine availability
+  const isAvailable = isProductAvailable(stockQuantity);
+  const stockStatus = getStockStatus(stockQuantity);
+  const stockMessage = getStockMessage(stockQuantity);
 
   // Check if this is a pizza that can be customized (SEMPLICI or SPECIALI categories)
   const isPizza = product?.category_slug === 'semplici' || product?.category_slug === 'speciali';
@@ -127,15 +133,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-peach-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
         {/* Stock indicator */}
-        {product && (
+        {product && isStockManagementEnabled && (
           <div className="absolute top-3 left-3">
-            {!isAvailable ? (
+            {stockStatus === 'out_of_stock' ? (
               <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
                 Non Disponibile
               </span>
-            ) : stockQuantity <= 5 && stockQuantity > 0 ? (
+            ) : stockStatus === 'low' ? (
               <span className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                Ultimi {stockQuantity}
+                {stockMessage}
+              </span>
+            ) : stockStatus === 'available' ? (
+              <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                Disponibile
               </span>
             ) : null}
           </div>
