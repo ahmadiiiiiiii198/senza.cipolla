@@ -36,6 +36,16 @@ const OrderNotificationSystem = () => {
 
   // Initialize audio safely
   useEffect(() => {
+    console.log('🚨 [OrderNotification] ===== COMPONENT MOUNTING =====');
+    console.log('🚨 [OrderNotification] Component state on mount:', {
+      isInitialized,
+      isSoundEnabled,
+      isPlaying,
+      notificationsCount: notifications.length,
+      currentURL: window.location.href,
+      timestamp: new Date().toISOString()
+    });
+
     const initializeAudio = async () => {
       try {
         console.log('🔊 [OrderNotification] Initializing audio system...');
@@ -540,6 +550,14 @@ const OrderNotificationSystem = () => {
 
   // Set up real-time subscription only after initialization
   useEffect(() => {
+    console.log('📡 [OrderNotification] ===== SETTING UP REAL-TIME SUBSCRIPTION =====');
+    console.log('📡 [OrderNotification] Subscription state:', {
+      isInitialized,
+      isSoundEnabled,
+      currentURL: window.location.href,
+      timestamp: new Date().toISOString()
+    });
+
     if (!isInitialized) {
       console.log('📡 [OrderNotification] Waiting for initialization...');
       return;
