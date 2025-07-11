@@ -8,9 +8,9 @@ import { LanguageProvider } from "@/hooks/use-language";
 import { SimpleCartProvider } from "@/hooks/use-simple-cart";
 
 import ErrorBoundary from "./components/ErrorBoundary";
-import DiagnosticInfo from "./components/DiagnosticInfo";
+// import DiagnosticInfo from "./components/DiagnosticInfo"; // Removed diagnostic button
 import BackgroundInitializer from "./components/BackgroundInitializer";
-import OrderNotificationSystem from "./components/OrderNotificationSystem";
+// OrderNotificationSystem moved to admin panel only to prevent conflicts
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import AdminMinimal from "./pages/AdminMinimal";
@@ -34,7 +34,7 @@ const App = () => (
         <LanguageProvider>
           <SimpleCartProvider>
             <BackgroundInitializer />
-            <OrderNotificationSystem />
+            {/* OrderNotificationSystem now only loads in admin panel */}
             <Toaster />
             <Sonner />
             <BrowserRouter>
@@ -93,7 +93,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-          <DiagnosticInfo />
+          {/* <DiagnosticInfo /> */}
           </SimpleCartProvider>
         </LanguageProvider>
       </TooltipProvider>

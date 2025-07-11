@@ -46,7 +46,8 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
       // Step 1: Create order directly
       console.log('📝 Creating order directly...');
 
-      const totalAmount = product.price * orderData.quantity;
+      const totalAmount = (product.price || 0) * (orderData.quantity || 1);
+      console.log('💰 ProductOrder - price:', product.price, 'quantity:', orderData.quantity, 'totalAmount:', totalAmount);
 
       // Create order with correct schema
       const { data: order, error: orderError } = await supabase
@@ -56,11 +57,13 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
           customer_email: orderData.customerEmail,
           customer_phone: orderData.customerPhone || 'Non fornito',
           customer_address: orderData.deliveryAddress,
+          delivery_type: 'delivery',
           total_amount: totalAmount,
+          delivery_fee: addressValidation?.deliveryFee || 0,
           status: 'pending',
           payment_status: 'pending',
           payment_method: 'stripe',
-          notes: `Product Order - ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`,
+          special_instructions: `Product Order - ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`,
           metadata: {
             product_id: product.id,
             product_name: product.name,
@@ -82,23 +85,41 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
       // Step 2: Create order item with correct schema
       const subtotal = product.price * orderData.quantity;
 
+      const orderItemData = {
+        order_id: order.id,
+        product_id: product.id,
+        product_name: product.name,
+        product_price: product.price,
+        quantity: orderData.quantity,
+        subtotal: product.price * orderData.quantity,
+        unit_price: product.price,
+        special_requests: orderData.specialRequests
+      };
+
+      console.log('🔍 ProductOrder: Inserting order item:', orderItemData);
       const { error: itemError } = await supabase
         .from('order_items')
-        .insert({
-          order_id: order.id,
-          product_id: product.id,
-          product_name: product.name,
-          product_price: product.price,
-          quantity: orderData.quantity,
-          subtotal: product.price * orderData.quantity
-        });
+        .insert(orderItemData);
 
       if (itemError) {
-        console.error('❌ Order item creation failed:', itemError);
+        console.error('❌ ProductOrder: Order item creation failed:', itemError);
+        console.error('❌ ProductOrder: Order item data that failed:', orderItemData);
         throw new Error(`Order item creation failed: ${itemError.message}`);
       }
 
       console.log('✅ Order item created');
+
+      // Create notification
+      await supabase
+        .from('order_notifications')
+        .insert({
+          order_id: order.id,
+          notification_type: 'new_order',
+          title: 'Nuovo Ordine!',
+          message: `New product order received from ${orderData.customerName} - ${product.name} x${orderData.quantity} - €${totalAmount.toFixed(2)}`,
+          is_read: false,
+          is_acknowledged: false
+        });
 
       // Step 3: Create Stripe session directly
       console.log('💳 Creating Stripe session...');
@@ -362,7 +383,10 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
     }
 
     const orderNumber = generateOrderNumber();
-    const totalAmount = (product.price * orderData.quantity) + addressValidation.deliveryFee;
+    const subtotal = (product.price || 0) * (orderData.quantity || 1);
+    const deliveryFee = addressValidation.deliveryFee || 0;
+    const totalAmount = subtotal + deliveryFee;
+    console.log('💰 ProductOrder PayLater - price:', product.price, 'quantity:', orderData.quantity, 'subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'totalAmount:', totalAmount);
 
     // Create order with "pending" status for pay later
     const { data: order, error: orderError } = await supabase
@@ -373,7 +397,9 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
         customer_email: orderData.customerEmail,
         customer_phone: orderData.customerPhone || 'Non fornito',
         customer_address: orderData.deliveryAddress, // Use customer_address column
+        delivery_type: 'delivery',
         total_amount: totalAmount,
+        delivery_fee: addressValidation.deliveryFee || 0,
         status: 'pending', // Pay later orders start as pending
         payment_status: 'pending',
         payment_method: 'cash_on_delivery',
@@ -383,7 +409,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
           coordinates: addressValidation.coordinates,
           formattedAddress: addressValidation.formattedAddress
         },
-        notes: `Pay Later Order - Product: ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`
+        special_instructions: `Pay Later Order - Product: ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`
       })
       .select()
       .single();
@@ -393,20 +419,40 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
     }
 
     // Create order item
+    const orderItemData = {
+      order_id: order.id,
+      product_id: product.id,
+      product_name: product.name,
+      quantity: orderData.quantity,
+      product_price: product.price,
+      subtotal: product.price * orderData.quantity,
+      unit_price: product.price,
+      special_requests: orderData.specialRequests
+    };
+
+    console.log('🔍 ProductOrder PayLater: Inserting order item:', orderItemData);
     const { error: itemError } = await supabase
       .from('order_items')
-      .insert({
-        order_id: order.id,
-        product_id: product.id,
-        product_name: product.name,
-        quantity: orderData.quantity,
-        product_price: product.price,
-        subtotal: product.price * orderData.quantity
-      });
+      .insert(orderItemData);
 
     if (itemError) {
+      console.error('❌ ProductOrder PayLater: Order item creation failed:', itemError);
+      console.error('❌ ProductOrder PayLater: Order item data that failed:', orderItemData);
       throw new Error(`Order item creation failed: ${itemError.message}`);
     }
+    console.log('✅ ProductOrder PayLater: Order item created successfully');
+
+    // Create notification
+    await supabase
+      .from('order_notifications')
+      .insert({
+        order_id: order.id,
+        notification_type: 'new_order',
+        title: 'Nuovo Ordine!',
+        message: `New pay-later product order from ${orderData.customerName} - ${product.name} x${orderData.quantity} - €${totalAmount.toFixed(2)}`,
+        is_read: false,
+        is_acknowledged: false
+      });
 
     return order;
   };

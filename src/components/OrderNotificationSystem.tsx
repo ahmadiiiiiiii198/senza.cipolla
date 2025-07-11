@@ -6,9 +6,11 @@ interface OrderNotification {
   id: string;
   order_id: string;
   message: string;
-  type: 'new_order' | 'order_update' | 'payment_received';
+  notification_type: string; // Fixed: was 'type', now matches DB schema
   is_read: boolean;
   created_at: string;
+  title?: string; // Added: exists in DB schema
+  metadata?: any; // Added: exists in DB schema
   order_details?: {
     customer_name: string;
     total_amount: number;
@@ -21,121 +23,323 @@ const OrderNotificationSystem = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize audio
+  // Web Audio API control variables - moved to component scope for proper cleanup
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const beepIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isBeepPlayingRef = useRef<boolean>(false);
+  const soundIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize audio safely
   useEffect(() => {
-    audioRef.current = new Audio('/notification-sound.mp3');
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.8;
+    const initializeAudio = async () => {
+      try {
+        console.log('🔊 [OrderNotification] Initializing audio system...');
 
-    // Fallback to a web-based notification sound if file doesn't exist
-    audioRef.current.onerror = () => {
-      // Create a simple beep sound using Web Audio API
-      const createBeepSound = () => {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.5);
-      };
+        // Try to create audio element
+        const audio = new Audio();
+        audio.loop = true;
+        audio.volume = 0.8;
 
-      audioRef.current = {
-        play: () => {
-          createBeepSound();
-          return Promise.resolve();
-        },
-        pause: () => {},
-        loop: true,
-        volume: 0.8
-      } as any;
+        // Try to load notification sound
+        audio.src = '/notification-sound.mp3';
+
+        // Handle audio load errors - use simple fallback
+        audio.onerror = () => {
+          console.log('🔊 [OrderNotification] Audio file not found, creating simple beep fallback');
+
+          // Create a simple beep sound using data URL
+          const beepDataUrl = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYELIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTuR2O/JdSYE';
+
+          const fallbackAudio = new Audio(beepDataUrl);
+          fallbackAudio.loop = true;
+          fallbackAudio.volume = 0.3;
+
+          audioRef.current = fallbackAudio;
+          console.log('🔊 [OrderNotification] Fallback beep audio created');
+        };
+
+        audioRef.current = audio;
+        setIsInitialized(true);
+        console.log('🔊 [OrderNotification] Audio system initialized successfully');
+
+        // Force check for notifications immediately after initialization
+        setTimeout(() => {
+          console.log('🚨 [OrderNotification] FORCE CHECKING NOTIFICATIONS AFTER INIT');
+          fetchNotifications();
+        }, 500);
+
+      } catch (error) {
+        console.error('🔊 [OrderNotification] Audio initialization error:', error);
+        setError(`Audio initialization failed: ${error.message}`);
+        setIsInitialized(true); // Still mark as initialized to continue
+      }
     };
 
+    initializeAudio();
+
     return () => {
-      if (audioRef.current && typeof audioRef.current.pause === 'function') {
-        audioRef.current.pause();
-      }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      try {
+        // Clean up Web Audio API
+        isBeepPlayingRef.current = false;
+        if (beepIntervalRef.current) {
+          clearInterval(beepIntervalRef.current);
+          beepIntervalRef.current = null;
+        }
+        if (audioContextRef.current) {
+          audioContextRef.current.close();
+          audioContextRef.current = null;
+        }
+
+        // Clean up HTML audio
+        if (audioRef.current && typeof audioRef.current.pause === 'function') {
+          audioRef.current.pause();
+        }
+
+        // Clean up intervals
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      } catch (error) {
+        console.warn('🔊 [OrderNotification] Cleanup error:', error);
       }
     };
   }, []);
 
-  // Fetch notifications
+  // Fetch notifications safely
   const fetchNotifications = async () => {
     try {
+      console.log('📡 [OrderNotification] Fetching notifications...');
+
+      // Check if we have a valid supabase client
+      if (!supabase) {
+        throw new Error('Supabase client not available');
+      }
+
+      // Check authentication status
+      const { data: { session }, error: authError } = await supabase.auth.getSession();
+      if (authError) {
+        console.warn('📡 [OrderNotification] Auth check failed:', authError);
+        // Continue without auth for public access
+      }
+
+      console.log('📡 [OrderNotification] Auth status:', session ? 'authenticated' : 'anonymous');
+
+      // Try a simple query first to test table access
       const { data, error } = await supabase
         .from('order_notifications')
         .select(`
-          *,
-          orders (
-            customer_name,
-            total_amount,
-            order_items (count)
-          )
+          id,
+          order_id,
+          message,
+          notification_type,
+          title,
+          is_read,
+          created_at,
+          metadata
         `)
         .eq('is_read', false)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(10); // Limit to prevent large queries
 
-      if (error) throw error;
+      if (error) {
+        console.warn('📡 [OrderNotification] Database query error:', error);
+        console.warn('📡 [OrderNotification] Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        // Don't throw error, just log it and continue with empty notifications
+        setNotifications([]);
+        setError(`Database query failed: ${error.message}`);
+        return;
+      }
 
+      // Process notifications without complex joins for now
       const formattedNotifications = data?.map(notification => ({
         ...notification,
-        order_details: notification.orders ? {
-          customer_name: notification.orders.customer_name,
-          total_amount: notification.orders.total_amount,
-          items_count: notification.orders.order_items?.length || 0
-        } : undefined
+        // We'll fetch order details separately if needed
+        order_details: undefined
       })) || [];
 
       setNotifications(formattedNotifications);
+      console.log(`📡 [OrderNotification] Found ${formattedNotifications.length} notifications`);
 
-      // Start sound if there are unread notifications
-      if (formattedNotifications.length > 0 && isSoundEnabled && !isPlaying) {
-        startNotificationSound();
+      // FORCE START SOUND if there are unread notifications
+      if (formattedNotifications.length > 0) {
+        console.log('🚨 [OrderNotification] UNREAD NOTIFICATIONS FOUND - FORCE STARTING SOUND');
+        console.log('🔊 [OrderNotification] Current state before sound start:', {
+          isSoundEnabled,
+          isPlaying,
+          audioRef: !!audioRef.current,
+          isInitialized
+        });
+
+        if (isSoundEnabled && !isPlaying) {
+          console.log('🔊 [OrderNotification] ===== STARTING SOUND NOW =====');
+          startNotificationSound();
+        } else if (!isSoundEnabled) {
+          console.log('🔊 [OrderNotification] Sound is DISABLED - enabling it now');
+          setIsSoundEnabled(true);
+          setTimeout(() => startNotificationSound(), 100);
+        } else if (isPlaying) {
+          console.log('🔊 [OrderNotification] Sound already playing - continuing');
+        }
       } else if (formattedNotifications.length === 0 && isPlaying) {
-        stopNotificationSound();
+        console.log('🔊 [OrderNotification] No notifications found, but keeping sound playing (manual stop only)');
+        // IMPORTANT: DON'T auto-stop sound - let user manually stop it with the stop button
+        // This ensures continuous notification until manually stopped
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error('📡 [OrderNotification] Error fetching notifications:', error);
+      setError(`Failed to fetch notifications: ${error.message}`);
+      // Continue with empty notifications instead of crashing
+      setNotifications([]);
     }
   };
 
   // Start continuous notification sound
   const startNotificationSound = () => {
-    if (audioRef.current && isSoundEnabled && !isPlaying) {
+    try {
+      console.log('🔊 [OrderNotification] ===== STARTING SOUND =====');
+
+      if (!audioRef.current) {
+        console.error('🔊 [OrderNotification] ❌ No audio reference');
+        return;
+      }
+
+      if (!isSoundEnabled) {
+        console.warn('🔊 [OrderNotification] ⚠️ Sound disabled');
+        return;
+      }
+
+      if (isPlaying) {
+        console.log('🔊 [OrderNotification] ⚠️ Already playing');
+        return;
+      }
+
+      console.log('🔊 [OrderNotification] Audio details:', {
+        paused: audioRef.current.paused,
+        currentTime: audioRef.current.currentTime,
+        volume: audioRef.current.volume,
+        loop: audioRef.current.loop
+      });
+
       setIsPlaying(true);
       audioRef.current.loop = true;
-      audioRef.current.play().catch(console.error);
+      audioRef.current.volume = 0.5;
+
+      audioRef.current.play()
+        .then(() => {
+          console.log('🔊 [OrderNotification] ✅ Sound started successfully');
+        })
+        .catch(error => {
+          console.error('🔊 [OrderNotification] ❌ Play error:', error);
+          setIsPlaying(false);
+        });
+
+    } catch (error) {
+      console.error('🔊 [OrderNotification] ❌ Start sound error:', error);
+      setIsPlaying(false);
     }
   };
 
   // Stop notification sound
   const stopNotificationSound = () => {
-    if (audioRef.current) {
-      setIsPlaying(false);
-      audioRef.current.pause();
-      if (typeof audioRef.current.currentTime !== 'undefined') {
-        audioRef.current.currentTime = 0;
+    try {
+      console.log('🔊 [OrderNotification] Stopping notification sound...');
+
+      // Clear interval first
+      if (soundIntervalRef.current) {
+        clearInterval(soundIntervalRef.current);
+        soundIntervalRef.current = null;
+        console.log('🔊 [OrderNotification] Sound interval cleared');
       }
+
+      // Stop and reset audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        if (typeof audioRef.current.currentTime !== 'undefined') {
+          audioRef.current.currentTime = 0;
+        }
+        console.log('🔊 [OrderNotification] Audio stopped and reset');
+      }
+
+      // Update state
+      setIsPlaying(false);
+      console.log('🔊 [OrderNotification] Sound stopped successfully');
+    } catch (error) {
+      console.error('🔊 [OrderNotification] Stop sound error:', error);
+      // Force state update even if there's an error
+      setIsPlaying(false);
     }
   };
 
-  // Force stop all sounds (for stop button)
+  // Force stop all sounds (for stop button) - CONNECT TO REAL AUDIO SYSTEM
   const forceStopSound = () => {
-    stopNotificationSound();
-    setIsSoundEnabled(false);
+    console.log('🔇 [OrderNotification] ===== FORCE STOPPING ALL AUDIO SYSTEMS =====');
+
+    try {
+      // 1. Stop our own audio system
+      if (soundIntervalRef.current) {
+        clearInterval(soundIntervalRef.current);
+        soundIntervalRef.current = null;
+        console.log('🔇 [OrderNotification] ✅ Sound interval cleared');
+      }
+
+      if (beepIntervalRef.current) {
+        clearInterval(beepIntervalRef.current);
+        beepIntervalRef.current = null;
+        console.log('🔇 [OrderNotification] ✅ Beep interval cleared');
+      }
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        console.log('🔇 [OrderNotification] ✅ Our audio stopped');
+      }
+
+      // 2. Stop the REAL notification system (ContinuousAudioNotifier)
+      if ((window as any).audioNotifier) {
+        console.log('🔇 [OrderNotification] 🎯 STOPPING REAL AUDIO NOTIFIER');
+        (window as any).audioNotifier.stopRinging();
+        console.log('🔇 [OrderNotification] ✅ Real audio notifier stopped');
+      } else {
+        console.log('🔇 [OrderNotification] ⚠️ Real audio notifier not found');
+      }
+
+      // 3. Stop background music if playing (using dynamic import with Promise)
+      import('@/services/audioService')
+        .then(({ default: audioService }) => {
+          if (audioService.isPlaying()) {
+            audioService.pause();
+            console.log('🔇 [OrderNotification] ✅ Background music stopped');
+          }
+        })
+        .catch(() => {
+          console.log('🔇 [OrderNotification] ⚠️ Background music service not available');
+        });
+
+      // 4. Update our state
+      setIsPlaying(false);
+      console.log('🔇 [OrderNotification] ✅ isPlaying set to false');
+
+      // 5. Mark notifications as read
+      setTimeout(() => {
+        console.log('🔇 [OrderNotification] Marking all notifications as read...');
+        markAllAsRead(true);
+      }, 100);
+
+      console.log('🔇 [OrderNotification] ✅ ALL AUDIO SYSTEMS STOPPED SUCCESSFULLY');
+    } catch (error) {
+      console.error('🔇 [OrderNotification] ❌ Error during force stop:', error);
+      setIsPlaying(false);
+    }
   };
 
   // Mark notification as read
@@ -149,18 +353,16 @@ const OrderNotificationSystem = () => {
       if (error) throw error;
 
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      
-      // Stop sound if no more notifications
-      if (notifications.length <= 1) {
-        stopNotificationSound();
-      }
+
+      // DON'T auto-stop sound when marking as read - let user manually stop it
+      console.log('🔊 [OrderNotification] Notification marked as read, but keeping sound playing (manual stop only)');
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
   };
 
   // Mark all as read
-  const markAllAsRead = async () => {
+  const markAllAsRead = async (shouldStopSound = false) => {
     try {
       const { error } = await supabase
         .from('order_notifications')
@@ -170,94 +372,158 @@ const OrderNotificationSystem = () => {
       if (error) throw error;
 
       setNotifications([]);
-      stopNotificationSound();
+
+      // Only stop sound if explicitly requested (from force stop button)
+      if (shouldStopSound) {
+        stopNotificationSound();
+        console.log('🔊 [OrderNotification] Sound stopped as requested by force stop');
+      } else {
+        console.log('🔊 [OrderNotification] All notifications marked as read, but keeping sound playing (manual stop only)');
+      }
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
     }
   };
 
-  // Set up real-time subscription
+  // Set up real-time subscription only after initialization
   useEffect(() => {
-    fetchNotifications();
+    if (!isInitialized) {
+      console.log('📡 [OrderNotification] Waiting for initialization...');
+      return;
+    }
 
-    const subscription = supabase
-      .channel('order_notifications')
-      .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'order_notifications' },
-        () => {
-          fetchNotifications();
+    console.log('📡 [OrderNotification] Setting up real-time subscription...');
+
+    // Add a small delay to ensure everything is ready
+    const initTimer = setTimeout(() => {
+      // Initial fetch
+      console.log('🚨 [OrderNotification] FORCE FETCHING NOTIFICATIONS ON MOUNT');
+      fetchNotifications();
+
+      // Set up real-time subscription
+      const subscription = supabase
+        .channel('order_notifications')
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'order_notifications' },
+          () => {
+            console.log('📡 [OrderNotification] New notification received via real-time');
+            fetchNotifications();
+          }
+        )
+        .subscribe();
+
+      // Poll for notifications every 30 seconds as backup
+      intervalRef.current = setInterval(() => {
+        console.log('📡 [OrderNotification] Polling for notifications...');
+        fetchNotifications();
+      }, 30000);
+
+      return () => {
+        console.log('📡 [OrderNotification] Cleaning up subscription...');
+        subscription.unsubscribe();
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
         }
-      )
-      .subscribe();
-
-    // Poll for notifications every 30 seconds as backup
-    intervalRef.current = setInterval(fetchNotifications, 30000);
+      };
+    }, 500); // 500ms delay for initialization
 
     return () => {
-      subscription.unsubscribe();
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      clearTimeout(initTimer);
+    };
+  }, [isInitialized, isSoundEnabled]);
+
+  // Add keyboard shortcut to stop sound (ESC key)
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isPlaying) {
+        console.log('🔇 [OrderNotification] ESC key pressed - stopping sound');
+        forceStopSound();
       }
     };
-  }, [isSoundEnabled]);
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isPlaying]);
 
   const unreadCount = notifications.length;
 
+  // Check real audio system state
+  const realAudioNotifier = (window as any).audioNotifier;
+  const isRealAudioPlaying = realAudioNotifier ? realAudioNotifier.isRinging : false;
+
+  // Show loading state during initialization
+  if (!isInitialized) {
+    return (
+      <div className="fixed top-4 right-4 z-50">
+        <div className="p-3 bg-blue-100 text-blue-800 rounded-full shadow-lg">
+          <Bell className="h-6 w-6 animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Notification Bell */}
+
+
+      {/* Error Display (if any) */}
+      {error && (
+        <div className="fixed top-32 right-4 z-50 max-w-sm">
+          <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg shadow-lg">
+            <div className="flex items-center">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <span className="text-sm">Notification system warning</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Force Stop Button - Always visible for testing */}
       <div className="fixed top-4 right-4 z-50">
         <button
-          onClick={() => setShowNotifications(!showNotifications)}
-          className={`relative p-3 rounded-full shadow-lg transition-all duration-300 ${
-            unreadCount > 0 
-              ? 'bg-red-600 text-white animate-pulse' 
-              : 'bg-white text-gray-600 hover:bg-gray-50'
-          }`}
-        >
-          <Bell size={24} className={unreadCount > 0 ? 'animate-bounce' : ''} />
-          {unreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-heartbeat">
-              {unreadCount}
-            </span>
-          )}
-        </button>
-
-        {/* Sound Toggle */}
-        <button
           onClick={() => {
-            setIsSoundEnabled(!isSoundEnabled);
-            if (!isSoundEnabled && unreadCount > 0) {
-              startNotificationSound();
-            } else {
-              stopNotificationSound();
-            }
+            console.log('🔇 [OrderNotification] Force stop button clicked');
+            forceStopSound();
           }}
-          className={`mt-2 p-2 rounded-full shadow-lg transition-all duration-300 ${
-            isSoundEnabled
-              ? 'bg-green-600 text-white'
-              : 'bg-gray-400 text-white'
-          }`}
-          title={isSoundEnabled ? 'Disabilita suoni' : 'Abilita suoni'}
+          className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 transition-all duration-300 font-bold text-sm"
         >
-          {isSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          🔇 FORCE STOP
         </button>
-
-        {/* Stop Sound Button - Only show when sound is playing */}
-        {isPlaying && (
-          <button
-            onClick={forceStopSound}
-            className="mt-2 p-3 rounded-full shadow-lg bg-red-600 text-white animate-pulse hover:bg-red-700 transition-all duration-300"
-            title="FERMA SUONO"
-          >
-            <X size={20} className="animate-bounce" />
-          </button>
-        )}
       </div>
 
-      {/* Notification Panel */}
-      {showNotifications && (
-        <div className="fixed top-20 right-4 w-96 max-h-96 bg-white rounded-lg shadow-2xl border z-50 overflow-hidden">
+
+
+
+
+      {/* Stop Button - Show when ANY sound is playing OR when there are unread notifications */}
+      {(isPlaying || unreadCount > 0 || isRealAudioPlaying) && (
+        <div className="fixed top-16 right-4 z-50">
+          <button
+            onClick={() => {
+              console.log('🔇 [OrderNotification] Stop button clicked - forcing sound stop');
+              forceStopSound();
+            }}
+            className={`px-4 py-2 rounded-xl shadow-lg hover:bg-red-700 transition-all duration-300 font-bold text-sm border-2 ${
+              (isPlaying || isRealAudioPlaying)
+                ? 'bg-red-600 text-white animate-pulse border-red-400'
+                : 'bg-orange-600 text-white border-orange-400'
+            }`}
+            title={(isPlaying || isRealAudioPlaying) ? "Ferma suono attivo" : `Ferma notifiche (${unreadCount} ordini)`}
+          >
+            <div className="flex items-center space-x-2">
+              <VolumeX size={16} className={(isPlaying || isRealAudioPlaying) ? "animate-bounce" : ""} />
+              <span>{(isPlaying || isRealAudioPlaying) ? 'STOP SUONO' : 'STOP NOTIFICHE'}</span>
+            </div>
+          </button>
+        </div>
+      )}
+
+
+
+      {/* Notification Panel - Removed for simplicity */}
+      {false && (
+        <div className="fixed top-40 right-4 w-96 max-h-96 bg-white rounded-xl shadow-2xl border z-50 overflow-hidden">
           <div className="p-4 bg-red-600 text-white flex items-center justify-between">
             <h3 className="font-semibold flex items-center">
               <AlertCircle className="mr-2" size={20} />
@@ -267,9 +533,12 @@ const OrderNotificationSystem = () => {
               {isPlaying && (
                 <button
                   onClick={forceStopSound}
-                  className="text-sm bg-red-800 text-white px-3 py-1 rounded font-bold hover:bg-red-900 transition-colors animate-pulse"
+                  className="text-sm bg-red-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-900 transition-colors animate-pulse border-2 border-red-600"
                 >
-                  🔇 FERMA SUONO
+                  <div className="flex items-center space-x-1">
+                    <VolumeX size={16} className="animate-bounce" />
+                    <span>FERMA SUONO</span>
+                  </div>
                 </button>
               )}
               {unreadCount > 0 && (
@@ -332,22 +601,7 @@ const OrderNotificationSystem = () => {
         </div>
       )}
 
-      {/* Floating Alert for New Orders */}
-      {isPlaying && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white p-6 rounded-lg shadow-2xl z-50 animate-bounce">
-          <div className="text-center">
-            <AlertCircle className="mx-auto mb-2 animate-spin" size={32} />
-            <h3 className="text-xl font-bold mb-2">NUOVO ORDINE!</h3>
-            <p className="mb-4">Hai {unreadCount} ordini in attesa</p>
-            <button
-              onClick={markAllAsRead}
-              className="bg-white text-red-600 px-4 py-2 rounded font-semibold hover:bg-gray-100 transition-colors"
-            >
-              OK, Ho Visto
-            </button>
-          </div>
-        </div>
-      )}
+
     </>
   );
 };

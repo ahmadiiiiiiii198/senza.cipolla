@@ -171,12 +171,7 @@ const SimpleCart: React.FC = () => {
           isOpen={isCheckoutOpen}
           onClose={() => setIsCheckoutOpen(false)}
           cartItems={items}
-          totalPrice={getTotalPrice()}
-          onOrderComplete={() => {
-            setIsCheckoutOpen(false);
-            clearCart();
-            closeCart();
-          }}
+          totalAmount={getTotalPrice()}
         />
       )}
     </>

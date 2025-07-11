@@ -194,7 +194,10 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
 
   const calculateTotal = () => {
     const deliveryFee = addressValidation?.deliveryFee || 0;
-    return totalAmount + deliveryFee;
+    const subtotal = totalAmount || 0;
+    const total = subtotal + deliveryFee;
+    console.log('💰 calculateTotal - subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'total:', total);
+    return total;
   };
 
   const createStripeOrder = async () => {
@@ -216,7 +219,10 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         customer_name: customerData.customerName,
         customer_email: customerData.customerEmail,
         customer_phone: customerData.customerPhone || 'Non fornito',
+        customer_address: customerData.deliveryAddress,
+        delivery_type: 'delivery',
         total_amount: calculateTotal(),
+        delivery_fee: addressValidation?.deliveryFee || 0,
         status: 'pending',
         payment_status: 'pending',
         payment_method: 'stripe'
@@ -243,6 +249,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
           product_price: item.product.price,
           quantity: item.quantity,
           subtotal: itemTotal,
+          unit_price: item.product.price,
           special_requests: item.specialRequests || null,
           toppings: item.extras ? item.extras.map(extra => `${extra.name} x${extra.quantity} (+€${extra.price})`) : null,
           metadata: {
@@ -253,11 +260,29 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         };
       });
 
+      console.log('🔍 SimpleCheckout: Inserting order items:', orderItems);
       const { error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error('❌ SimpleCheckout: Order items insertion failed:', itemsError);
+        console.error('❌ SimpleCheckout: Order items data that failed:', orderItems);
+        throw new Error(`Errore nella creazione degli articoli dell'ordine: ${itemsError.message}`);
+      }
+      console.log('✅ SimpleCheckout: Order items created successfully');
+
+      // Create notification
+      await supabase
+        .from('order_notifications')
+        .insert({
+          order_id: order.id,
+          notification_type: 'new_order',
+          title: 'Nuovo Ordine!',
+          message: `New order received from ${customerData.customerName} - ${cartItems.length} items - €${calculateTotal().toFixed(2)}`,
+          is_read: false,
+          is_acknowledged: false
+        });
 
       // Prepare Stripe line items
       const stripeItems = cartItems.map(item => {
@@ -389,7 +414,10 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         customer_name: customerData.customerName,
         customer_email: customerData.customerEmail,
         customer_phone: customerData.customerPhone || 'Non fornito',
+        customer_address: customerData.deliveryAddress,
+        delivery_type: 'delivery',
         total_amount: calculateTotal(),
+        delivery_fee: addressValidation?.deliveryFee || 0,
         status: 'confirmed',
         payment_status: 'pending',
         payment_method: 'cash_on_delivery'
@@ -416,6 +444,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
           product_price: item.product.price,
           quantity: item.quantity,
           subtotal: itemTotal,
+          unit_price: item.product.price,
           special_requests: item.specialRequests || null,
           toppings: item.extras ? item.extras.map(extra => `${extra.name} x${extra.quantity} (+€${extra.price})`) : null,
           metadata: {
@@ -426,11 +455,29 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         };
       });
 
+      console.log('🔍 SimpleCheckout PayLater: Inserting order items:', orderItems);
       const { error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error('❌ SimpleCheckout PayLater: Order items insertion failed:', itemsError);
+        console.error('❌ SimpleCheckout PayLater: Order items data that failed:', orderItems);
+        throw new Error(`Errore nella creazione degli articoli dell'ordine: ${itemsError.message}`);
+      }
+      console.log('✅ SimpleCheckout PayLater: Order items created successfully');
+
+      // Create notification
+      await supabase
+        .from('order_notifications')
+        .insert({
+          order_id: order.id,
+          notification_type: 'new_order',
+          title: 'Nuovo Ordine!',
+          message: `New pay-later order received from ${customerData.customerName} - ${cartItems.length} items - €${calculateTotal().toFixed(2)}`,
+          is_read: false,
+          is_acknowledged: false
+        });
 
       return order;
 

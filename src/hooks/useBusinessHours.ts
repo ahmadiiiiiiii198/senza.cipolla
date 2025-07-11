@@ -74,12 +74,19 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
   }, []);
 
   /**
-   * Refresh hours by clearing cache and re-checking
+   * Refresh hours by forcing complete refresh from database
    */
-  const refreshHours = useCallback(() => {
-    console.log('🔄 Refreshing business hours...');
-    businessHoursService.clearCache();
-    checkBusinessStatus();
+  const refreshHours = useCallback(async () => {
+    console.log('🔄 [useBusinessHours] Force refreshing business hours...');
+    try {
+      setIsLoading(true);
+      await businessHoursService.forceRefresh();
+      await checkBusinessStatus();
+    } catch (error) {
+      console.error('❌ [useBusinessHours] Force refresh failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [checkBusinessStatus]);
 
   // Initial load
@@ -87,14 +94,19 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
     checkBusinessStatus();
   }, [checkBusinessStatus]);
 
-  // Auto-refresh every minute if enabled
+  // Auto-refresh every 10 seconds if enabled (very fast for immediate updates)
   useEffect(() => {
     if (!autoRefresh) return;
 
-    const interval = setInterval(() => {
-      console.log('⏰ Auto-refreshing business hours...');
-      checkBusinessStatus();
-    }, 60000); // Check every minute
+    const interval = setInterval(async () => {
+      console.log('⏰ [useBusinessHours] Auto-refreshing business hours...');
+      try {
+        await businessHoursService.forceRefresh();
+        await checkBusinessStatus();
+      } catch (error) {
+        console.error('❌ [useBusinessHours] Auto-refresh failed:', error);
+      }
+    }, 10000); // Check every 10 seconds for immediate updates
 
     return () => clearInterval(interval);
   }, [autoRefresh, checkBusinessStatus]);

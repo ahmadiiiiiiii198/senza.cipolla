@@ -104,7 +104,9 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
 
     const orderNumber = generateOrderNumber();
     const deliveryFee = addressValidation.deliveryFee || 0;
-    const finalTotal = totalAmount + deliveryFee;
+    const subtotal = totalAmount || 0;
+    const finalTotal = subtotal + deliveryFee;
+    console.log('💰 CartCheckout - subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'finalTotal:', finalTotal);
 
     // Create order
     const { data: order, error: orderError } = await supabase
@@ -115,7 +117,9 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         customer_email: customerData.customerEmail,
         customer_phone: customerData.customerPhone || 'Non fornito',
         customer_address: customerData.deliveryAddress,
+        delivery_type: 'delivery',
         total_amount: finalTotal,
+        delivery_fee: deliveryFee,
         status: 'pending',
         payment_status: 'pending',
         payment_method: 'stripe',
@@ -132,7 +136,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
             special_requests: item.specialRequests
           }))
         },
-        notes: `Cart Order - ${cartItems.length} items\n${cartItems.map(item => 
+        special_instructions: `Cart Order - ${cartItems.length} items\n${cartItems.map(item =>
           `${item.product.name} x${item.quantity}${item.specialRequests ? ` (${item.specialRequests})` : ''}`
         ).join('\n')}`
       })
@@ -141,6 +145,19 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
 
     if (orderError) {
       console.error('Order creation error:', orderError);
+      console.error('Order data that failed:', {
+        order_number: orderNumber,
+        customer_name: customerData.customerName,
+        customer_email: customerData.customerEmail,
+        customer_phone: customerData.customerPhone || 'Non fornito',
+        customer_address: customerData.deliveryAddress,
+        delivery_type: 'delivery',
+        total_amount: finalTotal,
+        delivery_fee: deliveryFee,
+        status: 'pending',
+        payment_status: 'pending',
+        payment_method: 'stripe'
+      });
       throw new Error(`Errore nella creazione dell'ordine: ${orderError.message}`);
     }
 
@@ -152,39 +169,46 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       product_price: item.product.price,
       quantity: item.quantity,
       subtotal: item.product.price * item.quantity,
-      metadata: {
-        special_requests: item.specialRequests
-      }
+      unit_price: item.product.price,
+      special_requests: item.specialRequests
     }));
 
     // Add delivery fee as separate item if applicable
     if (deliveryFee > 0) {
       orderItems.push({
         order_id: order.id,
-        product_id: 'delivery-fee',
+        product_id: null, // No product ID for delivery fee
         product_name: 'Delivery Fee',
         product_price: deliveryFee,
         quantity: 1,
         subtotal: deliveryFee,
-        metadata: {
-          delivery_address: addressValidation.formattedAddress
-        }
+        unit_price: deliveryFee,
+        special_requests: `Delivery to: ${addressValidation.formattedAddress}`
       });
     }
 
+    console.log('🔍 Inserting order items:', orderItems);
     const { error: itemsError } = await supabase
       .from('order_items')
       .insert(orderItems);
 
-    if (itemsError) throw itemsError;
+    if (itemsError) {
+      console.error('❌ Order items insertion failed:', itemsError);
+      console.error('❌ Order items data that failed:', orderItems);
+      throw new Error(`Errore nella creazione degli articoli dell'ordine: ${itemsError.message}`);
+    }
+    console.log('✅ Order items created successfully');
 
     // Create notification
     await supabase
       .from('order_notifications')
       .insert({
         order_id: order.id,
-        message: `New cart order received from ${customerData.customerName} - ${cartItems.length} items`,
-        is_read: false
+        notification_type: 'new_order',
+        title: 'Nuovo Ordine!',
+        message: `New cart order received from ${customerData.customerName} - ${cartItems.length} items - €${finalTotal.toFixed(2)}`,
+        is_read: false,
+        is_acknowledged: false
       });
 
     // Create Stripe session
@@ -262,7 +286,9 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
 
     const orderNumber = generateOrderNumber();
     const deliveryFee = addressValidation.deliveryFee || 0;
-    const finalTotal = totalAmount + deliveryFee;
+    const subtotal = totalAmount || 0;
+    const finalTotal = subtotal + deliveryFee;
+    console.log('💰 CartCheckout PayLater - subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'finalTotal:', finalTotal);
 
     // Create order
     const { data: order, error: orderError } = await supabase
@@ -273,7 +299,9 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         customer_email: customerData.customerEmail,
         customer_phone: customerData.customerPhone || 'Non fornito',
         customer_address: customerData.deliveryAddress,
+        delivery_type: 'delivery',
         total_amount: finalTotal,
+        delivery_fee: deliveryFee,
         status: 'pending',
         payment_status: 'pending',
         payment_method: 'cash_on_delivery',
@@ -290,7 +318,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
             special_requests: item.specialRequests
           }))
         },
-        notes: `Pay Later Cart Order - ${cartItems.length} items\n${cartItems.map(item => 
+        special_instructions: `Pay Later Cart Order - ${cartItems.length} items\n${cartItems.map(item =>
           `${item.product.name} x${item.quantity}${item.specialRequests ? ` (${item.specialRequests})` : ''}`
         ).join('\n')}`
       })
@@ -298,7 +326,20 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       .single();
 
     if (orderError) {
-      console.error('Order creation error:', orderError);
+      console.error('Pay Later Order creation error:', orderError);
+      console.error('Pay Later Order data that failed:', {
+        order_number: orderNumber,
+        customer_name: customerData.customerName,
+        customer_email: customerData.customerEmail,
+        customer_phone: customerData.customerPhone || 'Non fornito',
+        customer_address: customerData.deliveryAddress,
+        delivery_type: 'delivery',
+        total_amount: finalTotal,
+        delivery_fee: deliveryFee,
+        status: 'pending',
+        payment_status: 'pending',
+        payment_method: 'cash_on_delivery'
+      });
       throw new Error(`Errore nella creazione dell'ordine: ${orderError.message}`);
     }
 
@@ -310,30 +351,34 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       product_price: item.product.price,
       quantity: item.quantity,
       subtotal: item.product.price * item.quantity,
-      metadata: {
-        special_requests: item.specialRequests
-      }
+      unit_price: item.product.price,
+      special_requests: item.specialRequests
     }));
 
     if (deliveryFee > 0) {
       orderItems.push({
         order_id: order.id,
-        product_id: 'delivery-fee',
+        product_id: null, // No product ID for delivery fee
         product_name: 'Delivery Fee',
         product_price: deliveryFee,
         quantity: 1,
         subtotal: deliveryFee,
-        metadata: {
-          delivery_address: addressValidation.formattedAddress
-        }
+        unit_price: deliveryFee,
+        special_requests: `Delivery to: ${addressValidation.formattedAddress}`
       });
     }
 
+    console.log('🔍 Inserting pay later order items:', orderItems);
     const { error: itemsError } = await supabase
       .from('order_items')
       .insert(orderItems);
 
-    if (itemsError) throw itemsError;
+    if (itemsError) {
+      console.error('❌ Pay later order items insertion failed:', itemsError);
+      console.error('❌ Pay later order items data that failed:', orderItems);
+      throw new Error(`Errore nella creazione degli articoli dell'ordine: ${itemsError.message}`);
+    }
+    console.log('✅ Pay later order items created successfully');
 
     // Create notification
     await supabase

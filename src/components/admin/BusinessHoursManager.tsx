@@ -101,12 +101,17 @@ const BusinessHoursManager = () => {
         throw error;
       }
 
-      // Clear cache to force refresh
-      businessHoursService.clearCache();
+      // Force complete refresh to verify changes immediately
+      console.log('🔄 [BusinessHoursManager] Forcing complete refresh...');
+      const updatedHours = await businessHoursService.forceRefresh();
+      console.log('✅ [BusinessHoursManager] Verified updated hours:', updatedHours);
+
+      // Update local state to reflect changes immediately
+      setHours(updatedHours);
 
       toast({
         title: "Successo",
-        description: "Orari di apertura salvati con successo",
+        description: "Orari di apertura salvati con successo. Le modifiche sono attive immediatamente.",
       });
 
       console.log('✅ Business hours saved successfully');

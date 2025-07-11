@@ -112,7 +112,7 @@ export const SimpleCartProvider: React.FC<SimpleCartProviderProps> = ({ children
   };
 
   const getTotalPrice = () => {
-    return items.reduce((total, item) => {
+    const total = items.reduce((total, item) => {
       const price = typeof item.product.price === 'string' ? parseFloat(item.product.price) : (item.product.price || 0);
       const productPrice = price * item.quantity;
       const extrasPrice = item.extras ?
@@ -122,6 +122,8 @@ export const SimpleCartProvider: React.FC<SimpleCartProviderProps> = ({ children
         }, 0) : 0;
       return total + productPrice + extrasPrice;
     }, 0);
+    console.log('💰 SimpleCart getTotalPrice:', total, 'items:', items.length);
+    return total;
   };
 
   const openCart = () => setIsOpen(true);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,39 +21,86 @@ import {
   Plus,
   Eye,
   Clock,
-  CreditCard
+  CreditCard,
+  Loader2
 } from 'lucide-react';
-import OrderNotificationSystem from '../OrderNotificationSystem';
 
-// Import admin components (we'll create these)
-import ProductsAdmin from './ProductsAdmin';
-import OrdersAdmin from './OrdersAdmin';
-import ContentEditor from './ContentEditor';
-import HeroContentEditor from './HeroContentEditor';
-import LogoEditor from './LogoEditor';
-import GalleryManager from './GalleryManager';
-import YouTubeManager from './YouTubeManager';
-import CommentsManager from './CommentsManager';
-import PopupManager from './PopupManager';
-import SettingsManager from './SettingsManager';
-import AnalyticsDashboard from './AnalyticsDashboard';
-import WeOfferManager from './WeOfferManager';
-import SystemTest from './SystemTest';
-import DatabaseTest from './DatabaseTest';
-import SystemConnectionTest from '../SystemConnectionTest';
-import YouTubeConnectionTest from '../YouTubeConnectionTest';
-import BusinessHoursManager from './BusinessHoursManager';
-import ShippingZoneManager from './ShippingZoneManager';
-import StripeSettings from './StripeSettings';
-import NotificationSettings from './NotificationSettings';
-import DatabaseSchemaUpdater from './DatabaseSchemaUpdater';
-import ProductsDebugger from '../ProductsDebugger';
-import MenuProductsConnectionTest from '../MenuProductsConnectionTest';
-import ProductsSchemaFixer from '../ProductsSchemaFixer';
-import FrontendConnectionTester from '../FrontendConnectionTester';
+// OrderNotificationSystem removed from main admin panel - only in separate ordini section
+
+// Lazy load admin components to prevent initialization errors
+const ProductsAdmin = lazy(() => import('./ProductsAdmin').catch(() => ({ default: () => <div>Error loading ProductsAdmin</div> })));
+// OrdersAdmin removed - only available in separate ordini section
+const ContentEditor = lazy(() => import('./ContentEditor').catch(() => ({ default: () => <div>Error loading ContentEditor</div> })));
+const HeroContentEditor = lazy(() => import('./HeroContentEditor').catch(() => ({ default: () => <div>Error loading HeroContentEditor</div> })));
+const LogoEditor = lazy(() => import('./LogoEditor').catch(() => ({ default: () => <div>Error loading LogoEditor</div> })));
+const GalleryManager = lazy(() => import('./GalleryManager').catch(() => ({ default: () => <div>Error loading GalleryManager</div> })));
+const YouTubeManager = lazy(() => import('./YouTubeManager').catch(() => ({ default: () => <div>Error loading YouTubeManager</div> })));
+const CommentsManager = lazy(() => import('./CommentsManager').catch(() => ({ default: () => <div>Error loading CommentsManager</div> })));
+const PopupManager = lazy(() => import('./PopupManager').catch(() => ({ default: () => <div>Error loading PopupManager</div> })));
+const SettingsManager = lazy(() => import('./SettingsManager').catch(() => ({ default: () => <div>Error loading SettingsManager</div> })));
+const AnalyticsDashboard = lazy(() => import('./AnalyticsDashboard').catch(() => ({ default: () => <div>Error loading AnalyticsDashboard</div> })));
+const WeOfferManager = lazy(() => import('./WeOfferManager').catch(() => ({ default: () => <div>Error loading WeOfferManager</div> })));
+const SystemTest = lazy(() => import('./SystemTest').catch(() => ({ default: () => <div>Error loading SystemTest</div> })));
+const DatabaseTest = lazy(() => import('./DatabaseTest').catch(() => ({ default: () => <div>Error loading DatabaseTest</div> })));
+const SystemConnectionTest = lazy(() => import('../SystemConnectionTest').catch(() => ({ default: () => <div>Error loading SystemConnectionTest</div> })));
+const YouTubeConnectionTest = lazy(() => import('../YouTubeConnectionTest').catch(() => ({ default: () => <div>Error loading YouTubeConnectionTest</div> })));
+const BusinessHoursManager = lazy(() => import('./BusinessHoursManager').catch(() => ({ default: () => <div>Error loading BusinessHoursManager</div> })));
+const ShippingZoneManager = lazy(() => import('./ShippingZoneManager').catch(() => ({ default: () => <div>Error loading ShippingZoneManager</div> })));
+const StripeSettings = lazy(() => import('./StripeSettings').catch(() => ({ default: () => <div>Error loading StripeSettings</div> })));
+const NotificationSettings = lazy(() => import('./NotificationSettings').catch(() => ({ default: () => <div>Error loading NotificationSettings</div> })));
+const DatabaseSchemaUpdater = lazy(() => import('./DatabaseSchemaUpdater').catch(() => ({ default: () => <div>Error loading DatabaseSchemaUpdater</div> })));
+const ProductsDebugger = lazy(() => import('../ProductsDebugger').catch(() => ({ default: () => <div>Error loading ProductsDebugger</div> })));
+const MenuProductsConnectionTest = lazy(() => import('../MenuProductsConnectionTest').catch(() => ({ default: () => <div>Error loading MenuProductsConnectionTest</div> })));
+const ProductsSchemaFixer = lazy(() => import('../ProductsSchemaFixer').catch(() => ({ default: () => <div>Error loading ProductsSchemaFixer</div> })));
+const FrontendConnectionTester = lazy(() => import('../FrontendConnectionTester').catch(() => ({ default: () => <div>Error loading FrontendConnectionTester</div> })));
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center p-8">
+    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+    <span className="ml-2 text-gray-600">Loading...</span>
+  </div>
+);
 
 const PizzeriaAdminPanel = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isReady, setIsReady] = useState(false);
+
+  // Add initialization logging with delay
+  useEffect(() => {
+    console.log('🚀 [AdminPanel] Initializing PizzeriaAdminPanel...');
+    console.log('🚀 [AdminPanel] Active tab:', activeTab);
+    console.log('🚀 [AdminPanel] Environment check:', {
+      supabaseUrl: import.meta.env.VITE_SUPABASE_URL ? 'configured' : 'missing',
+      supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY ? 'configured' : 'missing'
+    });
+
+    // Add a small delay to ensure all components are ready
+    const timer = setTimeout(() => {
+      setIsReady(true);
+      console.log('🚀 [AdminPanel] Component fully initialized and ready');
+      console.log('🚀 [AdminPanel] Notification system available only in separate ordini section');
+    }, 200); // Increased delay slightly
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    console.log('🔄 [AdminPanel] Active tab changed to:', activeTab);
+  }, [activeTab]);
+
+  // Show loading state during initialization
+  if (!isReady) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-700">Loading Admin Panel...</h2>
+          <p className="text-gray-500 mt-2">Initializing components...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Organized admin sections in logical groups
   const adminSections = [
@@ -65,13 +112,7 @@ const PizzeriaAdminPanel = () => {
       description: 'Panoramica generale e statistiche',
       category: 'core'
     },
-    {
-      id: 'orders',
-      label: 'Ordini',
-      icon: ShoppingCart,
-      description: 'Gestione ordini e notifiche',
-      category: 'core'
-    },
+
     {
       id: 'products',
       label: 'Menu & Prodotti',
@@ -191,26 +232,37 @@ const PizzeriaAdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Order Notification System */}
-      <OrderNotificationSystem />
+      {/* OrderNotificationSystem removed - only available in separate ordini section */}
 
-      {/* Modern Header */}
-      <div className="bg-white shadow-lg border-b border-gray-200">
+      {/* Enhanced Modern Header */}
+      <div className="bg-gradient-to-r from-white via-gray-50 to-white shadow-xl border-b border-gray-200 backdrop-blur-sm">
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="bg-gradient-to-r from-red-500 to-red-600 p-3 rounded-xl shadow-lg">
-                <Pizza className="h-8 w-8 text-white" />
+            <div className="flex items-center space-x-6">
+              <div className="bg-gradient-to-br from-red-500 via-red-600 to-red-700 p-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <Pizza className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 bg-clip-text text-transparent">
                   Pannello Admin
                 </h1>
-                <p className="text-lg text-gray-600 font-medium">Pizzeria Regina 2000</p>
-                <p className="text-sm text-gray-500">Gestisci tutti gli aspetti del tuo sito web</p>
+                <p className="text-xl text-gray-600 font-semibold">Pizzeria Regina 2000</p>
+                <p className="text-sm text-gray-500 flex items-center mt-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                  Sistema attivo e funzionante
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-6">
+              {/* Ordini Button */}
+              <Button
+                onClick={() => window.open('/ordini', '_blank')}
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-3 rounded-xl font-semibold"
+              >
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                Gestione Ordini
+              </Button>
+
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-700">
                   {new Date().toLocaleDateString('it-IT', {
@@ -238,18 +290,43 @@ const PizzeriaAdminPanel = () => {
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          {/* Modern Navigation */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Sezioni di Gestione</h2>
-              <p className="text-gray-600">Seleziona una sezione per iniziare a gestire il tuo sito</p>
+          {/* Enhanced Modern Navigation */}
+          <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-3xl shadow-2xl border border-gray-200 p-8 backdrop-blur-sm">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-3 flex items-center">
+                <div className="w-1 h-8 bg-gradient-to-b from-red-500 to-red-600 rounded-full mr-4"></div>
+                Sezioni di Gestione
+              </h2>
+              <p className="text-gray-600 text-lg">Seleziona una sezione per iniziare a gestire il tuo sito</p>
+            </div>
+
+            {/* Quick Access to Ordini */}
+            <div className="mb-8 p-6 bg-gradient-to-r from-orange-50 via-orange-100 to-red-50 rounded-2xl border-2 border-orange-200 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 p-4 rounded-2xl shadow-xl">
+                    <ShoppingCart className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-1">Gestione Ordini</h3>
+                    <p className="text-gray-600">Accesso rapido alla sezione ordini con notifiche audio</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => window.open('/ordini', '_blank')}
+                  className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 rounded-xl font-bold text-lg"
+                >
+                  <ShoppingCart className="w-6 h-6 mr-3" />
+                  Apri Ordini
+                </Button>
+              </div>
             </div>
 
             {/* Core Business Section */}
-            <div className="mb-8">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4 flex items-center">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                Gestione Principale
+            <div className="mb-10">
+              <h3 className="text-base font-bold text-gray-700 uppercase tracking-wide mb-6 flex items-center bg-gradient-to-r from-red-50 to-red-100 p-4 rounded-xl border border-red-200">
+                <div className="w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full mr-3 animate-pulse"></div>
+                🏪 Gestione Principale
               </h3>
               <TabsList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-transparent h-auto">
                 {adminSections.filter(s => s.category === 'core').map((section) => (
@@ -271,10 +348,10 @@ const PizzeriaAdminPanel = () => {
             </div>
 
             {/* Content Management Section */}
-            <div className="mb-8">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4 flex items-center">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                Gestione Contenuti
+            <div className="mb-10">
+              <h3 className="text-base font-bold text-gray-700 uppercase tracking-wide mb-6 flex items-center bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+                <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mr-3 animate-pulse"></div>
+                📝 Gestione Contenuti
               </h3>
               <TabsList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-transparent h-auto">
                 {adminSections.filter(s => s.category === 'content').map((section) => (
@@ -296,10 +373,10 @@ const PizzeriaAdminPanel = () => {
             </div>
 
             {/* Customer Interaction Section */}
-            <div className="mb-8">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4 flex items-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                Interazione Clienti
+            <div className="mb-10">
+              <h3 className="text-base font-bold text-gray-700 uppercase tracking-wide mb-6 flex items-center bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+                <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-green-600 rounded-full mr-3 animate-pulse"></div>
+                👥 Interazione Clienti
               </h3>
               <TabsList className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-transparent h-auto">
                 {adminSections.filter(s => s.category === 'interaction').map((section) => (
@@ -321,10 +398,10 @@ const PizzeriaAdminPanel = () => {
             </div>
 
             {/* System Settings */}
-            <div className="mb-8">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4 flex items-center">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                Impostazioni Sistema
+            <div className="mb-10">
+              <h3 className="text-base font-bold text-gray-700 uppercase tracking-wide mb-6 flex items-center bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
+                <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full mr-3 animate-pulse"></div>
+                ⚙️ Impostazioni Sistema
               </h3>
               <TabsList className="grid grid-cols-1 gap-4 bg-transparent h-auto">
                 {adminSections.filter(s => s.category === 'system').map((section) => (
@@ -345,16 +422,16 @@ const PizzeriaAdminPanel = () => {
               </TabsList>
             </div>
 
-            {/* Advanced Tools - Collapsible */}
+            {/* Advanced Tools - Enhanced Collapsible */}
             <details className="group">
-              <summary className="cursor-pointer flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:shadow-md transition-all duration-200">
+              <summary className="cursor-pointer flex items-center justify-between p-6 bg-gradient-to-r from-orange-50 via-orange-100 to-orange-50 rounded-2xl border border-orange-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 <div className="flex items-center">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
-                  <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                    Strumenti Avanzati & Test
+                  <div className="w-3 h-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mr-3 animate-pulse"></div>
+                  <h3 className="text-base font-bold text-gray-700 uppercase tracking-wide">
+                    🔧 Strumenti Avanzati & Test
                   </h3>
                 </div>
-                <div className="text-xs text-gray-500 group-open:hidden">Clicca per espandere</div>
+                <div className="text-sm text-orange-600 group-open:hidden font-medium">Clicca per espandere</div>
               </summary>
               <div className="mt-4">
                 <TabsList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 bg-transparent h-auto">
@@ -386,16 +463,16 @@ const PizzeriaAdminPanel = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                    <CardTitle className="text-sm font-semibold text-blue-800">Ordini Oggi</CardTitle>
+                    <CardTitle className="text-sm font-semibold text-blue-800">Prodotti Attivi</CardTitle>
                     <div className="bg-blue-500 p-2 rounded-lg">
-                      <ShoppingCart className="h-5 w-5 text-white" />
+                      <Pizza className="h-5 w-5 text-white" />
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold text-blue-900">12</div>
+                    <div className="text-3xl font-bold text-blue-900">24</div>
                     <p className="text-sm text-blue-600 flex items-center mt-2">
-                      <span className="text-green-600 font-medium">+20%</span>
-                      <span className="ml-1">da ieri</span>
+                      <span className="text-green-600 font-medium">+3</span>
+                      <span className="ml-1">nuovi prodotti</span>
                     </p>
                   </CardContent>
                 </Card>
@@ -451,9 +528,12 @@ const PizzeriaAdminPanel = () => {
                     <Plus className="h-5 w-5 mr-3" />
                     Nuovo Prodotto
                   </button>
-                  <button className="flex items-center p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all duration-200">
-                    <Eye className="h-5 w-5 mr-3" />
-                    Visualizza Ordini
+                  <button
+                    onClick={() => window.open('/ordini', '_blank')}
+                    className="flex items-center p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all duration-200"
+                  >
+                    <ShoppingCart className="h-5 w-5 mr-3" />
+                    Apri Sezione Ordini
                   </button>
                   <button className="flex items-center p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg transition-all duration-200">
                     <Settings className="h-5 w-5 mr-3" />
@@ -462,49 +542,12 @@ const PizzeriaAdminPanel = () => {
                 </div>
               </div>
 
-              <AnalyticsDashboard />
+              <Suspense fallback={<LoadingSpinner />}>
+                <AnalyticsDashboard />
+              </Suspense>
             </TabsContent>
 
-            {/* Orders Management */}
-            <TabsContent value="orders">
-              <Card className="bg-white rounded-2xl shadow-xl border border-gray-200">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-2xl border-b border-blue-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center text-blue-800">
-                        <div className="bg-blue-500 p-2 rounded-lg mr-3">
-                          <ShoppingCart className="h-6 w-6 text-white" />
-                        </div>
-                        Gestione Ordini
-                      </CardTitle>
-                      <CardDescription className="text-blue-600">
-                        Visualizza e gestisci tutti gli ordini ricevuti
-                      </CardDescription>
-                    </div>
-                    <Button
-                      onClick={() => window.open('/ordini', '_blank')}
-                      className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg"
-                    >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Apri Sezione Ordini Separata
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-center space-x-2 text-yellow-800">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                      <span className="font-medium">💡 Suggerimento:</span>
-                    </div>
-                    <p className="text-sm text-yellow-700 mt-1">
-                      Per una migliore esperienza di gestione ordini, utilizza la <strong>Sezione Ordini Separata</strong> che si apre in una nuova scheda.
-                      Questa pagina dedicata offre più spazio e funzionalità avanzate per la gestione degli ordini.
-                    </p>
-                  </div>
-                  <OrdersAdmin />
-                </CardContent>
-              </Card>
-            </TabsContent>
+            {/* Orders Management removed - only available in separate ordini section */}
 
             {/* Products Management */}
             <TabsContent value="products">
@@ -521,7 +564,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <ProductsAdmin />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <ProductsAdmin />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -543,7 +588,9 @@ const PizzeriaAdminPanel = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <LogoEditor />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <LogoEditor />
+                    </Suspense>
                   </CardContent>
                 </Card>
 
@@ -561,7 +608,9 @@ const PizzeriaAdminPanel = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <HeroContentEditor />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <HeroContentEditor />
+                    </Suspense>
                   </CardContent>
                 </Card>
 
@@ -579,7 +628,9 @@ const PizzeriaAdminPanel = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <WeOfferManager />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <WeOfferManager />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </div>
@@ -598,7 +649,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <GalleryManager />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <GalleryManager />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -616,7 +669,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <YouTubeManager />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <YouTubeManager />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -634,7 +689,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <CommentsManager />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CommentsManager />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -652,7 +709,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <PopupManager />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PopupManager />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -674,7 +733,9 @@ const PizzeriaAdminPanel = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <SettingsManager />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <SettingsManager />
+                    </Suspense>
                   </CardContent>
                 </Card>
 
@@ -692,7 +753,9 @@ const PizzeriaAdminPanel = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <BusinessHoursManager />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <BusinessHoursManager />
+                    </Suspense>
                   </CardContent>
                 </Card>
 
@@ -710,7 +773,9 @@ const PizzeriaAdminPanel = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <ShippingZoneManager />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <ShippingZoneManager />
+                    </Suspense>
                   </CardContent>
                 </Card>
 
@@ -728,7 +793,9 @@ const PizzeriaAdminPanel = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <StripeSettings />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <StripeSettings />
+                    </Suspense>
                   </CardContent>
                 </Card>
 
@@ -742,11 +809,13 @@ const PizzeriaAdminPanel = () => {
                       Impostazioni Notifiche
                     </CardTitle>
                     <CardDescription className="text-orange-600">
-                      Configura suoni e notifiche per nuovi ordini
+                      Configura impostazioni generali di notifica (ordini gestiti in sezione separata)
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <NotificationSettings />
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <NotificationSettings />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </div>
@@ -765,7 +834,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <DatabaseTest />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <DatabaseTest />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -779,11 +850,13 @@ const PizzeriaAdminPanel = () => {
                     System Connection Test
                   </CardTitle>
                   <CardDescription>
-                    Test complete system: Products ↔ Admin, Orders → Notifications, Real-time Updates
+                    Test complete system: Products ↔ Admin, Content Management, Real-time Updates
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <SystemConnectionTest />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <SystemConnectionTest />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -801,7 +874,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ProductsDebugger />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <ProductsDebugger />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -819,7 +894,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <MenuProductsConnectionTest />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <MenuProductsConnectionTest />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -837,7 +914,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ProductsSchemaFixer />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <ProductsSchemaFixer />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -855,7 +934,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <DatabaseSchemaUpdater />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <DatabaseSchemaUpdater />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -873,7 +954,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <FrontendConnectionTester />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <FrontendConnectionTester />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -891,7 +974,9 @@ const PizzeriaAdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <YouTubeConnectionTest />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <YouTubeConnectionTest />
+                  </Suspense>
                 </CardContent>
               </Card>
             </TabsContent>

@@ -27,7 +27,7 @@ class BusinessHoursService {
   private static instance: BusinessHoursService;
   private cachedHours: WeeklyHours | null = null;
   private lastFetch: number = 0;
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly CACHE_DURATION = 30 * 1000; // 30 seconds for faster updates
 
   static getInstance(): BusinessHoursService {
     if (!BusinessHoursService.instance) {
@@ -65,7 +65,11 @@ class BusinessHoursService {
       if (data?.value) {
         this.cachedHours = data.value as WeeklyHours;
         this.lastFetch = now;
-        console.log('✅ Business hours loaded from database');
+        console.log('✅ Business hours loaded from database:', {
+          monday: this.cachedHours.monday,
+          currentTime: new Date().toLocaleTimeString('it-IT'),
+          cacheExpiry: new Date(now + this.CACHE_DURATION).toLocaleTimeString('it-IT')
+        });
         return this.cachedHours;
       }
 
@@ -242,7 +246,14 @@ class BusinessHoursService {
   async validateOrderTime(orderTime?: Date): Promise<{ valid: boolean; message: string }> {
     const checkTime = orderTime || new Date();
     const result = await this.isBusinessOpen(checkTime);
-    
+
+    console.log('🕒 [BusinessHours] Order validation:', {
+      checkTime: checkTime.toLocaleString('it-IT'),
+      isOpen: result.isOpen,
+      message: result.message,
+      todayHours: result.todayHours
+    });
+
     if (result.isOpen) {
       return {
         valid: true,
@@ -262,7 +273,65 @@ class BusinessHoursService {
   clearCache(): void {
     this.cachedHours = null;
     this.lastFetch = 0;
-    console.log('🗑️ Business hours cache cleared');
+
+    // Also clear any localStorage cache that might exist
+    try {
+      localStorage.removeItem('businessHours');
+      localStorage.removeItem('opening_hours');
+      localStorage.removeItem('business_hours_cache');
+    } catch (e) {
+      console.warn('Could not clear localStorage cache:', e);
+    }
+
+    console.log('🗑️ Business hours cache completely cleared (memory + localStorage)');
+  }
+
+  /**
+   * Force refresh business hours from database (bypasses all caching)
+   */
+  async forceRefresh(): Promise<WeeklyHours> {
+    console.log('🔄 [BusinessHours] FORCE REFRESH - bypassing all caches');
+
+    // Clear all caches first
+    this.clearCache();
+
+    // Force fresh fetch from database
+    this.lastFetch = 0;
+    this.cachedHours = null;
+
+    // Add cache-busting timestamp to ensure fresh data
+    const timestamp = Date.now();
+
+    try {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value, updated_at')
+        .eq('key', 'businessHours')
+        .single();
+
+      if (error) {
+        console.error('❌ Force refresh failed:', error);
+        throw error;
+      }
+
+      if (data?.value) {
+        this.cachedHours = data.value as WeeklyHours;
+        this.lastFetch = timestamp;
+
+        console.log('✅ [BusinessHours] Force refresh successful:', {
+          data: this.cachedHours,
+          dbUpdatedAt: data.updated_at,
+          fetchedAt: new Date(timestamp).toLocaleString('it-IT')
+        });
+
+        return this.cachedHours;
+      }
+
+      throw new Error('No business hours data found');
+    } catch (error) {
+      console.error('❌ Force refresh failed:', error);
+      return this.getDefaultHours();
+    }
   }
 }
 

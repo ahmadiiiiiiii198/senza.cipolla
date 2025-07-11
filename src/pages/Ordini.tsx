@@ -1,7 +1,8 @@
-import React from 'react';
-import { ArrowLeft, Pizza } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { Suspense } from 'react';
+import { Pizza, Loader2 } from 'lucide-react';
 import OrdersAdmin from '@/components/admin/OrdersAdmin';
+import OrderNotificationSystem from '@/components/OrderNotificationSystem';
+import OrdiniHeader from '@/components/OrdiniHeader';
 
 const Ordini = () => {
   const handleBackToAdmin = () => {
@@ -30,19 +31,24 @@ const Ordini = () => {
                 <p className="text-sm text-gray-500">Visualizza e gestisci tutti gli ordini ricevuti</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
+              {/* Notification Controls - Integrated into Header */}
+              <div id="header-notification-controls" className="flex items-center space-x-2 mr-4">
+                {/* This will be populated by OrderNotificationSystem */}
+              </div>
+
               <Button
                 onClick={handleBackToAdmin}
                 variant="outline"
-                className="flex items-center gap-2 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                className="flex items-center gap-2 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Torna al Pannello Admin
+                Pannello Admin
               </Button>
               <Button
                 onClick={handleBackToHome}
                 variant="outline"
-                className="flex items-center gap-2 bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                className="flex items-center gap-2 bg-green-50 border-green-200 text-green-700 hover:bg-green-100 px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Torna al Sito
@@ -74,6 +80,17 @@ const Ordini = () => {
           </div>
         </div>
       </div>
+
+      {/* Order Notification System - Only in Ordini Section */}
+      <Suspense fallback={
+        <div className="fixed top-4 right-4 z-50">
+          <div className="p-3 bg-gray-100 text-gray-600 rounded-full shadow-lg">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        </div>
+      }>
+        <OrderNotificationSystem />
+      </Suspense>
     </div>
   );
 };

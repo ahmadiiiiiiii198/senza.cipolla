@@ -94,6 +94,18 @@ const OrderManagement = () => {
           refetch();
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'orders'
+        },
+        (payload) => {
+          console.log('Order deleted in OrderManagement:', payload);
+          refetch(); // Refetch to update the list
+        }
+      )
       .subscribe();
 
     return () => {

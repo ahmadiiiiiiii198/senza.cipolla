@@ -118,8 +118,10 @@ const OrdersAdmin = () => {
         .from('order_notifications')
         .insert([{
           order_id: orderId,
+          notification_type: 'order_update',
+          title: 'Ordine Aggiornato',
           message: `Ordine aggiornato a: ${orderStatuses.find(s => s.value === newStatus)?.label}`,
-          type: 'order_update'
+          is_read: false
         }]);
 
       toast({
@@ -282,47 +284,128 @@ const OrdersAdmin = () => {
   };
 
   useEffect(() => {
+    console.log('🔄 [OrdersAdmin] Setting up real-time subscriptions...');
+
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      console.log('🔐 [OrdersAdmin] Auth status:', session ? 'authenticated' : 'anonymous');
+      if (error) {
+        console.warn('🔐 [OrdersAdmin] Auth check error:', error);
+      }
+    };
+
+    checkAuth();
     loadOrders();
 
-    // Set up real-time subscription for orders
+    // Check Supabase real-time connection status
+    console.log('🔌 [OrdersAdmin] Supabase client status:', {
+      supabaseUrl: supabase.supabaseUrl,
+      supabaseKey: supabase.supabaseKey ? 'configured' : 'missing',
+      realtime: supabase.realtime ? 'available' : 'unavailable'
+    });
+
+    // Set up real-time subscription for orders with unique channel name
+    const channelName = `orders_admin_${Date.now()}`;
+    console.log('📡 [OrdersAdmin] Creating channel:', channelName);
+
     const ordersSubscription = supabase
-      .channel('orders_admin')
+      .channel(channelName)
       .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
+        { event: 'INSERT', schema: 'public', table: 'orders' },
         (payload) => {
-          console.log('Order change detected:', payload);
-          loadOrders(); // Reload orders when any change occurs
+          console.log('🚨 [OrdersAdmin] NEW ORDER DETECTED!', payload);
+          console.log('🚨 [OrdersAdmin] Order details:', JSON.stringify(payload.new, null, 2));
+          console.log('🚨 [OrdersAdmin] Event type:', payload.eventType);
+          console.log('🚨 [OrdersAdmin] Timestamp:', new Date().toLocaleString('it-IT'));
+
+          loadOrders(); // Reload orders when new order is added
           setLastRefresh(new Date());
 
           // Show toast for new orders
-          if (payload.eventType === 'INSERT') {
-            toast({
-              title: "🔔 Nuovo Ordine!",
-              description: `Ordine ricevuto da ${payload.new.customer_name}`,
-              duration: 5000,
-            });
+          toast({
+            title: "🔔 Nuovo Ordine!",
+            description: `Ordine ricevuto da ${payload.new.customer_name}`,
+            duration: 5000,
+          });
+
+          // Trigger audio notification if available
+          if ((window as any).audioNotifier) {
+            console.log('🔊 Triggering audio notification from OrdersAdmin');
+            (window as any).audioNotifier.startContinuousRinging();
           }
         }
       )
-      .subscribe();
-
-    // Set up real-time subscription for order items
-    const orderItemsSubscription = supabase
-      .channel('order_items_admin')
       .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'order_items' },
-        () => {
-          console.log('Order items change detected');
-          loadOrders(); // Reload orders when items change
+        { event: 'UPDATE', schema: 'public', table: 'orders' },
+        (payload) => {
+          console.log('Order updated:', payload);
+          // Update specific order in state instead of reloading all
+          setOrders(prevOrders =>
+            prevOrders.map(order =>
+              order.id === payload.new.id ? { ...order, ...payload.new } : order
+            )
+          );
+          setLastRefresh(new Date());
         }
       )
-      .subscribe();
+      .on('postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'orders' },
+        (payload) => {
+          console.log('Order deleted:', payload);
+          // Remove deleted order from state instead of reloading all
+          setOrders(prevOrders =>
+            prevOrders.filter(order => order.id !== payload.old.id)
+          );
+          setLastRefresh(new Date());
+        }
+      )
+      .subscribe((status) => {
+        console.log('📡 [OrdersAdmin] Orders subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ [OrdersAdmin] Orders real-time subscription ACTIVE');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ [OrdersAdmin] Orders subscription ERROR');
+        } else if (status === 'TIMED_OUT') {
+          console.error('⏰ [OrdersAdmin] Orders subscription TIMED OUT');
+        } else if (status === 'CLOSED') {
+          console.warn('🔒 [OrdersAdmin] Orders subscription CLOSED');
+        }
+      });
 
-    // Auto-refresh every 30 seconds as backup
+    // Set up real-time subscription for order items
+    const orderItemsChannelName = `order_items_admin_${Date.now()}`;
+    console.log('📡 [OrdersAdmin] Creating order items channel:', orderItemsChannelName);
+
+    const orderItemsSubscription = supabase
+      .channel(orderItemsChannelName)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'order_items' },
+        (payload) => {
+          console.log('📦 [OrdersAdmin] Order items change detected:', payload);
+          // Only reload orders if it's a new item or significant change
+          // For deletions during order deletion, don't reload
+          if (payload.eventType === 'INSERT') {
+            console.log('📦 [OrdersAdmin] New order item added, reloading orders...');
+            loadOrders(); // Reload orders when new items are added
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('📦 [OrdersAdmin] Order items subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ [OrdersAdmin] Order items real-time subscription ACTIVE');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ [OrdersAdmin] Order items subscription ERROR');
+        }
+      });
+
+    // Auto-refresh every 30 seconds as backup for testing real-time issues
     const refreshInterval = setInterval(() => {
+      console.log('🔄 [OrdersAdmin] Backup refresh: Reloading orders...');
       loadOrders();
       setLastRefresh(new Date());
-    }, 30000);
+    }, 30000); // 30 seconds backup refresh for testing
 
     return () => {
       ordersSubscription.unsubscribe();
