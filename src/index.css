@@ -638,6 +638,62 @@
       font-size: 14px;
     }
   }
+
+  /* Hero section mobile video optimizations */
+  @media (max-width: 768px) {
+    /* Ensure hero video covers full screen on mobile */
+    .hero-video-mobile {
+      object-fit: cover !important;
+      object-position: center center !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      min-width: 100% !important;
+      min-height: 100% !important;
+      transform: scale(1.05) !important;
+    }
+
+    /* Hero background image mobile optimization */
+    .hero-bg-mobile {
+      background-size: cover !important;
+      background-position: center center !important;
+      background-attachment: scroll !important;
+      min-height: 100vh !important;
+      min-width: 100vw !important;
+    }
+
+    /* Prevent video overflow on mobile */
+    .hero-container-mobile {
+      overflow: hidden !important;
+      position: relative !important;
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+
+    /* Better mobile video performance */
+    video {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+  }
+
+  /* Specific optimizations for very small screens */
+  @media (max-width: 480px) {
+    .hero-video-mobile {
+      transform: scale(1.1) !important;
+    }
+  }
+
+  /* Landscape mobile optimization */
+  @media (max-width: 768px) and (orientation: landscape) {
+    .hero-video-mobile {
+      object-fit: cover !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      transform: scale(1.02) !important;
+    }
+  }
 }
 
 /* Flegrea-specific utility classes */

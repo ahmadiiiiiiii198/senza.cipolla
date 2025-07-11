@@ -67,18 +67,39 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen overflow-hidden">
-      {/* Pizza background video */}
-      <div className="absolute inset-0 overflow-hidden">
+    <section className="relative min-h-screen overflow-hidden hero-container-mobile">
+      {/* Pizza background video - Mobile Optimized */}
+      <div className="absolute inset-0 overflow-hidden hero-container-mobile">
         {!videoError ? (
           <video
             autoPlay
             muted
             loop
             playsInline
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ${
               videoLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
+            }
+            /* Mobile-optimized video display */
+            object-cover object-center
+            sm:object-cover sm:object-center
+            md:object-cover md:object-center
+            lg:object-cover lg:object-center
+            /* Ensure video scales properly on mobile */
+            min-w-full min-h-full
+            /* Better mobile positioning */
+            transform scale-105 sm:scale-100
+            /* Apply mobile-specific CSS class */
+            hero-video-mobile
+            `}
+            style={{
+              /* Additional mobile optimizations */
+              objectPosition: 'center center',
+              /* Ensure video covers the entire area on mobile */
+              width: '100vw',
+              height: '100vh',
+              minWidth: '100%',
+              minHeight: '100%'
+            }}
             onLoadedData={() => {
               console.log('✅ [Hero] Background video loaded successfully');
               setVideoLoaded(true);
@@ -92,12 +113,28 @@ const Hero = () => {
           </video>
         ) : null}
 
-        {/* Fallback to background image if video fails or is loading */}
+        {/* Fallback to background image if video fails or is loading - Mobile Optimized */}
         {(videoError || !videoLoaded) && (
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat
+            /* Mobile-optimized background positioning */
+            sm:bg-cover sm:bg-center
+            md:bg-cover md:bg-center
+            lg:bg-cover lg:bg-center
+            /* Better mobile scaling */
+            bg-fixed sm:bg-scroll
+            /* Apply mobile-specific CSS class */
+            hero-bg-mobile
+            "
             style={{
-              backgroundImage: `url('${heroContent.backgroundImage}')`
+              backgroundImage: `url('${heroContent.backgroundImage}')`,
+              /* Mobile-specific background optimizations */
+              backgroundSize: 'cover',
+              backgroundPosition: 'center center',
+              backgroundAttachment: window.innerWidth < 768 ? 'scroll' : 'fixed',
+              /* Ensure full coverage on mobile */
+              minHeight: '100vh',
+              minWidth: '100vw'
             }}
           ></div>
         )}
