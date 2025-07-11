@@ -388,22 +388,38 @@ const OrderNotificationSystem = () => {
     }
   };
 
-  // Populate header controls
+  // Populate header controls for both mobile and desktop
   const populateHeaderControls = () => {
-    const headerControls = document.getElementById('header-notification-controls');
-    console.log('🔧 [OrderNotification] Looking for header controls element:', headerControls);
+    const mobileHeaderControls = document.getElementById('header-notification-controls');
+    const desktopHeaderControls = document.getElementById('header-notification-controls-desktop');
 
-    if (headerControls) {
-      // Clear existing content
-      headerControls.innerHTML = '';
+    console.log('🔧 [OrderNotification] Looking for header controls:', {
+      mobile: !!mobileHeaderControls,
+      desktop: !!desktopHeaderControls
+    });
 
-      // Show stop button if there are notifications, sound is playing, OR system is initialized (always show)
-      const unreadCount = notifications.filter(n => !n.is_read).length;
-      console.log('🔧 [OrderNotification] State check:', { isPlaying, unreadCount, isInitialized });
+    const unreadCount = notifications.filter(n => !n.is_read).length;
+    console.log('🔧 [OrderNotification] State check:', { isPlaying, unreadCount, isInitialized });
 
-      if (isPlaying || unreadCount > 0 || isInitialized) {
-        // Create stop button for header
-        const stopButton = document.createElement('button');
+    // Function to create stop button
+    const createStopButton = (isMobile = false) => {
+      const stopButton = document.createElement('button');
+
+      if (isMobile) {
+        // Mobile button - more compact
+        stopButton.className = `px-2 py-1 rounded-md shadow-md transition-all duration-300 font-medium text-xs flex items-center space-x-1 ${
+          isPlaying ? 'bg-red-600 text-white hover:bg-red-700 animate-pulse' :
+          unreadCount > 0 ? 'bg-orange-600 text-white hover:bg-orange-700' :
+          'bg-gray-600 text-white hover:bg-gray-700'
+        }`;
+
+        const buttonText = isPlaying ? 'Stop' :
+                          unreadCount > 0 ? `${unreadCount}` :
+                          'Stop';
+
+        stopButton.innerHTML = `<span>🔇</span><span>${buttonText}</span>`;
+      } else {
+        // Desktop button - full size
         stopButton.className = `px-3 py-1 rounded-lg shadow-md transition-all duration-300 font-medium text-sm flex items-center space-x-1 ${
           isPlaying ? 'bg-red-600 text-white hover:bg-red-700 animate-pulse' :
           unreadCount > 0 ? 'bg-orange-600 text-white hover:bg-orange-700' :
@@ -415,21 +431,35 @@ const OrderNotificationSystem = () => {
                           'Stop Audio';
 
         stopButton.innerHTML = `<span>🔇</span><span>${buttonText}</span>`;
-        stopButton.onclick = () => {
-          console.log('🔇 [OrderNotification] Header stop button clicked');
-          forceStopSound();
-        };
-
-        headerControls.appendChild(stopButton);
-        console.log('🔧 [OrderNotification] Stop button added to header');
-      } else {
-        console.log('🔧 [OrderNotification] No button needed - no sound/notifications');
       }
 
-      console.log('🔧 [OrderNotification] Header controls updated');
-    } else {
-      console.error('🔧 [OrderNotification] Header controls element not found!');
+      stopButton.onclick = () => {
+        console.log('🔇 [OrderNotification] Header stop button clicked');
+        forceStopSound();
+      };
+
+      return stopButton;
+    };
+
+    // Populate mobile header
+    if (mobileHeaderControls) {
+      mobileHeaderControls.innerHTML = '';
+      if (isPlaying || unreadCount > 0 || isInitialized) {
+        mobileHeaderControls.appendChild(createStopButton(true));
+        console.log('🔧 [OrderNotification] Mobile stop button added');
+      }
     }
+
+    // Populate desktop header
+    if (desktopHeaderControls) {
+      desktopHeaderControls.innerHTML = '';
+      if (isPlaying || unreadCount > 0 || isInitialized) {
+        desktopHeaderControls.appendChild(createStopButton(false));
+        console.log('🔧 [OrderNotification] Desktop stop button added');
+      }
+    }
+
+    console.log('🔧 [OrderNotification] Header controls updated');
   };
 
   // Update header controls when state changes

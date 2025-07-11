@@ -422,35 +422,35 @@ const OrdersAdmin = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with filters */}
-      <div className="flex justify-between items-center">
+      {/* Mobile-Optimized Header with filters */}
+      <div className="space-y-3 sm:space-y-0 sm:flex sm:justify-between sm:items-center">
         <div>
-          <h3 className="text-lg font-semibold">Gestione Ordini</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="text-base sm:text-lg font-semibold">Gestione Ordini</h3>
+          <p className="text-xs sm:text-sm text-gray-600">
             Visualizza e gestisci tutti gli ordini
-            <span className="ml-2 text-xs text-green-600">
+            <span className="block sm:inline sm:ml-2 text-xs text-green-600">
               🔄 Ultimo aggiornamento: {lastRefresh.toLocaleTimeString('it-IT')}
             </span>
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Button
             onClick={deleteAllOrders}
             variant="outline"
             size="sm"
-            className="bg-red-100 border-red-300 text-red-700 hover:bg-red-200 shadow-lg border-2 rounded-full text-xs sm:text-sm"
+            className="bg-red-100 border-red-300 text-red-700 hover:bg-red-200 shadow-lg border-2 rounded-full text-xs flex-shrink-0"
             disabled={orders.length === 0 || isLoading}
           >
-            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <Trash2 className="w-3 h-3 mr-1" />
             <span className="hidden sm:inline">🗑️ Elimina Tutti</span>
             <span className="sm:hidden">🗑️</span>
           </Button>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md"
+            className="px-2 sm:px-3 py-1 sm:py-2 border rounded-md text-xs sm:text-sm min-w-0 flex-1 sm:flex-initial"
           >
-            <option value="all">Tutti gli ordini ({counts.all})</option>
+            <option value="all">Tutti ({counts.all})</option>
             {orderStatuses.map((status) => (
               <option key={status.value} value={status.value}>
                 {status.label} ({counts[status.value as keyof typeof counts] || 0})
@@ -460,20 +460,20 @@ const OrdersAdmin = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {/* Mobile-Optimized Stats Cards */}
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
         {orderStatuses.map((status) => {
           const count = counts[status.value as keyof typeof counts] || 0;
           const StatusIcon = status.icon;
           return (
-            <Card key={status.value}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-600">{status.label}</p>
-                    <p className="text-xl font-bold">{count}</p>
+            <Card key={status.value} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-2 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-1 sm:space-y-0">
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs text-gray-600 truncate">{status.label}</p>
+                    <p className="text-lg sm:text-xl font-bold">{count}</p>
                   </div>
-                  <StatusIcon size={20} className="text-gray-500" />
+                  <StatusIcon size={16} className="text-gray-500 mx-auto sm:mx-0 sm:ml-2" />
                 </div>
               </CardContent>
             </Card>
@@ -481,41 +481,42 @@ const OrdersAdmin = () => {
         })}
       </div>
 
-      {/* Orders List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h4 className="font-semibold">Lista Ordini</h4>
+      {/* Mobile-Optimized Orders Layout */}
+      <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
+        <div className="space-y-3 sm:space-y-4">
+          <h4 className="text-sm sm:text-base font-semibold">Lista Ordini</h4>
           {orders.map((order) => {
             const statusInfo = getStatusInfo(order.order_status);
             const StatusIcon = statusInfo.icon;
             
             return (
-              <Card 
-                key={order.id} 
+              <Card
+                key={order.id}
                 className={`cursor-pointer hover:shadow-md transition-shadow ${
                   selectedOrder?.id === order.id ? 'ring-2 ring-red-500' : ''
                 }`}
                 onClick={() => setSelectedOrder(order)}
               >
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-sm">
+                <CardHeader className="pb-2 p-3 sm:p-4">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-xs sm:text-sm font-semibold">
                         Ordine #{order.id.slice(-8)}
                       </CardTitle>
-                      <CardDescription className="flex items-center space-x-2">
-                        <User size={14} />
-                        <span>{order.customer_name}</span>
+                      <CardDescription className="flex items-center space-x-1 text-xs">
+                        <User size={12} />
+                        <span className="truncate">{order.customer_name}</span>
                       </CardDescription>
                     </div>
-                    <Badge className={statusInfo.color}>
-                      <StatusIcon size={12} className="mr-1" />
-                      {statusInfo.label}
+                    <Badge className={`${statusInfo.color} text-xs px-1 py-0.5 flex-shrink-0`}>
+                      <StatusIcon size={10} className="mr-1" />
+                      <span className="hidden sm:inline">{statusInfo.label}</span>
+                      <span className="sm:hidden">{statusInfo.label.slice(0, 3)}</span>
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm">
+                <CardContent className="p-3 sm:p-4 pt-0">
+                  <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
                     <div className="flex justify-between">
                       <span>Totale:</span>
                       <span className="font-semibold">€{order.total_amount.toFixed(2)}</span>
@@ -526,7 +527,7 @@ const OrdersAdmin = () => {
                     </div>
                     <div className="flex justify-between">
                       <span>Data:</span>
-                      <span>{new Date(order.created_at).toLocaleDateString('it-IT')}</span>
+                      <span className="text-xs">{new Date(order.created_at).toLocaleDateString('it-IT')}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -536,54 +537,54 @@ const OrdersAdmin = () => {
           
           {orders.length === 0 && (
             <Card>
-              <CardContent className="text-center py-8">
-                <ShoppingCart className="mx-auto mb-4 text-gray-400" size={48} />
-                <p className="text-gray-500">Nessun ordine trovato</p>
+              <CardContent className="text-center py-6 sm:py-8">
+                <ShoppingCart className="mx-auto mb-3 sm:mb-4 text-gray-400" size={36} />
+                <p className="text-gray-500 text-sm">Nessun ordine trovato</p>
               </CardContent>
             </Card>
           )}
         </div>
 
-        {/* Order Details */}
-        <div>
+        {/* Mobile-Optimized Order Details */}
+        <div className="lg:sticky lg:top-4">
           {selectedOrder ? (
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+              <CardHeader className="p-3 sm:p-4">
+                <CardTitle className="flex items-center justify-between text-sm sm:text-base">
                   <span>Dettagli Ordine #{selectedOrder.id.slice(-8)}</span>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => deleteOrder(selectedOrder.id)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-red-600 hover:text-red-700 p-1 sm:p-2"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={14} />
                   </Button>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4">
                 {/* Customer Info */}
                 <div>
-                  <h5 className="font-semibold mb-2">Informazioni Cliente</h5>
-                  <div className="space-y-1 text-sm">
+                  <h5 className="text-sm sm:text-base font-semibold mb-2">Informazioni Cliente</h5>
+                  <div className="space-y-1 text-xs sm:text-sm">
                     <div className="flex items-center space-x-2">
-                      <User size={14} />
-                      <span>{selectedOrder.customer_name}</span>
+                      <User size={12} />
+                      <span className="truncate">{selectedOrder.customer_name}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span>📧</span>
-                      <span>{selectedOrder.customer_email}</span>
+                      <span className="truncate text-xs">{selectedOrder.customer_email}</span>
                     </div>
                     {selectedOrder.customer_phone && (
                       <div className="flex items-center space-x-2">
-                        <Phone size={14} />
+                        <Phone size={12} />
                         <span>{selectedOrder.customer_phone}</span>
                       </div>
                     )}
                     {selectedOrder.delivery_address && (
-                      <div className="flex items-center space-x-2">
-                        <MapPin size={14} />
-                        <span>{selectedOrder.delivery_address}</span>
+                      <div className="flex items-start space-x-2">
+                        <MapPin size={12} className="mt-0.5 flex-shrink-0" />
+                        <span className="text-xs leading-tight">{selectedOrder.delivery_address}</span>
                       </div>
                     )}
                   </div>
@@ -591,15 +592,15 @@ const OrdersAdmin = () => {
 
                 {/* Order Items */}
                 <div>
-                  <h5 className="font-semibold mb-2">Articoli Ordinati</h5>
-                  <div className="space-y-2">
+                  <h5 className="text-sm sm:text-base font-semibold mb-2">Articoli Ordinati</h5>
+                  <div className="space-y-1 sm:space-y-2">
                     {selectedOrder.order_items?.map((item) => (
-                      <div key={item.id} className="flex justify-between text-sm">
-                        <span>{item.quantity}x {item.product_name}</span>
-                        <span>€{((item.subtotal || (item.product_price * item.quantity)) || 0).toFixed(2)}</span>
+                      <div key={item.id} className="flex justify-between text-xs sm:text-sm">
+                        <span className="truncate mr-2">{item.quantity}x {item.product_name}</span>
+                        <span className="font-medium">€{((item.subtotal || (item.product_price * item.quantity)) || 0).toFixed(2)}</span>
                       </div>
                     ))}
-                    <div className="border-t pt-2 flex justify-between font-semibold">
+                    <div className="border-t pt-2 flex justify-between font-semibold text-sm">
                       <span>Totale:</span>
                       <span>€{(selectedOrder.total_amount || 0).toFixed(2)}</span>
                     </div>
@@ -608,8 +609,8 @@ const OrdersAdmin = () => {
 
                 {/* Status Update */}
                 <div>
-                  <h5 className="font-semibold mb-2">Aggiorna Stato</h5>
-                  <div className="grid grid-cols-2 gap-2">
+                  <h5 className="text-sm sm:text-base font-semibold mb-2">Aggiorna Stato</h5>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2">
                     {orderStatuses.map((status) => {
                       const StatusIcon = status.icon;
                       return (
@@ -618,10 +619,10 @@ const OrdersAdmin = () => {
                           size="sm"
                           variant={selectedOrder.order_status === status.value ? "default" : "outline"}
                           onClick={() => updateOrderStatus(selectedOrder.id, status.value)}
-                          className="text-xs"
+                          className="text-xs p-1 sm:p-2 h-auto"
                         >
-                          <StatusIcon size={12} className="mr-1" />
-                          {status.label}
+                          <StatusIcon size={10} className="mr-1" />
+                          <span className="truncate">{status.label}</span>
                         </Button>
                       );
                     })}
@@ -631,29 +632,29 @@ const OrdersAdmin = () => {
                 {/* Notes */}
                 {selectedOrder.notes && (
                   <div>
-                    <h5 className="font-semibold mb-2">Note</h5>
-                    <p className="text-sm text-gray-600">{selectedOrder.notes}</p>
+                    <h5 className="text-sm sm:text-base font-semibold mb-2">Note</h5>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{selectedOrder.notes}</p>
                   </div>
                 )}
 
                 {/* Timestamps */}
                 <div className="text-xs text-gray-500 space-y-1">
                   <div className="flex items-center space-x-2">
-                    <Calendar size={12} />
-                    <span>Creato: {new Date(selectedOrder.created_at).toLocaleString('it-IT')}</span>
+                    <Calendar size={10} />
+                    <span className="truncate">Creato: {new Date(selectedOrder.created_at).toLocaleString('it-IT')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Calendar size={12} />
-                    <span>Aggiornato: {new Date(selectedOrder.updated_at).toLocaleString('it-IT')}</span>
+                    <Calendar size={10} />
+                    <span className="truncate">Aggiornato: {new Date(selectedOrder.updated_at).toLocaleString('it-IT')}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
           ) : (
-            <Card>
-              <CardContent className="text-center py-8">
-                <Eye className="mx-auto mb-4 text-gray-400" size={48} />
-                <p className="text-gray-500">Seleziona un ordine per vedere i dettagli</p>
+            <Card className="lg:block hidden">
+              <CardContent className="text-center py-6 sm:py-8">
+                <Eye className="mx-auto mb-3 sm:mb-4 text-gray-400" size={36} />
+                <p className="text-gray-500 text-sm">Seleziona un ordine per vedere i dettagli</p>
               </CardContent>
             </Card>
           )}
