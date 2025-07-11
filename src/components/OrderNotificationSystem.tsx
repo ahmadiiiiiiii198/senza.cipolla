@@ -193,6 +193,10 @@ const OrderNotificationSystem = () => {
         } else if (isPlaying) {
           console.log('🔊 [OrderNotification] Sound already playing - continuing');
         }
+
+        // Always update header controls when notifications are found
+        console.log('🔧 [OrderNotification] Updating header controls after notification check');
+        populateHeaderControls();
       } else if (formattedNotifications.length === 0 && isPlaying) {
         console.log('🔊 [OrderNotification] No notifications found, but keeping sound playing (manual stop only)');
         // IMPORTANT: DON'T auto-stop sound - let user manually stop it with the stop button
@@ -438,7 +442,16 @@ const OrderNotificationSystem = () => {
 
     console.log('🔧 [OrderNotification] Looking for header controls:', {
       mobile: !!mobileHeaderControls,
-      desktop: !!desktopHeaderControls
+      desktop: !!desktopHeaderControls,
+      mobileElement: mobileHeaderControls,
+      desktopElement: desktopHeaderControls
+    });
+
+    // Debug: Check if we're on the right page
+    console.log('🔧 [OrderNotification] Current page info:', {
+      pathname: window.location.pathname,
+      url: window.location.href,
+      title: document.title
     });
 
     const unreadCount = notifications.filter(n => !n.is_read).length;
