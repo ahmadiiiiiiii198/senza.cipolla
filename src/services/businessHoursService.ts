@@ -283,14 +283,20 @@ class BusinessHoursService {
       console.warn('Could not clear localStorage cache:', e);
     }
 
-    console.log('🗑️ Business hours cache completely cleared (memory + localStorage)');
+    // Reduced logging - only log cache clear in debug mode
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🗑️ Business hours cache cleared');
+    }
   }
 
   /**
    * Force refresh business hours from database (bypasses all caching)
    */
   async forceRefresh(): Promise<WeeklyHours> {
-    console.log('🔄 [BusinessHours] FORCE REFRESH - bypassing all caches');
+    // Reduced logging - only log force refresh in debug mode
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔄 [BusinessHours] Force refresh initiated');
+    }
 
     // Clear all caches first
     this.clearCache();
@@ -318,11 +324,10 @@ class BusinessHoursService {
         this.cachedHours = data.value as WeeklyHours;
         this.lastFetch = timestamp;
 
-        console.log('✅ [BusinessHours] Force refresh successful:', {
-          data: this.cachedHours,
-          dbUpdatedAt: data.updated_at,
-          fetchedAt: new Date(timestamp).toLocaleString('it-IT')
-        });
+        // Reduced logging - only detailed logs in debug mode
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ [BusinessHours] Force refresh successful');
+        }
 
         return this.cachedHours;
       }

@@ -43,21 +43,27 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
   const checkBusinessStatus = useCallback(async () => {
     try {
       setIsLoading(true);
-      console.log('🕒 Checking business hours status...');
-      
+      // Reduced logging - only log in debug mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🕒 Checking business hours status...');
+      }
+
       const result: BusinessHoursResult = await businessHoursService.isBusinessOpen();
       const formatted = await businessHoursService.getFormattedHours();
-      
+
       setIsOpen(result.isOpen);
       setMessage(result.message);
       setNextOpenTime(result.nextOpenTime);
       setTodayHours(result.todayHours);
       setFormattedHours(formatted);
-      
-      console.log('✅ Business status updated:', {
-        isOpen: result.isOpen,
-        message: result.message
-      });
+
+      // Reduced logging - only log in debug mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Business status updated:', {
+          isOpen: result.isOpen,
+          message: result.message
+        });
+      }
     } catch (error) {
       console.error('❌ Failed to check business status:', error);
       setMessage('Errore nel caricamento degli orari');
@@ -94,19 +100,23 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
     checkBusinessStatus();
   }, [checkBusinessStatus]);
 
-  // Auto-refresh every 10 seconds if enabled (very fast for immediate updates)
+  // Auto-refresh every 5 minutes if enabled (reasonable frequency for business hours)
   useEffect(() => {
     if (!autoRefresh) return;
 
     const interval = setInterval(async () => {
-      console.log('⏰ [useBusinessHours] Auto-refreshing business hours...');
+      // Reduced logging - only log in debug mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⏰ [useBusinessHours] Auto-refreshing business hours...');
+      }
       try {
-        await businessHoursService.forceRefresh();
+        // Use regular refresh instead of force refresh to respect caching
+        await businessHoursService.getBusinessHours();
         await checkBusinessStatus();
       } catch (error) {
         console.error('❌ [useBusinessHours] Auto-refresh failed:', error);
       }
-    }, 10000); // Check every 10 seconds for immediate updates
+    }, 300000); // 5 minutes (300,000ms) - much more reasonable for business hours
 
     return () => clearInterval(interval);
   }, [autoRefresh, checkBusinessStatus]);
