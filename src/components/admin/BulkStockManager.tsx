@@ -17,6 +17,92 @@ interface Product {
   category_name: string;
 }
 
+interface IndividualProductCardProps {
+  product: Product;
+  onUpdateStock: (productId: string, quantity: number) => void;
+  isUpdating: boolean;
+}
+
+const IndividualProductCard: React.FC<IndividualProductCardProps> = ({
+  product,
+  onUpdateStock,
+  isUpdating
+}) => {
+  const [localQuantity, setLocalQuantity] = useState(product.stock_quantity);
+
+  // Update local quantity when product changes
+  React.useEffect(() => {
+    setLocalQuantity(product.stock_quantity);
+  }, [product.stock_quantity]);
+
+  const handleUpdate = () => {
+    if (localQuantity !== product.stock_quantity) {
+      onUpdateStock(product.id, localQuantity);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleUpdate();
+    }
+  };
+
+  return (
+    <div className="border rounded-lg p-3 space-y-3">
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <h4 className="font-medium text-sm">{product.name}</h4>
+          <p className="text-xs text-gray-600">{product.category_name}</p>
+        </div>
+        <Badge
+          variant={product.stock_quantity > 10 ? "default" : product.stock_quantity > 0 ? "secondary" : "destructive"}
+        >
+          {product.stock_quantity}
+        </Badge>
+      </div>
+
+      <div className="flex items-center gap-1 text-xs">
+        {product.stock_quantity > 10 ? (
+          <CheckCircle className="h-3 w-3 text-green-500" />
+        ) : product.stock_quantity > 0 ? (
+          <AlertCircle className="h-3 w-3 text-yellow-500" />
+        ) : (
+          <AlertCircle className="h-3 w-3 text-red-500" />
+        )}
+        <span className="text-gray-600">
+          {product.stock_quantity > 10 ? 'Disponibile' :
+           product.stock_quantity > 0 ? 'Scorte basse' : 'Esaurito'}
+        </span>
+      </div>
+
+      <div className="flex gap-2">
+        <Input
+          type="number"
+          min="0"
+          value={localQuantity}
+          onChange={(e) => setLocalQuantity(parseInt(e.target.value) || 0)}
+          onKeyPress={handleKeyPress}
+          disabled={isUpdating}
+          className="flex-1 h-8 text-sm"
+          placeholder="Quantità"
+        />
+        <Button
+          onClick={handleUpdate}
+          disabled={isUpdating || localQuantity === product.stock_quantity}
+          size="sm"
+          className="h-8 px-3"
+        >
+          {isUpdating ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            'Aggiorna'
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const BulkStockManager: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [stockManagementEnabled, setStockManagementEnabled] = useState(false);
@@ -24,6 +110,7 @@ const BulkStockManager: React.FC = () => {
   const [bulkStockQuantity, setBulkStockQuantity] = useState(100);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [updatingProducts, setUpdatingProducts] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -269,6 +356,52 @@ const BulkStockManager: React.FC = () => {
     }
   };
 
+  const updateIndividualStock = async (productId: string, newQuantity: number) => {
+    try {
+      setUpdatingProducts(prev => new Set([...prev, productId]));
+
+      console.log('🔄 Updating individual stock:', { productId, newQuantity });
+
+      const { error } = await supabase
+        .from('products')
+        .update({ stock_quantity: newQuantity })
+        .eq('id', productId);
+
+      if (error) {
+        console.error('❌ Error updating individual stock:', error);
+        throw error;
+      }
+
+      // Update local state
+      setProducts(prev => prev.map(product =>
+        product.id === productId
+          ? { ...product, stock_quantity: newQuantity }
+          : product
+      ));
+
+      console.log('✅ Individual stock updated successfully:', { productId, newQuantity });
+
+      toast({
+        title: 'Stock Aggiornato',
+        description: `Stock aggiornato a ${newQuantity} unità.`,
+      });
+
+    } catch (error) {
+      console.error('Error updating individual stock:', error);
+      toast({
+        title: 'Errore',
+        description: `Impossibile aggiornare lo stock: ${error.message || 'Errore sconosciuto'}`,
+        variant: 'destructive'
+      });
+    } finally {
+      setUpdatingProducts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -398,32 +531,12 @@ const BulkStockManager: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map(product => (
-              <div key={product.id} className="border rounded-lg p-3">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-sm">{product.name}</h4>
-                    <p className="text-xs text-gray-600">{product.category_name}</p>
-                  </div>
-                  <Badge 
-                    variant={product.stock_quantity > 10 ? "default" : product.stock_quantity > 0 ? "secondary" : "destructive"}
-                  >
-                    {product.stock_quantity}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-1 text-xs">
-                  {product.stock_quantity > 10 ? (
-                    <CheckCircle className="h-3 w-3 text-green-500" />
-                  ) : product.stock_quantity > 0 ? (
-                    <AlertCircle className="h-3 w-3 text-yellow-500" />
-                  ) : (
-                    <AlertCircle className="h-3 w-3 text-red-500" />
-                  )}
-                  <span className="text-gray-600">
-                    {product.stock_quantity > 10 ? 'Disponibile' : 
-                     product.stock_quantity > 0 ? 'Scorte basse' : 'Esaurito'}
-                  </span>
-                </div>
-              </div>
+              <IndividualProductCard
+                key={product.id}
+                product={product}
+                onUpdateStock={updateIndividualStock}
+                isUpdating={updatingProducts.has(product.id)}
+              />
             ))}
           </div>
         </CardContent>
