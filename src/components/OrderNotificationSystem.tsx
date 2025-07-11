@@ -48,6 +48,9 @@ const OrderNotificationSystem = () => {
         // Try to load notification sound
         audio.src = '/notification-sound.mp3';
 
+        // Populate header controls
+        populateHeaderControls();
+
         // Handle audio load errors - use simple fallback
         audio.onerror = () => {
           console.log('🔊 [OrderNotification] Audio file not found, creating simple beep fallback');
@@ -385,6 +388,39 @@ const OrderNotificationSystem = () => {
     }
   };
 
+  // Populate header controls
+  const populateHeaderControls = () => {
+    const headerControls = document.getElementById('header-notification-controls');
+    if (headerControls) {
+      // Clear existing content
+      headerControls.innerHTML = '';
+
+      // Only show stop button if there are notifications or sound is playing
+      const unreadCount = notifications.filter(n => !n.is_read).length;
+      if (isPlaying || unreadCount > 0) {
+        // Create stop button for header
+        const stopButton = document.createElement('button');
+        stopButton.className = `px-3 py-1 rounded-lg shadow-md transition-all duration-300 font-medium text-sm flex items-center space-x-1 ${
+          isPlaying ? 'bg-red-600 text-white hover:bg-red-700 animate-pulse' : 'bg-orange-600 text-white hover:bg-orange-700'
+        }`;
+        stopButton.innerHTML = `<span>🔇</span><span>${isPlaying ? 'Stop Suoni' : `Ordini (${unreadCount})`}</span>`;
+        stopButton.onclick = () => {
+          console.log('🔇 [OrderNotification] Header stop button clicked');
+          forceStopSound();
+        };
+
+        headerControls.appendChild(stopButton);
+      }
+
+      console.log('🔧 [OrderNotification] Header controls updated');
+    }
+  };
+
+  // Update header controls when state changes
+  useEffect(() => {
+    populateHeaderControls();
+  }, [isPlaying, notifications]);
+
   // Set up real-time subscription only after initialization
   useEffect(() => {
     if (!isInitialized) {
@@ -479,21 +515,6 @@ const OrderNotificationSystem = () => {
           </div>
         </div>
       )}
-      {/* Force Stop Button - Always visible for testing */}
-      <div className="fixed top-4 right-4 z-50">
-        <button
-          onClick={() => {
-            console.log('🔇 [OrderNotification] Force stop button clicked');
-            forceStopSound();
-          }}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 transition-all duration-300 font-bold text-sm"
-        >
-          🔇 FORCE STOP
-        </button>
-      </div>
-
-
-
 
 
       {/* Stop Button - Show when ANY sound is playing OR when there are unread notifications */}
