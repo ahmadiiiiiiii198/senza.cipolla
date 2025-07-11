@@ -79,24 +79,24 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
+            <h3 className="font-semibold mb-4">Menu</h3>
             <ul className="space-y-2 text-gray-300">
-              <li><a href="#home" className="hover:text-yellow-400 transition-colors">Home</a></li>
-              <li><a href="#flowers" className="hover:text-yellow-400 transition-colors">Flowers</a></li>
-              <li><a href="#plants" className="hover:text-yellow-400 transition-colors">Plants</a></li>
-              <li><a href="#bouquets" className="hover:text-yellow-400 transition-colors">Bouquets</a></li>
-              <li><a href="#about" className="hover:text-yellow-400 transition-colors">About</a></li>
+              <li><a href="#home" className="hover:text-pizza-orange transition-colors">Home</a></li>
+              <li><a href="#products" className="hover:text-pizza-orange transition-colors">Le Nostre Pizze</a></li>
+              <li><a href="#categories" className="hover:text-pizza-orange transition-colors">Categorie</a></li>
+              <li><a href="#about" className="hover:text-pizza-orange transition-colors">Chi Siamo</a></li>
+              <li><a href="#contact" className="hover:text-pizza-orange transition-colors">Contatti</a></li>
             </ul>
           </div>
-          
+
           <div>
-            <h3 className="font-semibold mb-4">Services</h3>
+            <h3 className="font-semibold mb-4">I Nostri Servizi</h3>
             <ul className="space-y-2 text-gray-300">
-              <li>Wedding Arrangements</li>
-              <li>Corporate Events</li>
-              <li>Funeral Flowers</li>
-              <li>Plant Care Services</li>
-              <li>Custom Bouquets</li>
+              <li>🍕 Pizza al Taglio</li>
+              <li>🚚 Consegna a Domicilio</li>
+              <li>🎉 Catering per Eventi</li>
+              <li>👨‍🍳 Pizza Personalizzata</li>
+              <li>🥤 Bevande e Dolci</li>
             </ul>
           </div>
 
@@ -109,7 +109,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Francesco Fiori & Piante. All rights reserved.</p>
+          <p>&copy; 2024 Pizzeria Regina 2000 Torino. Tutti i diritti riservati.</p>
         </div>
       </div>
     </footer>
