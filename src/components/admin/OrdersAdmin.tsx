@@ -529,6 +529,10 @@ const OrdersAdmin = () => {
                       <span>Data:</span>
                       <span className="text-xs">{new Date(order.created_at).toLocaleDateString('it-IT')}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span>Ora:</span>
+                      <span className="text-xs font-medium text-blue-600">{new Date(order.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
