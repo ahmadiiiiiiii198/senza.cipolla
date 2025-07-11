@@ -10,6 +10,7 @@ import { SimpleCartProvider } from "@/hooks/use-simple-cart";
 import ErrorBoundary from "./components/ErrorBoundary";
 // import DiagnosticInfo from "./components/DiagnosticInfo"; // Removed diagnostic button
 import BackgroundInitializer from "./components/BackgroundInitializer";
+import ButtonDebugger from "./components/ButtonDebugger";
 // OrderNotificationSystem moved to admin panel only to prevent conflicts
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
@@ -35,6 +36,7 @@ const App = () => (
           <SimpleCartProvider>
             <BackgroundInitializer />
             {/* OrderNotificationSystem now only loads in admin panel */}
+            <ButtonDebugger />
             <Toaster />
             <Sonner />
             <BrowserRouter>
