@@ -391,28 +391,44 @@ const OrderNotificationSystem = () => {
   // Populate header controls
   const populateHeaderControls = () => {
     const headerControls = document.getElementById('header-notification-controls');
+    console.log('🔧 [OrderNotification] Looking for header controls element:', headerControls);
+
     if (headerControls) {
       // Clear existing content
       headerControls.innerHTML = '';
 
-      // Only show stop button if there are notifications or sound is playing
+      // Show stop button if there are notifications, sound is playing, OR system is initialized (always show)
       const unreadCount = notifications.filter(n => !n.is_read).length;
-      if (isPlaying || unreadCount > 0) {
+      console.log('🔧 [OrderNotification] State check:', { isPlaying, unreadCount, isInitialized });
+
+      if (isPlaying || unreadCount > 0 || isInitialized) {
         // Create stop button for header
         const stopButton = document.createElement('button');
         stopButton.className = `px-3 py-1 rounded-lg shadow-md transition-all duration-300 font-medium text-sm flex items-center space-x-1 ${
-          isPlaying ? 'bg-red-600 text-white hover:bg-red-700 animate-pulse' : 'bg-orange-600 text-white hover:bg-orange-700'
+          isPlaying ? 'bg-red-600 text-white hover:bg-red-700 animate-pulse' :
+          unreadCount > 0 ? 'bg-orange-600 text-white hover:bg-orange-700' :
+          'bg-gray-600 text-white hover:bg-gray-700'
         }`;
-        stopButton.innerHTML = `<span>🔇</span><span>${isPlaying ? 'Stop Suoni' : `Ordini (${unreadCount})`}</span>`;
+
+        const buttonText = isPlaying ? 'Stop Suoni' :
+                          unreadCount > 0 ? `Ordini (${unreadCount})` :
+                          'Stop Audio';
+
+        stopButton.innerHTML = `<span>🔇</span><span>${buttonText}</span>`;
         stopButton.onclick = () => {
           console.log('🔇 [OrderNotification] Header stop button clicked');
           forceStopSound();
         };
 
         headerControls.appendChild(stopButton);
+        console.log('🔧 [OrderNotification] Stop button added to header');
+      } else {
+        console.log('🔧 [OrderNotification] No button needed - no sound/notifications');
       }
 
       console.log('🔧 [OrderNotification] Header controls updated');
+    } else {
+      console.error('🔧 [OrderNotification] Header controls element not found!');
     }
   };
 
@@ -517,7 +533,28 @@ const OrderNotificationSystem = () => {
       )}
 
 
-      {/* Fixed stop button removed - only header integration now */}
+      {/* Fallback Stop Button - Always visible for emergency stop */}
+      {isInitialized && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => {
+              console.log('🔇 [OrderNotification] Fallback stop button clicked');
+              forceStopSound();
+            }}
+            className={`px-4 py-2 rounded-xl shadow-lg transition-all duration-300 font-bold text-sm border-2 ${
+              isPlaying
+                ? 'bg-red-600 text-white animate-pulse border-red-400 hover:bg-red-700'
+                : 'bg-gray-600 text-white border-gray-400 hover:bg-gray-700'
+            }`}
+            title="Emergency stop for all sounds and notifications"
+          >
+            <div className="flex items-center space-x-2">
+              <span>🔇</span>
+              <span>{isPlaying ? 'STOP SUONO' : 'STOP AUDIO'}</span>
+            </div>
+          </button>
+        </div>
+      )}
 
 
 
