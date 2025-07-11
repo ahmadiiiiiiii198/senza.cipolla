@@ -23,7 +23,8 @@ import {
   Clock,
   CreditCard,
   Loader2,
-  Package
+  Package,
+  Volume2
 } from 'lucide-react';
 
 // OrderNotificationSystem removed from main admin panel - only in separate ordini section
@@ -47,6 +48,7 @@ const SystemConnectionTest = lazy(() => import('../SystemConnectionTest').catch(
 const YouTubeConnectionTest = lazy(() => import('../YouTubeConnectionTest').catch(() => ({ default: () => <div>Error loading YouTubeConnectionTest</div> })));
 const BusinessHoursManager = lazy(() => import('./BusinessHoursManager').catch(() => ({ default: () => <div>Error loading BusinessHoursManager</div> })));
 const ShippingZoneManager = lazy(() => import('./ShippingZoneManager').catch(() => ({ default: () => <div>Error loading ShippingZoneManager</div> })));
+const IOSAudioTest = lazy(() => import('../IOSAudioTest').catch(() => ({ default: () => <div>Error loading IOSAudioTest</div> })));
 const StripeSettings = lazy(() => import('./StripeSettings').catch(() => ({ default: () => <div>Error loading StripeSettings</div> })));
 const NotificationSettings = lazy(() => import('./NotificationSettings').catch(() => ({ default: () => <div>Error loading NotificationSettings</div> })));
 const DatabaseSchemaUpdater = lazy(() => import('./DatabaseSchemaUpdater').catch(() => ({ default: () => <div>Error loading DatabaseSchemaUpdater</div> })));
@@ -213,6 +215,13 @@ const PizzeriaAdminPanel = () => {
       label: 'Frontend Test',
       icon: Globe,
       description: 'Test connessioni frontend',
+      category: 'testing'
+    },
+    {
+      id: 'ios-audio-test',
+      label: 'iOS Audio Test',
+      icon: Volume2,
+      description: 'Test audio notifications su iOS',
       category: 'testing'
     },
 
@@ -988,6 +997,26 @@ const PizzeriaAdminPanel = () => {
                 <CardContent>
                   <Suspense fallback={<LoadingSpinner />}>
                     <FrontendConnectionTester />
+                  </Suspense>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* iOS Audio Test */}
+            <TabsContent value="ios-audio-test">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Volume2 className="mr-2" />
+                    iOS Audio Notification Test
+                  </CardTitle>
+                  <CardDescription>
+                    Test and debug audio notifications on iOS devices
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <IOSAudioTest />
                   </Suspense>
                 </CardContent>
               </Card>

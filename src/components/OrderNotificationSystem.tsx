@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, X, Check, AlertCircle, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import iosAudioFix from '@/utils/iosAudioFix';
 
 interface OrderNotification {
   id: string;
@@ -221,18 +222,15 @@ const OrderNotificationSystem = () => {
   };
 
   // Start continuous notification sound
-  const startNotificationSound = () => {
+  const startNotificationSound = async () => {
     try {
       console.log('🔊 [OrderNotification] ===== STARTING SOUND =====');
+      const iosStatus = iosAudioFix.getStatus();
+      console.log('🔊 [OrderNotification] iOS Audio Status:', iosStatus);
       console.log('🔊 [OrderNotification] Mobile check:', {
         isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
         userAgent: navigator.userAgent
       });
-
-      if (!audioRef.current) {
-        console.error('🔊 [OrderNotification] ❌ No audio reference');
-        return;
-      }
 
       if (!isSoundEnabled) {
         console.warn('🔊 [OrderNotification] ⚠️ Sound disabled');
@@ -241,6 +239,30 @@ const OrderNotificationSystem = () => {
 
       if (isPlaying) {
         console.log('🔊 [OrderNotification] ⚠️ Already playing');
+        return;
+      }
+
+      // Try iOS-specific audio first
+      if (iosStatus.isIOS) {
+        console.log('🍎 [OrderNotification] Using iOS audio fix...');
+        const iosSuccess = await iosAudioFix.playNotificationSound();
+        if (iosSuccess) {
+          console.log('🍎 [OrderNotification] ✅ iOS audio played successfully');
+          setIsPlaying(true);
+
+          // Start looping for iOS
+          const stopLoop = await iosAudioFix.playLoopingSound();
+          // Store stop function for later use
+          (window as any).stopIOSLoop = stopLoop;
+          return;
+        } else {
+          console.log('🍎 [OrderNotification] ❌ iOS audio failed, falling back to standard');
+        }
+      }
+
+      // Fallback to standard audio for non-iOS or if iOS fails
+      if (!audioRef.current) {
+        console.error('🔊 [OrderNotification] ❌ No audio reference');
         return;
       }
 
@@ -304,7 +326,14 @@ const OrderNotificationSystem = () => {
         console.log('🔊 [OrderNotification] Sound interval cleared');
       }
 
-      // Stop and reset audio
+      // Stop iOS audio loop if exists
+      if ((window as any).stopIOSLoop) {
+        console.log('🍎 [OrderNotification] Stopping iOS audio loop...');
+        (window as any).stopIOSLoop();
+        (window as any).stopIOSLoop = null;
+      }
+
+      // Stop and reset standard audio
       if (audioRef.current) {
         audioRef.current.pause();
         if (typeof audioRef.current.currentTime !== 'undefined') {
@@ -345,6 +374,14 @@ const OrderNotificationSystem = () => {
     console.log('🔇 [OrderNotification] ===== FORCE STOPPING ALL AUDIO SYSTEMS =====');
 
     try {
+      // 0. Stop iOS audio loop first
+      if ((window as any).stopIOSLoop) {
+        console.log('🔇 [OrderNotification] 🍎 STOPPING iOS AUDIO LOOP');
+        (window as any).stopIOSLoop();
+        (window as any).stopIOSLoop = null;
+        console.log('🔇 [OrderNotification] ✅ iOS audio loop stopped');
+      }
+
       // 1. Stop our own audio system
       if (soundIntervalRef.current) {
         clearInterval(soundIntervalRef.current);
