@@ -22,7 +22,8 @@ import {
   Eye,
   Clock,
   CreditCard,
-  Loader2
+  Loader2,
+  Package
 } from 'lucide-react';
 
 // OrderNotificationSystem removed from main admin panel - only in separate ordini section
@@ -53,6 +54,7 @@ const ProductsDebugger = lazy(() => import('../ProductsDebugger').catch(() => ({
 const MenuProductsConnectionTest = lazy(() => import('../MenuProductsConnectionTest').catch(() => ({ default: () => <div>Error loading MenuProductsConnectionTest</div> })));
 const ProductsSchemaFixer = lazy(() => import('../ProductsSchemaFixer').catch(() => ({ default: () => <div>Error loading ProductsSchemaFixer</div> })));
 const FrontendConnectionTester = lazy(() => import('../FrontendConnectionTester').catch(() => ({ default: () => <div>Error loading FrontendConnectionTester</div> })));
+const BulkStockManager = lazy(() => import('./BulkStockManager').catch(() => ({ default: () => <div>Error loading BulkStockManager</div> })));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -118,6 +120,14 @@ const PizzeriaAdminPanel = () => {
       label: 'Menu & Prodotti',
       icon: Pizza,
       description: 'Gestione menu, pizze e prodotti',
+      category: 'core'
+    },
+
+    {
+      id: 'stock',
+      label: 'Gestione Stock',
+      icon: Package,
+      description: 'Gestione stock e disponibilità prodotti',
       category: 'core'
     },
 
@@ -548,6 +558,28 @@ const PizzeriaAdminPanel = () => {
             </TabsContent>
 
             {/* Orders Management removed - only available in separate ordini section */}
+
+            {/* Stock Management */}
+            <TabsContent value="stock">
+              <Card className="bg-white rounded-2xl shadow-xl border border-gray-200">
+                <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 rounded-t-2xl border-b border-green-200">
+                  <CardTitle className="flex items-center text-green-800">
+                    <div className="bg-green-500 p-2 rounded-lg mr-3">
+                      <Package className="h-6 w-6 text-white" />
+                    </div>
+                    Gestione Stock Prodotti
+                  </CardTitle>
+                  <CardDescription className="text-green-700">
+                    Gestisci la disponibilità e le quantità di stock per tutti i prodotti
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <BulkStockManager />
+                  </Suspense>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             {/* Products Management */}
             <TabsContent value="products">
