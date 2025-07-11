@@ -527,11 +527,24 @@ const OrdersAdmin = () => {
                     </div>
                     <div className="flex justify-between">
                       <span>Data:</span>
-                      <span className="text-xs">{new Date(order.created_at).toLocaleDateString('it-IT')}</span>
+                      <span className="text-xs sm:text-sm font-medium text-green-600">{new Date(order.created_at).toLocaleDateString('it-IT')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Ora:</span>
-                      <span className="text-xs font-medium text-blue-600">{new Date(order.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="text-xs sm:text-sm font-medium text-blue-600">{new Date(order.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-1 mt-1">
+                      <span className="text-xs text-gray-500">Ricevuto:</span>
+                      <span className="text-xs font-semibold text-purple-600">
+                        {new Date(order.created_at).toLocaleDateString('it-IT', {
+                          weekday: 'short',
+                          day: '2-digit',
+                          month: 'short'
+                        })} alle {new Date(order.created_at).toLocaleTimeString('it-IT', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -641,15 +654,46 @@ const OrdersAdmin = () => {
                   </div>
                 )}
 
-                {/* Timestamps */}
-                <div className="text-xs text-gray-500 space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <Calendar size={10} />
-                    <span className="truncate">Creato: {new Date(selectedOrder.created_at).toLocaleString('it-IT')}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Calendar size={10} />
-                    <span className="truncate">Aggiornato: {new Date(selectedOrder.updated_at).toLocaleString('it-IT')}</span>
+                {/* Enhanced Timestamps */}
+                <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                  <h5 className="text-sm font-semibold text-gray-700 mb-2">📅 Informazioni Temporali</h5>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Calendar size={12} className="text-green-600" />
+                        <span className="text-xs font-medium">Ordine Ricevuto:</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs font-semibold text-green-600">
+                          {new Date(selectedOrder.created_at).toLocaleDateString('it-IT', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </div>
+                        <div className="text-xs font-bold text-blue-600">
+                          alle {new Date(selectedOrder.created_at).toLocaleTimeString('it-IT', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t pt-2">
+                      <div className="flex items-center space-x-2">
+                        <Calendar size={12} className="text-orange-600" />
+                        <span className="text-xs font-medium">Ultimo Aggiornamento:</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs text-orange-600">
+                          {new Date(selectedOrder.updated_at).toLocaleDateString('it-IT')} alle {new Date(selectedOrder.updated_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
