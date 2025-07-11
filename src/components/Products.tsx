@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Pizza, Sparkles, ChefHat, Users, ShoppingBag, Search, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import ProductCard from './ProductCard';
+import OrderOptionsModal from './OrderOptionsModal';
 
 import { Product, ProductsByCategory } from '@/types/category';
 import { useStockManagement } from '@/hooks/useStockManagement';
@@ -16,6 +17,7 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { isProductAvailable } = useStockManagement();
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -386,10 +388,21 @@ const Products = () => {
                 Chiamaci per pizze su misura, eventi speciali e catering personalizzato per le tue feste!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-stagger-2">
-                <button className="bg-gradient-to-r from-pizza-red to-pizza-orange text-white px-8 py-4 rounded-full hover:from-pizza-red hover:to-pizza-tomato transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 hover-glow animate-heartbeat font-fredoka font-bold text-lg">
+                <button
+                  onClick={() => setIsOrderModalOpen(true)}
+                  className="bg-gradient-to-r from-pizza-red to-pizza-orange text-white px-8 py-4 rounded-full hover:from-pizza-red hover:to-pizza-tomato transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 hover-glow animate-heartbeat font-fredoka font-bold text-lg"
+                >
                   Richiedi Preventivo Personalizzato
                 </button>
-                <button className="border-2 border-emerald-500 text-emerald-600 px-8 py-3 rounded-full hover:bg-emerald-50 transition-all duration-300 hover-lift animate-bounce-gentle">
+                <button
+                  onClick={() => {
+                    const contactSection = document.getElementById('contact');
+                    if (contactSection) {
+                      contactSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="border-2 border-emerald-500 text-emerald-600 px-8 py-3 rounded-full hover:bg-emerald-50 transition-all duration-300 hover-lift animate-bounce-gentle"
+                >
                   Contattaci
                 </button>
               </div>
@@ -398,7 +411,11 @@ const Products = () => {
         </div>
       </section>
 
-
+      {/* Order Options Modal */}
+      <OrderOptionsModal
+        isOpen={isOrderModalOpen}
+        onClose={() => setIsOrderModalOpen(false)}
+      />
     </>
   );
 };
