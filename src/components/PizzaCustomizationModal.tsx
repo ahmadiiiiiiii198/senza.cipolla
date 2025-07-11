@@ -54,19 +54,22 @@ const PizzaCustomizationModal: React.FC<PizzaCustomizationModalProps> = ({
   const loadExtras = async () => {
     try {
       setIsLoading(true);
+
+      // First get the category ID for 'extra'
+      const { data: categoryData, error: categoryError } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', 'extra')
+        .single();
+
+      if (categoryError) throw categoryError;
+
+      // Then get products with that category_id
       const { data: extrasData, error } = await supabase
         .from('products')
-        .select(`
-          id,
-          name,
-          price,
-          description,
-          categories (
-            slug
-          )
-        `)
+        .select('id, name, price, description')
         .eq('is_active', true)
-        .eq('categories.slug', 'extra')
+        .eq('category_id', categoryData.id)
         .order('name');
 
       if (error) throw error;
