@@ -517,28 +517,7 @@ const OrderNotificationSystem = () => {
       )}
 
 
-      {/* Stop Button - Show when ANY sound is playing OR when there are unread notifications */}
-      {(isPlaying || unreadCount > 0 || isRealAudioPlaying) && (
-        <div className="fixed top-16 right-4 z-50">
-          <button
-            onClick={() => {
-              console.log('🔇 [OrderNotification] Stop button clicked - forcing sound stop');
-              forceStopSound();
-            }}
-            className={`px-4 py-2 rounded-xl shadow-lg hover:bg-red-700 transition-all duration-300 font-bold text-sm border-2 ${
-              (isPlaying || isRealAudioPlaying)
-                ? 'bg-red-600 text-white animate-pulse border-red-400'
-                : 'bg-orange-600 text-white border-orange-400'
-            }`}
-            title={(isPlaying || isRealAudioPlaying) ? "Ferma suono attivo" : `Ferma notifiche (${unreadCount} ordini)`}
-          >
-            <div className="flex items-center space-x-2">
-              <VolumeX size={16} className={(isPlaying || isRealAudioPlaying) ? "animate-bounce" : ""} />
-              <span>{(isPlaying || isRealAudioPlaying) ? 'STOP SUONO' : 'STOP NOTIFICHE'}</span>
-            </div>
-          </button>
-        </div>
-      )}
+      {/* Fixed stop button removed - only header integration now */}
 
 
 
