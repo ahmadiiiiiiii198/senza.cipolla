@@ -53,92 +53,92 @@ const About = () => {
       tagline: 'Creiamo bellezza, un fiore alla volta'
     },
     en: {
-      title: 'About Francesco Fiori & Piante',
+      title: 'About Pizzeria Regina 2000',
       storyTitle: 'Our Story',
-      paragraph1: 'Francesco Fiori & Piante was born from a passion for natural beauty and artisanal experience passed down through time. From the most delicate moments like funerals, to the most beautiful days like weddings, we offer floral arrangements created with love and care.',
-      paragraph2: 'Our creations are born from a deep passion for natural beauty. Only selected flowers, only elegance made in Turin. 🌼 Located inside the Porta Palazzo Market, we offer artisanal experience and passion for natural beauty.',
-      quote: '📍 Find us at Porta Palazzo, Turin – in the heart of the city\'s most vibrant and colorful market.',
-      quoteAuthor: 'A journey through scents, colors and floral harmonies',
-      servicesTitle: 'In our shop you can find:',
+      paragraph1: 'Pizzeria Regina 2000 was born from a passion for authentic Italian tradition and culinary experience passed down through time. Since 2000, we offer Italian pizza prepared with love, fresh ingredients and our traditional wood-fired oven.',
+      paragraph2: 'Our pizzas are born from a deep passion for Italian culinary tradition. Only selected ingredients, only authenticity made in Turin. 🍕 Located in the heart of Turin, we offer artisanal experience and passion for authentic Italian pizza.',
+      quote: '📍 Find us in the center of Turin – where Italian tradition meets Piedmontese hospitality.',
+      quoteAuthor: 'A journey through flavors, tradition and authenticity',
+      servicesTitle: 'In our pizzeria you can find:',
       services: [
-        'Fresh flowers for every occasion',
-        'Indoor and outdoor plants to decorate with nature',
-        'High quality fake flowers, ideal for long-lasting decorations',
-        'Tailor-made floral services for ceremonies, events, and environments'
+        'Italian pizza cooked in a wood-fired oven',
+        'Fresh and top quality ingredients',
+        'Dough prepared daily with natural leavening',
+        'Service for events, parties and personalized catering'
       ],
       stats: {
-        years: 'Years Experience',
-        customers: 'Happy Customers',
-        varieties: 'Flower Varieties'
+        years: 'Years of Experience',
+        customers: 'Satisfied Customers',
+        varieties: 'Pizza Varieties'
       },
-      closingMessage: 'Come visit us at Francesco Fiori & Piante and bring a touch of nature into your life.',
-      tagline: 'Creating beauty, one flower at a time'
+      closingMessage: 'Come visit us at Pizzeria Regina 2000 and discover the true taste of Italian tradition.',
+      tagline: 'Creating authentic flavors, one pizza at a time'
     },
     fr: {
-      title: 'À Propos de Francesco Fiori & Piante',
+      title: 'À Propos de Pizzeria Regina 2000',
       storyTitle: 'Notre Histoire',
-      paragraph1: 'Francesco Fiori & Piante est né d\'une passion pour la beauté naturelle et l\'expérience artisanale transmise à travers le temps. Des moments les plus délicats comme les funérailles, aux plus beaux jours comme les mariages, nous offrons des arrangements floraux créés avec amour et soin.',
-      paragraph2: 'Nos créations naissent d\'une passion profonde pour la beauté naturelle. Seulement des fleurs sélectionnées, seulement l\'élégance made in Turin. 🌼 Situés à l\'intérieur du Marché de Porta Palazzo, nous offrons une expérience artisanale et une passion pour la beauté naturelle.',
-      quote: '📍 Trouvez-nous à Porta Palazzo, Turin – au cœur du marché le plus vivant et coloré de la ville.',
-      quoteAuthor: 'Un voyage à travers les parfums, couleurs et harmonies florales',
-      servicesTitle: 'Dans notre boutique vous pouvez trouver:',
+      paragraph1: 'Pizzeria Regina 2000 est née d\'une passion pour la tradition italienne authentique et l\'expérience culinaire transmise à travers le temps. Depuis 2000, nous offrons de la pizza italienne préparée avec amour, des ingrédients frais et notre four à bois traditionnel.',
+      paragraph2: 'Nos pizzas naissent d\'une passion profonde pour la tradition culinaire italienne. Seulement des ingrédients sélectionnés, seulement l\'authenticité made in Turin. 🍕 Situés au cœur de Turin, nous offrons une expérience artisanale et une passion pour la vraie pizza italienne.',
+      quote: '📍 Trouvez-nous au centre de Turin – où la tradition italienne rencontre l\'hospitalité piémontaise.',
+      quoteAuthor: 'Un voyage à travers les saveurs, la tradition et l\'authenticité',
+      servicesTitle: 'Dans notre pizzeria vous pouvez trouver:',
       services: [
-        'Fleurs fraîches pour chaque occasion',
-        'Plantes d\'intérieur et d\'extérieur pour décorer avec la nature',
-        'Fleurs artificielles de haute qualité, idéales pour des décorations durables',
-        'Services floraux sur mesure pour cérémonies, événements et environnements'
+        'Pizza italienne cuite au four à bois',
+        'Ingrédients frais et de première qualité',
+        'Pâte préparée quotidiennement avec levage naturel',
+        'Service pour événements, fêtes et catering personnalisé'
       ],
       stats: {
         years: 'Années d\'Expérience',
         customers: 'Clients Satisfaits',
-        varieties: 'Variétés de Fleurs'
+        varieties: 'Variétés de Pizzas'
       },
-      closingMessage: 'Venez nous rendre visite chez Francesco Fiori & Piante et apportez une touche de nature dans votre vie.',
-      tagline: 'Créer la beauté, une fleur à la fois'
+      closingMessage: 'Venez nous rendre visite à Pizzeria Regina 2000 et découvrez le vrai goût de la tradition italienne.',
+      tagline: 'Créer des saveurs authentiques, une pizza à la fois'
     },
     ar: {
-      title: 'حول فرانشيسكو فيوري وبيانتي',
+      title: 'حول بيتزيريا ريجينا 2000',
       storyTitle: 'قصتنا',
-      paragraph1: 'ولد فرانشيسكو فيوري وبيانتي من شغف بالجمال الطبيعي والخبرة الحرفية المتوارثة عبر الزمن. من اللحظات الأكثر حساسية مثل الجنازات، إلى أجمل الأيام مثل حفلات الزفاف، نقدم تنسيقات زهرية مصنوعة بحب وعناية.',
-      paragraph2: 'إبداعاتنا تولد من شغف عميق بالجمال الطبيعي. فقط زهور مختارة، فقط أناقة صنع في تورين. 🌼 تقع داخل سوق بورتا بالازو، نقدم خبرة حرفية وشغف بالجمال الطبيعي.',
-      quote: '📍 اعثر علينا في بورتا بالازو، تورين – في قلب أكثر أسواق المدينة حيوية وألوانًا.',
-      quoteAuthor: 'رحلة عبر العطور والألوان والتناغمات الزهرية',
-      servicesTitle: 'في متجرنا يمكنك أن تجد:',
+      paragraph1: 'ولدت بيتزيريا ريجينا 2000 من شغف بالتقاليد الإيطالية الأصيلة والخبرة الطهوية المتوارثة عبر الزمن. منذ عام 2000، نقدم البيتزا الإيطالية المحضرة بحب، مع مكونات طازجة وفرننا التقليدي الذي يعمل بالحطب.',
+      paragraph2: 'بيتزاتنا تولد من شغف عميق بالتقاليد الطهوية الإيطالية. فقط مكونات مختارة، فقط أصالة صنع في تورين. 🍕 تقع في قلب تورين، نقدم خبرة حرفية وشغف بالبيتزا الإيطالية الأصيلة.',
+      quote: '📍 اعثر علينا في وسط تورين – حيث تلتقي التقاليد الإيطالية بالضيافة البيدمونتية.',
+      quoteAuthor: 'رحلة عبر النكهات والتقاليد والأصالة',
+      servicesTitle: 'في بيتزيريتنا يمكنك أن تجد:',
       services: [
-        'زهور طازجة لكل مناسبة',
-        'نباتات داخلية وخارجية للتزيين بالطبيعة',
-        'زهور صناعية عالية الجودة، مثالية للديكورات طويلة الأمد',
-        'خدمات زهرية مخصصة للاحتفالات والفعاليات والبيئات'
+        'بيتزا إيطالية مطبوخة في فرن الحطب',
+        'مكونات طازجة وعالية الجودة',
+        'عجين محضر يومياً مع تخمير طبيعي',
+        'خدمة للفعاليات والحفلات والتموين المخصص'
       ],
       stats: {
         years: 'سنوات الخبرة',
-        customers: 'عملاء سعداء',
-        varieties: 'أنواع الزهور'
+        customers: 'عملاء راضون',
+        varieties: 'أنواع البيتزا'
       },
-      closingMessage: 'تعال لزيارتنا في فرانشيسكو فيوري وبيانتي وأضف لمسة من الطبيعة إلى حياتك.',
-      tagline: 'نخلق الجمال، زهرة واحدة في كل مرة'
+      closingMessage: 'تعال لزيارتنا في بيتزيريا ريجينا 2000 واكتشف الطعم الحقيقي للتقاليد الإيطالية.',
+      tagline: 'نخلق نكهات أصيلة، بيتزا واحدة في كل مرة'
     },
     fa: {
-      title: 'درباره فرانچسکو فیوری و پیانته',
+      title: 'درباره پیتزریا رجینا 2000',
       storyTitle: 'داستان ما',
-      paragraph1: 'فرانچسکو فیوری و پیانته از عشق به زیبایی طبیعی و تجربه صنعتگری که در طول زمان منتقل شده، متولد شد. از حساس‌ترین لحظات مانند تشییع جنازه، تا زیباترین روزها مانند عروسی، ما تنظیمات گل ارائه می‌دهیم که با عشق و مراقبت ساخته شده‌اند.',
-      paragraph2: 'آثار ما از عشق عمیق به زیبایی طبیعی متولد می‌شوند. فقط گل‌های انتخابی، فقط ظرافت ساخت تورین. 🌼 واقع در داخل بازار پورتا پالازو، ما تجربه صنعتگری و عشق به زیبایی طبیعی ارائه می‌دهیم.',
-      quote: '📍 ما را در پورتا پالازو، تورین پیدا کنید – در قلب پر جنب و جوش‌ترین و رنگارنگ‌ترین بازار شهر.',
-      quoteAuthor: 'سفری در میان عطرها، رنگ‌ها و هارمونی‌های گل',
-      servicesTitle: 'در فروشگاه ما می‌توانید پیدا کنید:',
+      paragraph1: 'پیتزریا رجینا 2000 از عشق به سنت‌های اصیل ایتالیایی و تجربه آشپزی که در طول زمان منتقل شده، متولد شد. از سال 2000، ما پیتزای ایتالیایی تهیه شده با عشق، مواد تازه و کوره سنتی هیزمی خود ارائه می‌دهیم.',
+      paragraph2: 'پیتزاهای ما از عشق عمیق به سنت‌های آشپزی ایتالیایی متولد می‌شوند. فقط مواد انتخابی، فقط اصالت ساخت تورین. 🍕 واقع در قلب تورین، ما تجربه صنعتگری و عشق به پیتزای اصیل ایتالیایی ارائه می‌دهیم.',
+      quote: '📍 ما را در مرکز تورین پیدا کنید – جایی که سنت ایتالیایی با مهمان‌نوازی پیدمونتی ملاقات می‌کند.',
+      quoteAuthor: 'سفری در میان طعم‌ها، سنت و اصالت',
+      servicesTitle: 'در پیتزریای ما می‌توانید پیدا کنید:',
       services: [
-        'گل‌های تازه برای هر مناسبت',
-        'گیاهان داخلی و خارجی برای تزیین با طبیعت',
-        'گل‌های مصنوعی با کیفیت بالا، ایده‌آل برای تزیینات بادوام',
-        'خدمات گل سفارشی برای مراسم، رویدادها و محیط‌ها'
+        'پیتزای ایتالیایی پخته شده در کوره هیزمی',
+        'مواد تازه و با کیفیت بالا',
+        'خمیر تهیه شده روزانه با تخمیر طبیعی',
+        'خدمات برای رویدادها، جشن‌ها و کترینگ شخصی‌سازی شده'
       ],
       stats: {
         years: 'سال تجربه',
-        customers: 'مشتریان خوشحال',
-        varieties: 'انواع گل'
+        customers: 'مشتریان راضی',
+        varieties: 'انواع پیتزا'
       },
-      closingMessage: 'برای دیدن ما به فرانچسکو فیوری و پیانته بیایید و لمسی از طبیعت را به زندگی‌تان بیاورید.',
-      tagline: 'خلق زیبایی، یک گل در هر زمان'
+      closingMessage: 'برای دیدن ما به پیتزریا رجینا 2000 بیایید و طعم واقعی سنت ایتالیایی را کشف کنید.',
+      tagline: 'خلق طعم‌های اصیل، یک پیتزا در هر زمان'
     }
   };
 
