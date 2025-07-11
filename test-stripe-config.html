@@ -15,8 +15,8 @@
             results.innerHTML = '<p>Testing Stripe configuration...</p>';
 
             try {
-                // Test with your publishable key
-                const stripe = Stripe('pk_live_51RGNdrDOJ63odpAzQO3MOKACOOOEZrts38zjpFfiZYL9ynVjweBR6j9WJfcWzrdsZNoMOMinSUuJ9jxf8z8PjqWT00oqoe6KCn');
+                // Test with your publishable key - REPLACE WITH YOUR ACTUAL KEY
+                const stripe = Stripe('pk_live_YOUR_PUBLISHABLE_KEY_HERE');
                 
                 if (stripe) {
                     results.innerHTML = '<p style="color: green;">✅ Stripe initialized successfully!</p>';
