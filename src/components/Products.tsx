@@ -188,8 +188,20 @@ const Products = () => {
         return 'SPECIALI - Signature & Gourmet';
       case 'extra':
         return 'EXTRA - Toppings';
+      case 'pizze-al-metro-per-4-5-persone':
+        return 'Pizze al-metro-per-4-5-persone';
       default:
         return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1).replace('-', ' ');
+    }
+  };
+
+  // Get category pricing information
+  const getCategoryPricingInfo = (categorySlug: string) => {
+    switch (categorySlug) {
+      case 'pizze-al-metro-per-4-5-persone':
+        return 'Prezzo chef secondo i gusti, si stabilisce secondo i gusti';
+      default:
+        return null;
     }
   };
 
@@ -319,6 +331,11 @@ const Products = () => {
                     <h3 className="text-3xl font-bold text-gray-800 mb-2 font-playfair animate-fade-in-up">
                       {displayName}
                     </h3>
+                    {getCategoryPricingInfo(categorySlug) && (
+                      <p className="text-lg text-pizza-orange font-semibold mb-3 animate-fade-in-up italic">
+                        {getCategoryPricingInfo(categorySlug)}
+                      </p>
+                    )}
                     <div className="w-24 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 mx-auto rounded-full animate-shimmer"></div>
                   </div>
 

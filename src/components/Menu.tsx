@@ -15,12 +15,17 @@ interface Product {
   };
 }
 
-const MenuSection = ({ title, items }: { title: string; items: Product[] }) => {
+const MenuSection = ({ title, items, pricingInfo }: { title: string; items: Product[]; pricingInfo?: string }) => {
   return (
     <div className="mb-12">
       <h3 className="text-2xl font-bold text-pizza-dark mb-6 text-center">
         <span className="border-b-2 border-pizza-red pb-1">{title}</span>
       </h3>
+      {pricingInfo && (
+        <p className="text-lg text-pizza-orange font-semibold mb-4 text-center italic">
+          {pricingInfo}
+        </p>
+      )}
       <div className="grid md:grid-cols-2 gap-8">
         {items.map((item, index) => (
           <div key={index} className="border-b border-gray-200 pb-4">
@@ -39,6 +44,14 @@ const MenuSection = ({ title, items }: { title: string; items: Product[] }) => {
 const Menu = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Get category pricing information
+  const getCategoryPricingInfo = (categoryName: string) => {
+    if (categoryName === 'Pizze al-metro-per-4-5-persone') {
+      return 'Prezzo chef secondo i gusti, si stabilisce secondo i gusti';
+    }
+    return null;
+  };
 
   useEffect(() => {
     loadProducts();
@@ -122,6 +135,7 @@ const Menu = () => {
                 key={categoryName}
                 title={categoryName}
                 items={categoryProducts}
+                pricingInfo={getCategoryPricingInfo(categoryName)}
               />
             ))
           )}
