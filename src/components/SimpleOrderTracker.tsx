@@ -36,7 +36,50 @@ const SimpleOrderTracker: React.FC = () => {
   // Auto-load tracked order on mount - FULLY AUTOMATIC
   useEffect(() => {
     const loadOrder = async () => {
-      const trackedOrder = getTrackedOrder();
+      let trackedOrder = getTrackedOrder();
+
+      // MANUAL FIX: If no tracked order found, check for recent orders from this browser
+      if (!trackedOrder) {
+        console.log('🔍 No cookie found, checking for recent orders...');
+        try {
+          const { data: recentOrders, error } = await supabase
+            .from('orders')
+            .select('id, order_number, customer_name, customer_email, total_amount, created_at, status')
+            .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24 hours
+            .in('status', ['confirmed', 'preparing', 'ready']) // Active statuses
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+          if (!error && recentOrders && recentOrders.length > 0) {
+            console.log('📋 Found recent orders:', recentOrders.length);
+            const mostRecentOrder = recentOrders[0];
+
+            // Auto-save for tracking
+            saveOrderForTracking({
+              id: mostRecentOrder.id,
+              order_number: mostRecentOrder.order_number,
+              customer_email: mostRecentOrder.customer_email,
+              customer_name: mostRecentOrder.customer_name,
+              total_amount: mostRecentOrder.total_amount,
+              created_at: mostRecentOrder.created_at
+            });
+
+            trackedOrder = {
+              orderId: mostRecentOrder.id,
+              orderNumber: mostRecentOrder.order_number,
+              customerEmail: mostRecentOrder.customer_email,
+              customerName: mostRecentOrder.customer_name,
+              totalAmount: mostRecentOrder.total_amount,
+              createdAt: mostRecentOrder.created_at
+            };
+
+            console.log('✅ Auto-detected and saved order:', mostRecentOrder.order_number);
+          }
+        } catch (error) {
+          console.error('❌ Error checking recent orders:', error);
+        }
+      }
+
       if (trackedOrder) {
         console.log('🎯 Auto-loading tracked order:', trackedOrder.orderNumber);
         await searchOrder(trackedOrder.orderNumber, trackedOrder.customerEmail);

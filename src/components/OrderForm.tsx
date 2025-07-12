@@ -157,7 +157,7 @@ const OrderForm = () => {
           customer_phone: formData.customerPhone || null,
           customer_address: shippingAddress, // Use customer_address column
           total_amount: estimatedPrice,
-          status: 'payment_pending', // Will be updated to 'paid' by Stripe webhook
+          status: 'confirmed', // Orders are automatically confirmed
           payment_status: 'pending',
           payment_method: 'stripe',
           metadata: {
