@@ -1,34 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { Pizza, ChefHat, Star, Utensils } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 const WeOffer = () => {
-  const [offerContent, setOfferContent] = useState({
-    heading: "We Offer",
-    subheading: "Discover our authentic Italian specialties",
+  const { t } = useLanguage();
+
+  // Dynamic content based on translations
+  const getOfferContent = () => ({
+    heading: t('weOffer'),
+    subheading: t('weOfferSubtitle'),
     offers: [
       {
         id: 1,
-        title: "Pizza Metro Finchi 5 Gusti",
-        description: "Experience our signature meter-long pizza with up to 5 different flavors in one amazing creation. Perfect for sharing with family and friends.",
+        title: t('pizzaMetroTitle'),
+        description: t('pizzaMetroDesc'),
         image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: "Specialty"
+        badge: t('specialtyBadge')
       },
       {
         id: 2,
-        title: "Usiamo la Farina 5 Stagioni Gusti, Alta Qualità",
-        description: "We use premium 5 Stagioni flour, the finest quality ingredients that make our pizza dough light, digestible and incredibly flavorful.",
+        title: t('flourQualityTitle'),
+        description: t('flourQualityDesc'),
         image: "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: "Quality"
+        badge: t('qualityBadge')
       },
       {
         id: 3,
-        title: "We Make All Kinds of Italian Pizza with High Quality and Very Delicious",
-        description: "From classic Margherita to gourmet specialties, we craft every pizza with passion, using traditional techniques and the finest ingredients for an authentic Italian experience.",
+        title: t('italianPizzaTitle'),
+        description: t('italianPizzaDesc'),
         image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: "Authentic"
+        badge: t('authenticBadge')
       }
     ]
   });
+
+  const [offerContent, setOfferContent] = useState(getOfferContent());
+
+  // Update content when language changes
+  useEffect(() => {
+    setOfferContent(getOfferContent());
+  }, [t]);
 
   const [imagesLoaded, setImagesLoaded] = useState({
     1: false,

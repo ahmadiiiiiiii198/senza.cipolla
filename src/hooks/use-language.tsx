@@ -143,7 +143,20 @@ const translations: Record<Language, Record<string, string>> = {
     "defaultHours": "Lun-Dom: 08:00 - 19:00",
 
     // Navigation
-    "products": "Menu"
+    "products": "Menu",
+
+    // WeOffer section
+    "weOffer": "Le Nostre Specialità",
+    "weOfferSubtitle": "Scopri le nostre autentiche specialità italiane",
+    "pizzaMetroTitle": "Pizza Metro Finchi 5 Gusti",
+    "pizzaMetroDesc": "Prova la nostra pizza metro caratteristica con fino a 5 gusti diversi in un'unica creazione straordinaria. Perfetta da condividere con famiglia e amici.",
+    "flourQualityTitle": "Usiamo la Farina 5 Stagioni Gusti, Alta Qualità",
+    "flourQualityDesc": "Utilizziamo farina premium 5 Stagioni, ingredienti della migliore qualità che rendono il nostro impasto leggero, digeribile e incredibilmente saporito.",
+    "italianPizzaTitle": "Realizziamo Tutti i Tipi di Pizza Italiana di Alta Qualità e Molto Deliziosa",
+    "italianPizzaDesc": "Dalla classica Margherita alle specialità gourmet, realizziamo ogni pizza con passione, utilizzando tecniche tradizionali e i migliori ingredienti per un'autentica esperienza italiana.",
+    "specialtyBadge": "Specialità",
+    "qualityBadge": "Qualità",
+    "authenticBadge": "Autentico"
   },
   en: {
     // Navigation
@@ -278,7 +291,20 @@ const translations: Record<Language, Record<string, string>> = {
     "defaultHours": "Mon-Sun: 08:00 - 19:00",
 
     // Navigation
-    "products": "Menu"
+    "products": "Menu",
+
+    // WeOffer section
+    "weOffer": "We Offer",
+    "weOfferSubtitle": "Discover our authentic Italian specialties",
+    "pizzaMetroTitle": "Pizza Metro Finchi 5 Gusti",
+    "pizzaMetroDesc": "Experience our signature meter-long pizza with up to 5 different flavors in one amazing creation. Perfect for sharing with family and friends.",
+    "flourQualityTitle": "We Use 5 Stagioni Flour, High Quality",
+    "flourQualityDesc": "We use premium 5 Stagioni flour, the finest quality ingredients that make our pizza dough light, digestible and incredibly flavorful.",
+    "italianPizzaTitle": "We Make All Kinds of Italian Pizza with High Quality and Very Delicious",
+    "italianPizzaDesc": "From classic Margherita to gourmet specialties, we craft every pizza with passion, using traditional techniques and the finest ingredients for an authentic Italian experience.",
+    "specialtyBadge": "Specialty",
+    "qualityBadge": "Quality",
+    "authenticBadge": "Authentic"
   }
 };
 
