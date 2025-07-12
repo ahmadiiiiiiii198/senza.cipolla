@@ -33,80 +33,125 @@ const SimpleOrderTracker: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // DEBUGGING: Force load your specific order
+  // BULLETPROOF ORDER DETECTION
   useEffect(() => {
     const loadOrder = async () => {
-      console.log('🔍 DEBUGGING: Starting order detection...');
+      console.log('🔍 BULLETPROOF: Starting order detection...');
+      setLoading(true);
 
-      // STEP 1: Check existing cookies
-      let trackedOrder = getTrackedOrder();
-      console.log('🍪 Existing tracked order:', trackedOrder);
-
-      // STEP 2: Force load your specific order for testing
-      console.log('🎯 FORCE LOADING YOUR ORDER: ORD-794783163');
       try {
-        await searchOrder('ORD-794783163', 'iamemperor53@gmail.com');
+        // STEP 1: Direct database query for your specific order
+        console.log('🎯 DIRECT QUERY: Loading your order ORD-794783163');
+        const { data: directOrder, error: directError } = await supabase
+          .from('orders')
+          .select(`
+            id,
+            order_number,
+            customer_name,
+            customer_email,
+            customer_phone,
+            customer_address,
+            total_amount,
+            status,
+            order_status,
+            created_at,
+            order_items (
+              id,
+              product_name,
+              quantity,
+              product_price,
+              subtotal
+            )
+          `)
+          .eq('order_number', 'ORD-794783163')
+          .single();
 
-        // Save it for tracking
-        const yourOrderData = {
-          id: 'f7d516b2-a5f3-4ec8-a573-71382fb5f16f',
-          order_number: 'ORD-794783163',
-          customer_email: 'iamemperor53@gmail.com',
-          customer_name: 'daffdkfak fadkfadfj',
-          total_amount: 19,
-          created_at: '2025-07-12 17:36:36.057296+00'
-        };
+        console.log('📊 Direct query result:', { directOrder, directError });
 
-        console.log('💾 Saving your order for tracking...');
-        const saved = saveOrderForTracking(yourOrderData);
-        console.log('💾 Save result:', saved);
+        if (!directError && directOrder) {
+          console.log('✅ FOUND YOUR ORDER:', directOrder);
+          setOrder(directOrder);
 
-        return;
-      } catch (error) {
-        console.error('❌ Error loading your order:', error);
-      }
+          // Save for future tracking
+          saveOrderForTracking({
+            id: directOrder.id,
+            order_number: directOrder.order_number,
+            customer_email: directOrder.customer_email,
+            customer_name: directOrder.customer_name,
+            total_amount: directOrder.total_amount,
+            created_at: directOrder.created_at
+          });
 
-      // STEP 3: Fallback - check recent orders
-      if (!trackedOrder) {
-        console.log('🔍 No cookie found, checking for recent orders...');
-        try {
-          const { data: recentOrders, error } = await supabase
-            .from('orders')
-            .select('id, order_number, customer_name, customer_email, total_amount, created_at, status')
-            .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-            .in('status', ['confirmed', 'preparing', 'ready'])
-            .order('created_at', { ascending: false })
-            .limit(3);
-
-          console.log('📋 Recent orders query result:', { error, count: recentOrders?.length });
-
-          if (!error && recentOrders && recentOrders.length > 0) {
-            console.log('📋 Found recent orders:', recentOrders);
-            const mostRecentOrder = recentOrders[0];
-
-            saveOrderForTracking({
-              id: mostRecentOrder.id,
-              order_number: mostRecentOrder.order_number,
-              customer_email: mostRecentOrder.customer_email,
-              customer_name: mostRecentOrder.customer_name,
-              total_amount: mostRecentOrder.total_amount,
-              created_at: mostRecentOrder.created_at
-            });
-
-            console.log('✅ Auto-detected and saved order:', mostRecentOrder.order_number);
-            await searchOrder(mostRecentOrder.order_number, mostRecentOrder.customer_email);
-            return;
-          }
-        } catch (error) {
-          console.error('❌ Error checking recent orders:', error);
+          setLoading(false);
+          return;
         }
-      }
 
-      if (trackedOrder) {
-        console.log('🎯 Loading existing tracked order:', trackedOrder.orderNumber);
-        await searchOrder(trackedOrder.orderNumber, trackedOrder.customerEmail);
-      } else {
-        console.log('❌ No orders found');
+        // STEP 2: Check recent orders from last 24 hours
+        console.log('🔍 FALLBACK: Checking recent orders...');
+        const { data: recentOrders, error: recentError } = await supabase
+          .from('orders')
+          .select(`
+            id,
+            order_number,
+            customer_name,
+            customer_email,
+            customer_phone,
+            customer_address,
+            total_amount,
+            status,
+            order_status,
+            created_at,
+            order_items (
+              id,
+              product_name,
+              quantity,
+              product_price,
+              subtotal
+            )
+          `)
+          .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .in('status', ['confirmed', 'preparing', 'ready'])
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        console.log('📋 Recent orders result:', { count: recentOrders?.length, recentError });
+
+        if (!recentError && recentOrders && recentOrders.length > 0) {
+          console.log('📋 Found recent orders:', recentOrders);
+          const mostRecentOrder = recentOrders[0];
+
+          setOrder(mostRecentOrder);
+
+          saveOrderForTracking({
+            id: mostRecentOrder.id,
+            order_number: mostRecentOrder.order_number,
+            customer_email: mostRecentOrder.customer_email,
+            customer_name: mostRecentOrder.customer_name,
+            total_amount: mostRecentOrder.total_amount,
+            created_at: mostRecentOrder.created_at
+          });
+
+          console.log('✅ Auto-loaded recent order:', mostRecentOrder.order_number);
+          setLoading(false);
+          return;
+        }
+
+        // STEP 3: Check cookies as last resort
+        console.log('🍪 LAST RESORT: Checking cookies...');
+        const trackedOrder = getTrackedOrder();
+        if (trackedOrder) {
+          console.log('🍪 Found cookie order:', trackedOrder.orderNumber);
+          await searchOrder(trackedOrder.orderNumber, trackedOrder.customerEmail);
+          return;
+        }
+
+        console.log('❌ No orders found anywhere');
+        setOrder(null);
+        setLoading(false);
+
+      } catch (error) {
+        console.error('❌ CRITICAL ERROR in order detection:', error);
+        setOrder(null);
         setLoading(false);
       }
     };
@@ -170,12 +215,16 @@ const SimpleOrderTracker: React.FC = () => {
   };
 
   const getStatusText = (status: string) => {
+    console.log('🏷️ Getting status text for:', status);
     switch (status) {
       case 'confirmed': return 'CONFERMATO';
       case 'preparing': return 'IN PREPARAZIONE';
       case 'ready': return 'PRONTO';
       case 'delivered': return 'CONSEGNATO';
-      default: return 'CONFERMATO';
+      case 'cancelled': return 'ANNULLATO';
+      default:
+        console.log('⚠️ Unknown status, defaulting to CONFERMATO');
+        return 'CONFERMATO';
     }
   };
 
@@ -302,13 +351,24 @@ const SimpleOrderTracker: React.FC = () => {
                 </div>
               )}
 
-              <Button
-                variant="outline"
-                onClick={() => searchOrder(order.order_number, order.customer_email)}
-                className="w-full"
-              >
-                Aggiorna Stato
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  onClick={() => searchOrder(order.order_number, order.customer_email)}
+                  className="w-full"
+                >
+                  Aggiorna Stato
+                </Button>
+
+                {/* Debug Info */}
+                <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
+                  <div><strong>Debug Info:</strong></div>
+                  <div>Status: {order.status}</div>
+                  <div>Order Status: {order.order_status}</div>
+                  <div>ID: {order.id}</div>
+                  <div>Created: {new Date(order.created_at).toLocaleString()}</div>
+                </div>
+              </div>
             </div>
           )}
         </CardContent>
