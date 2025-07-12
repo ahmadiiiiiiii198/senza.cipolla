@@ -54,39 +54,3 @@ const LanguageSelector = () => {
 };
 
 export default LanguageSelector;
-            variant={language === "fr" ? "default" : "ghost"}
-            onClick={() => {
-              setLanguage("fr");
-              setOpen(false);
-            }}
-            className={`rounded-none justify-start text-sm ${language === "fr" ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-100"}`}
-          >
-            🇫🇷 Français
-          </Button>
-          <Button
-            variant={language === "ar" ? "default" : "ghost"}
-            onClick={() => {
-              setLanguage("ar");
-              setOpen(false);
-            }}
-            className={`rounded-none justify-start text-sm ${language === "ar" ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-100"}`}
-          >
-            🇸🇦 العربية
-          </Button>
-          <Button
-            variant={language === "fa" ? "default" : "ghost"}
-            onClick={() => {
-              setLanguage("fa");
-              setOpen(false);
-            }}
-            className={`rounded-none justify-start text-sm ${language === "fa" ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-100"}`}
-          >
-            🇮🇷 فارسی
-          </Button>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
-export default LanguageSelector;
