@@ -259,6 +259,12 @@ const SimpleOrderTracker: React.FC = () => {
     return () => clearInterval(interval);
   }, [order]);
 
+  const clearTracking = () => {
+    clearOrderTracking();
+    setOrder(null);
+    console.log('🗑️ Order tracking cleared');
+  };
+
   const searchOrder = async (orderNum: string, email: string) => {
     try {
       const { data: orderData, error } = await supabase
