@@ -128,10 +128,18 @@ const OrderStatusUpdater: React.FC<OrderStatusUpdaterProps> = ({
         description: `Ordine #${order.order_number} aggiornato a: ${orderStatuses.find(s => s.value === newStatus)?.label}`,
       });
 
+      // Update local order object to reflect changes immediately
+      order.status = newStatus;
+      order.order_status = newStatus;
+
       // Call callback if provided
       if (onStatusUpdate) {
         onStatusUpdate(order.id, newStatus);
       }
+
+      // Force component re-render by updating state
+      setUpdating(false);
+      setUpdating(false); // Double call to ensure re-render
 
     } catch (error) {
       console.error('Failed to update order status:', error);
@@ -227,14 +235,15 @@ const OrderStatusUpdater: React.FC<OrderStatusUpdaterProps> = ({
                   size="sm"
                   onClick={() => updateOrderStatus(status.value)}
                   disabled={updating || isCurrentStatus}
-                  className={`text-xs p-2 h-auto ${
-                    isCurrentStatus 
-                      ? 'bg-gray-400 cursor-not-allowed' 
-                      : 'hover:bg-gray-100'
+                  className={`text-xs p-2 h-auto transition-all duration-200 ${
+                    isCurrentStatus
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-md cursor-not-allowed'
+                      : 'hover:bg-gray-100 hover:border-gray-300'
                   }`}
                 >
                   <StatusIcon className="h-3 w-3 mr-1" />
                   <span className="truncate">{status.label}</span>
+                  {isCurrentStatus && <span className="ml-1">✓</span>}
                 </Button>
               );
             })}

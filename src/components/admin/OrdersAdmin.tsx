@@ -125,7 +125,8 @@ const OrdersAdmin = () => {
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ 
+        .update({
+          status: newStatus,
           order_status: newStatus,
           updated_at: new Date().toISOString()
         })
@@ -144,9 +145,21 @@ const OrdersAdmin = () => {
           is_read: false
         }]);
 
+      // Update local state immediately
+      setOrders(prev => prev.map(order =>
+        order.id === orderId
+          ? { ...order, status: newStatus, order_status: newStatus, updated_at: new Date().toISOString() }
+          : order
+      ));
+
+      // Update selected order if it's the one being updated
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder(prev => prev ? { ...prev, status: newStatus, order_status: newStatus } : null);
+      }
+
       toast({
-        title: "Successo",
-        description: "Stato ordine aggiornato",
+        title: "✅ Successo",
+        description: `Stato aggiornato a: ${orderStatuses.find(s => s.value === newStatus)?.label}`,
       });
 
       loadOrders();
@@ -712,10 +725,16 @@ const OrdersAdmin = () => {
                           size="sm"
                           variant={selectedOrder.order_status === status.value ? "default" : "outline"}
                           onClick={() => updateOrderStatus(selectedOrder.id, status.value)}
-                          className="text-xs p-1 sm:p-2 h-auto"
+                          disabled={selectedOrder.order_status === status.value}
+                          className={`text-xs p-1 sm:p-2 h-auto transition-all duration-200 ${
+                            selectedOrder.order_status === status.value
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-md cursor-not-allowed'
+                              : 'hover:bg-gray-100 hover:border-gray-300'
+                          }`}
                         >
                           <StatusIcon size={10} className="mr-1" />
                           <span className="truncate">{status.label}</span>
+                          {selectedOrder.order_status === status.value && <span className="ml-1">✓</span>}
                         </Button>
                       );
                     })}
