@@ -7,7 +7,7 @@ import WeOffer from '../components/WeOffer';
 import YouTubeSection from '../components/YouTubeSection';
 import Products from '../components/Products';
 import Gallery from '../components/Gallery';
-import PersistentOrderTracker from '../components/PersistentOrderTracker';
+import SimpleOrderTracker from '../components/SimpleOrderTracker';
 import About from '../components/About';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
@@ -43,9 +43,9 @@ const Index = () => {
           <Gallery />
         </div>
       </ErrorBoundary>
-      <ErrorBoundary componentName="PersistentOrderTracker">
+      <ErrorBoundary componentName="SimpleOrderTracker">
         <div className="animate-fade-in-up animate-stagger-5">
-          <PersistentOrderTracker />
+          <SimpleOrderTracker />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="About">
