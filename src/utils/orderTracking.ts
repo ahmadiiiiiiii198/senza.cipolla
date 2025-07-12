@@ -17,6 +17,35 @@ const ORDER_HISTORY_KEY = 'pizzeria_order_history';
 /**
  * Save order for automatic tracking after successful order creation
  */
+// Cookie utility functions
+const setCookie = (name: string, value: string, days: number = 7) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+};
+
+const getCookieValue = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    const cookieValue = parts.pop()?.split(';').shift();
+    return cookieValue || null;
+  }
+  return null;
+};
+
+const getOrCreateClientId = (): string => {
+  // Try to get existing client ID from cookie
+  let clientId = getCookieValue('pizzeria_client_id');
+  if (!clientId) {
+    // Create unique client ID
+    clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setCookie('pizzeria_client_id', clientId, 30); // 30 days
+    console.log('🆔 Created new client ID cookie:', clientId);
+  }
+  return clientId;
+};
+
 export const saveOrderForTracking = (orderData: {
   id: string;
   order_number: string;
@@ -25,12 +54,8 @@ export const saveOrderForTracking = (orderData: {
   total_amount: number;
   created_at: string;
 }) => {
-  // Generate or get client ID for this browser/device
-  let clientId = localStorage.getItem('pizzeria_client_id');
-  if (!clientId) {
-    clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem('pizzeria_client_id', clientId);
-  }
+  // Get or create client ID
+  const clientId = getOrCreateClientId();
 
   const trackingData: OrderTrackingData = {
     orderId: orderData.id,
@@ -46,23 +71,16 @@ export const saveOrderForTracking = (orderData: {
     // Save to localStorage for immediate access
     localStorage.setItem(ORDER_TRACKING_KEY, JSON.stringify(trackingData));
 
-    // Also save to cookies for cross-session persistence (30 days)
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 30);
-    document.cookie = `${ORDER_TRACKING_KEY}=${encodeURIComponent(JSON.stringify(trackingData))}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+    // Save to client-specific cookie (7 days for active orders)
+    setCookie(`pizzeria_order_${clientId}`, encodeURIComponent(JSON.stringify(trackingData)), 7);
 
-    // Save client-specific order data
-    const clientSpecificData = {
-      ...orderData,
-      clientId: clientId,
-      timestamp: Date.now()
-    };
-    localStorage.setItem(`order_${orderData.id}`, JSON.stringify(clientSpecificData));
+    // Also save general tracking cookie for fallback
+    setCookie(ORDER_TRACKING_KEY, encodeURIComponent(JSON.stringify(trackingData)), 7);
 
     // Add to order history
     addToOrderHistory(trackingData);
 
-    console.log('✅ Order saved for client-specific tracking:', orderData.order_number, 'Client ID:', clientId);
+    console.log('✅ Order saved with client-specific cookie tracking:', orderData.order_number, 'Client ID:', clientId);
     return true;
   } catch (error) {
     console.error('❌ Failed to save order for tracking:', error);
@@ -75,24 +93,39 @@ export const saveOrderForTracking = (orderData: {
  */
 export const getTrackedOrder = (): OrderTrackingData | null => {
   try {
-    // First try localStorage
-    const localData = localStorage.getItem(ORDER_TRACKING_KEY);
-    if (localData) {
-      return JSON.parse(localData);
+    // Get client ID
+    const clientId = getOrCreateClientId();
+
+    // First try client-specific cookie
+    const clientOrderCookie = getCookieValue(`pizzeria_order_${clientId}`);
+    if (clientOrderCookie) {
+      const parsed = JSON.parse(decodeURIComponent(clientOrderCookie));
+      console.log('📖 Retrieved order from client-specific cookie:', parsed.orderNumber);
+      return parsed;
     }
 
-    // Fallback to cookies
+    // Then try localStorage
+    const localData = localStorage.getItem(ORDER_TRACKING_KEY);
+    if (localData) {
+      const parsed = JSON.parse(localData);
+      // Save to client-specific cookie for future
+      setCookie(`pizzeria_order_${clientId}`, encodeURIComponent(JSON.stringify(parsed)), 7);
+      return parsed;
+    }
+
+    // Fallback to general tracking cookie
     const cookieData = getCookieValue(ORDER_TRACKING_KEY);
     if (cookieData) {
       const parsed = JSON.parse(decodeURIComponent(cookieData));
-      // Restore to localStorage for faster access
+      // Restore to localStorage and client cookie
       localStorage.setItem(ORDER_TRACKING_KEY, JSON.stringify(parsed));
+      setCookie(`pizzeria_order_${clientId}`, encodeURIComponent(JSON.stringify(parsed)), 7);
       return parsed;
     }
   } catch (error) {
     console.error('Error getting tracked order:', error);
   }
-  
+
   return null;
 };
 
@@ -108,22 +141,24 @@ export const hasActiveOrder = (): boolean => {
  */
 export const clearOrderTracking = () => {
   try {
+    // Get client ID before clearing
+    const clientId = getCookieValue('pizzeria_client_id');
+
+    // Clear localStorage
     localStorage.removeItem(ORDER_TRACKING_KEY);
 
-    // Clear cookie by setting expired date
+    // Clear general tracking cookie
     document.cookie = `${ORDER_TRACKING_KEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 
-    // Clear client-specific order data
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('order_')) {
-        keysToRemove.push(key);
-      }
+    // Clear client-specific order cookie
+    if (clientId) {
+      document.cookie = `pizzeria_order_${clientId}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
 
-    console.log('✅ Order tracking cleared (including client-specific data)');
+    // Clear client ID cookie (optional - uncomment if you want to reset client completely)
+    // document.cookie = `pizzeria_client_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+
+    console.log('✅ Order tracking cleared (including client-specific cookies)');
     return true;
   } catch (error) {
     console.error('❌ Failed to clear order tracking:', error);

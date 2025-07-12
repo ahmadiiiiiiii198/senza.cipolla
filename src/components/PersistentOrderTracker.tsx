@@ -235,71 +235,87 @@ const PersistentOrderTracker: React.FC = () => {
     }
   };
 
-  // Client-specific order detection system
-  const clientSpecificOrderDetection = async () => {
-    console.log('🧠 Starting client-specific order detection...');
+  // Cookie-based client identification and order tracking
+  const getCookieValue = (name: string): string | null => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      const cookieValue = parts.pop()?.split(';').shift();
+      return cookieValue || null;
+    }
+    return null;
+  };
 
-    // Method 1: Check existing tracking data (client-specific)
+  const setCookie = (name: string, value: string, days: number = 30) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  };
+
+  const getOrCreateClientId = (): string => {
+    // Try to get existing client ID from cookie
+    let clientId = getCookieValue('pizzeria_client_id');
+    if (!clientId) {
+      // Create unique client ID
+      clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      setCookie('pizzeria_client_id', clientId, 30); // 30 days
+      console.log('🆔 Created new client ID cookie:', clientId);
+    } else {
+      console.log('🆔 Found existing client ID cookie:', clientId);
+    }
+    return clientId;
+  };
+
+  // Cookie-based order detection system
+  const cookieBasedOrderDetection = async () => {
+    console.log('🍪 Starting cookie-based order detection...');
+
+    // Get client ID from cookie
+    const clientId = getOrCreateClientId();
+
+    // Method 1: Check for active order cookie for this client
+    const activeOrderCookie = getCookieValue(`pizzeria_order_${clientId}`);
+    if (activeOrderCookie) {
+      try {
+        const orderData = JSON.parse(decodeURIComponent(activeOrderCookie));
+        console.log('✅ Found active order cookie for client:', orderData.orderNumber);
+        return orderData;
+      } catch (error) {
+        console.error('❌ Error parsing order cookie:', error);
+      }
+    }
+
+    // Method 2: Check existing tracking data (fallback)
     const trackedOrder = getTrackedOrder();
     if (trackedOrder) {
-      console.log('✅ Found client-specific tracked order:', trackedOrder.orderNumber);
+      console.log('✅ Found tracked order in localStorage:', trackedOrder.orderNumber);
+      // Save to client-specific cookie for future
+      setCookie(`pizzeria_order_${clientId}`, encodeURIComponent(JSON.stringify(trackedOrder)), 7);
       return trackedOrder;
     }
 
-    // Method 2: Generate client identifier for this session/device
-    const getClientIdentifier = () => {
-      // Try to get existing client ID from localStorage
-      let clientId = localStorage.getItem('pizzeria_client_id');
-      if (!clientId) {
-        // Create unique client ID based on timestamp + random
-        clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('pizzeria_client_id', clientId);
-        console.log('🆔 Created new client ID:', clientId);
-      }
-      return clientId;
+    console.log('❌ No orders found for client ID:', clientId);
+    return null;
+  };
+
+  // Save order to client-specific cookie
+  const saveOrderToCookie = (orderData: any) => {
+    const clientId = getOrCreateClientId();
+    const trackingData = {
+      orderId: orderData.id,
+      orderNumber: orderData.order_number,
+      customerName: orderData.customer_name,
+      customerEmail: orderData.customer_email,
+      totalAmount: orderData.total_amount,
+      createdAt: orderData.created_at,
+      clientId: clientId
     };
 
-    const clientId = getClientIdentifier();
-    console.log('🔍 Client ID:', clientId);
+    // Save to client-specific cookie (7 days for active orders)
+    setCookie(`pizzeria_order_${clientId}`, encodeURIComponent(JSON.stringify(trackingData)), 7);
+    console.log('🍪 Order saved to client-specific cookie:', orderData.order_number, 'for client:', clientId);
 
-    // Method 3: Check for orders from this specific session/browser
-    console.log('🔍 No tracking data found, checking for client-specific orders...');
-
-    // First, try to find orders that were created in this browser session
-    const sessionOrders = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('order_')) {
-        try {
-          const orderData = JSON.parse(localStorage.getItem(key) || '{}');
-          if (orderData.clientId === clientId) {
-            sessionOrders.push(orderData);
-          }
-        } catch (e) {
-          // Ignore invalid JSON
-        }
-      }
-    }
-
-    if (sessionOrders.length > 0) {
-      console.log('📱 Found session-specific orders:', sessionOrders.length);
-      const mostRecentSessionOrder = sessionOrders.sort((a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )[0];
-
-      console.log('🎯 Using session-specific order:', mostRecentSessionOrder.order_number);
-      return {
-        orderId: mostRecentSessionOrder.id,
-        orderNumber: mostRecentSessionOrder.order_number,
-        customerName: mostRecentSessionOrder.customer_name,
-        customerEmail: mostRecentSessionOrder.customer_email,
-        totalAmount: mostRecentSessionOrder.total_amount,
-        createdAt: mostRecentSessionOrder.created_at
-      };
-    }
-
-    console.log('❌ No client-specific orders found - showing search form');
-    return null;
+    return trackingData;
   };
 
   // Auto-load order on component mount
@@ -313,7 +329,7 @@ const PersistentOrderTracker: React.FC = () => {
       console.log('📦 localStorage content:', localStorageContent);
       console.log('🍪 Cookie exists:', hasCookie);
 
-      const detectedOrder = await clientSpecificOrderDetection();
+      const detectedOrder = await cookieBasedOrderDetection();
 
       if (detectedOrder) {
         setOrderNumber(detectedOrder.orderNumber);
@@ -696,7 +712,8 @@ const PersistentOrderTracker: React.FC = () => {
                   <h4 className="text-sm font-medium mb-2 text-blue-800">Debug Info:</h4>
                   <div className="text-xs space-y-1 text-blue-700">
                     <p>localStorage: {localStorage.getItem('pizzeria_active_order') ? '✅ Has data' : '❌ Empty'}</p>
-                    <p>cookies: {document.cookie.includes('pizzeria_active_order') ? '✅ Has cookie' : '❌ No cookie'}</p>
+                    <p>Client ID: {getCookieValue('pizzeria_client_id') || '❌ None'}</p>
+                    <p>Order Cookie: {getCookieValue(`pizzeria_order_${getOrCreateClientId()}`) ? '✅ Has order' : '❌ No order'}</p>
                     <p>getTrackedOrder(): {getTrackedOrder() ? '✅ Found' : '❌ None'}</p>
                     <div className="flex gap-2 mt-2">
                       <Button
@@ -730,9 +747,15 @@ const PersistentOrderTracker: React.FC = () => {
                             created_at: new Date().toISOString()
                           };
                           console.log('🧪 Creating test order:', testOrder);
+
+                          // Save using both methods
                           const result = saveOrderForTracking(testOrder);
+                          const cookieResult = saveOrderToCookie(testOrder);
+
                           console.log('🧪 Save result:', result);
+                          console.log('🍪 Cookie save result:', cookieResult);
                           console.log('🧪 localStorage after save:', localStorage.getItem('pizzeria_active_order'));
+                          console.log('🍪 Client cookies:', document.cookie);
 
                           // Immediately trigger auto-load to test
                           setTimeout(() => {
@@ -740,7 +763,7 @@ const PersistentOrderTracker: React.FC = () => {
                             window.location.reload();
                           }, 500);
 
-                          alert('Test order created! Page will refresh to test auto-load.');
+                          alert('Test order created with cookie! Page will refresh to test auto-load.');
                         }}
                         className="text-xs"
                       >
@@ -750,10 +773,18 @@ const PersistentOrderTracker: React.FC = () => {
                         size="sm"
                         variant="outline"
                         onClick={() => {
+                          // Clear localStorage
                           localStorage.removeItem('pizzeria_active_order');
                           clearOrderTracking();
+
+                          // Clear client-specific cookies
+                          const clientId = getOrCreateClientId();
+                          document.cookie = `pizzeria_order_${clientId}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                          document.cookie = `pizzeria_client_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+
                           setOrder(null);
-                          alert('Tracking cleared!');
+                          console.log('🗑️ All tracking data and cookies cleared');
+                          alert('All tracking data and cookies cleared!');
                         }}
                         className="text-xs"
                       >
