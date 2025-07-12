@@ -30,33 +30,26 @@ interface OrderItem {
 
 const SimpleOrderTracker: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [orderNumber, setOrderNumber] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Auto-load tracked order on mount
+  // Auto-load tracked order on mount - FULLY AUTOMATIC
   useEffect(() => {
-    const trackedOrder = getTrackedOrder();
-    if (trackedOrder) {
-      console.log('🎯 Auto-loading tracked order:', trackedOrder.orderNumber);
-      setOrderNumber(trackedOrder.orderNumber);
-      setCustomerEmail(trackedOrder.customerEmail);
-      searchOrder(trackedOrder.orderNumber, trackedOrder.customerEmail);
-    }
+    const loadOrder = async () => {
+      const trackedOrder = getTrackedOrder();
+      if (trackedOrder) {
+        console.log('🎯 Auto-loading tracked order:', trackedOrder.orderNumber);
+        await searchOrder(trackedOrder.orderNumber, trackedOrder.customerEmail);
+      } else {
+        console.log('❌ No tracked order found');
+        setLoading(false);
+      }
+    };
+
+    loadOrder();
   }, []);
 
   const searchOrder = async (orderNum: string, email: string) => {
-    if (!orderNum || !email) {
-      toast({
-        title: 'Campi richiesti',
-        description: 'Inserisci numero ordine e email',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    setLoading(true);
     try {
       const { data: orderData, error } = await supabase
         .from('orders')
@@ -75,12 +68,9 @@ const SimpleOrderTracker: React.FC = () => {
         .single();
 
       if (error || !orderData) {
-        toast({
-          title: 'Ordine non trovato',
-          description: 'Verifica numero ordine e email',
-          variant: 'destructive'
-        });
+        console.log('❌ Order not found:', orderNum);
         setOrder(null);
+        setLoading(false);
         return;
       }
 
@@ -88,11 +78,7 @@ const SimpleOrderTracker: React.FC = () => {
       console.log('✅ Order found and displayed:', orderData.order_number);
     } catch (error) {
       console.error('Search error:', error);
-      toast({
-        title: 'Errore di ricerca',
-        description: 'Riprova più tardi',
-        variant: 'destructive'
-      });
+      setOrder(null);
     } finally {
       setLoading(false);
     }
@@ -100,23 +86,31 @@ const SimpleOrderTracker: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pending': return <Clock className="h-4 w-4" />;
       case 'confirmed': return <CheckCircle className="h-4 w-4" />;
       case 'preparing': return <Package className="h-4 w-4" />;
       case 'ready': return <CheckCircle className="h-4 w-4" />;
       case 'delivered': return <CheckCircle className="h-4 w-4" />;
-      default: return <AlertCircle className="h-4 w-4" />;
+      default: return <Package className="h-4 w-4" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'confirmed': return 'bg-blue-100 text-blue-800';
       case 'preparing': return 'bg-orange-100 text-orange-800';
       case 'ready': return 'bg-green-100 text-green-800';
       case 'delivered': return 'bg-emerald-100 text-emerald-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-blue-100 text-blue-800';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'confirmed': return 'CONFERMATO';
+      case 'preparing': return 'IN PREPARAZIONE';
+      case 'ready': return 'PRONTO';
+      case 'delivered': return 'CONSEGNATO';
+      default: return 'CONFERMATO';
     }
   };
 
@@ -132,7 +126,7 @@ const SimpleOrderTracker: React.FC = () => {
 
     saveOrderForTracking(testOrder);
     console.log('🧪 Test order created:', testOrder.order_number);
-    
+
     setTimeout(() => {
       window.location.reload();
     }, 500);
@@ -141,8 +135,6 @@ const SimpleOrderTracker: React.FC = () => {
   const clearTracking = () => {
     clearOrderTracking();
     setOrder(null);
-    setOrderNumber('');
-    setCustomerEmail('');
     console.log('🗑️ Tracking cleared');
   };
 
@@ -156,44 +148,23 @@ const SimpleOrderTracker: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!order ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  placeholder="Numero Ordine"
-                  value={orderNumber}
-                  onChange={(e) => setOrderNumber(e.target.value)}
-                />
-                <Input
-                  placeholder="Email Cliente"
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => searchOrder(orderNumber, customerEmail)}
-                  disabled={loading}
-                  className="flex-1"
-                >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Search className="h-4 w-4 mr-2" />
-                  )}
-                  Cerca Ordine
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={createTestOrder}
-                  className="px-3"
-                >
-                  Test
-                </Button>
-              </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin mr-3" />
+              <span>Caricamento ordine...</span>
+            </div>
+          ) : !order ? (
+            <div className="text-center py-8">
+              <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-medium mb-2">Nessun ordine attivo</h3>
+              <p className="text-gray-600 mb-4">Non hai ordini in corso al momento</p>
+              <Button
+                variant="outline"
+                onClick={createTestOrder}
+                className="mx-auto"
+              >
+                Crea Ordine Test
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -214,7 +185,7 @@ const SimpleOrderTracker: React.FC = () => {
               <div className="flex items-center gap-2">
                 {getStatusIcon(order.status)}
                 <Badge className={getStatusColor(order.status)}>
-                  {order.status.toUpperCase()}
+                  {getStatusText(order.status)}
                 </Badge>
               </div>
 

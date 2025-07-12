@@ -121,7 +121,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         delivery_type: 'delivery',
         total_amount: finalTotal,
         delivery_fee: deliveryFee,
-        status: 'pending',
+        status: 'confirmed',
         payment_status: 'pending',
         payment_method: 'stripe',
         metadata: {
@@ -325,7 +325,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         delivery_type: 'delivery',
         total_amount: finalTotal,
         delivery_fee: deliveryFee,
-        status: 'pending',
+        status: 'confirmed',
         payment_status: 'pending',
         payment_method: 'cash_on_delivery',
         metadata: {

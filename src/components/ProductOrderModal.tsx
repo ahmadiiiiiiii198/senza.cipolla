@@ -61,7 +61,7 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
           delivery_type: 'delivery',
           total_amount: totalAmount,
           delivery_fee: addressValidation?.deliveryFee || 0,
-          status: 'pending',
+          status: 'confirmed',
           payment_status: 'pending',
           payment_method: 'stripe',
           special_instructions: `Product Order - ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`,
@@ -412,7 +412,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
         delivery_type: 'delivery',
         total_amount: totalAmount,
         delivery_fee: addressValidation.deliveryFee || 0,
-        status: 'pending', // Pay later orders start as pending
+        status: 'confirmed', // Orders are automatically confirmed
         payment_status: 'pending',
         payment_method: 'cash_on_delivery',
         metadata: {
