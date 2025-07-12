@@ -33,28 +33,57 @@ const SimpleOrderTracker: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Auto-load tracked order on mount - FULLY AUTOMATIC
+  // DEBUGGING: Force load your specific order
   useEffect(() => {
     const loadOrder = async () => {
-      let trackedOrder = getTrackedOrder();
+      console.log('🔍 DEBUGGING: Starting order detection...');
 
-      // MANUAL FIX: If no tracked order found, check for recent orders from this browser
+      // STEP 1: Check existing cookies
+      let trackedOrder = getTrackedOrder();
+      console.log('🍪 Existing tracked order:', trackedOrder);
+
+      // STEP 2: Force load your specific order for testing
+      console.log('🎯 FORCE LOADING YOUR ORDER: ORD-794783163');
+      try {
+        await searchOrder('ORD-794783163', 'iamemperor53@gmail.com');
+
+        // Save it for tracking
+        const yourOrderData = {
+          id: 'f7d516b2-a5f3-4ec8-a573-71382fb5f16f',
+          order_number: 'ORD-794783163',
+          customer_email: 'iamemperor53@gmail.com',
+          customer_name: 'daffdkfak fadkfadfj',
+          total_amount: 19,
+          created_at: '2025-07-12 17:36:36.057296+00'
+        };
+
+        console.log('💾 Saving your order for tracking...');
+        const saved = saveOrderForTracking(yourOrderData);
+        console.log('💾 Save result:', saved);
+
+        return;
+      } catch (error) {
+        console.error('❌ Error loading your order:', error);
+      }
+
+      // STEP 3: Fallback - check recent orders
       if (!trackedOrder) {
         console.log('🔍 No cookie found, checking for recent orders...');
         try {
           const { data: recentOrders, error } = await supabase
             .from('orders')
             .select('id, order_number, customer_name, customer_email, total_amount, created_at, status')
-            .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24 hours
-            .in('status', ['confirmed', 'preparing', 'ready']) // Active statuses
+            .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+            .in('status', ['confirmed', 'preparing', 'ready'])
             .order('created_at', { ascending: false })
             .limit(3);
 
+          console.log('📋 Recent orders query result:', { error, count: recentOrders?.length });
+
           if (!error && recentOrders && recentOrders.length > 0) {
-            console.log('📋 Found recent orders:', recentOrders.length);
+            console.log('📋 Found recent orders:', recentOrders);
             const mostRecentOrder = recentOrders[0];
 
-            // Auto-save for tracking
             saveOrderForTracking({
               id: mostRecentOrder.id,
               order_number: mostRecentOrder.order_number,
@@ -64,16 +93,9 @@ const SimpleOrderTracker: React.FC = () => {
               created_at: mostRecentOrder.created_at
             });
 
-            trackedOrder = {
-              orderId: mostRecentOrder.id,
-              orderNumber: mostRecentOrder.order_number,
-              customerEmail: mostRecentOrder.customer_email,
-              customerName: mostRecentOrder.customer_name,
-              totalAmount: mostRecentOrder.total_amount,
-              createdAt: mostRecentOrder.created_at
-            };
-
             console.log('✅ Auto-detected and saved order:', mostRecentOrder.order_number);
+            await searchOrder(mostRecentOrder.order_number, mostRecentOrder.customer_email);
+            return;
           }
         } catch (error) {
           console.error('❌ Error checking recent orders:', error);
@@ -81,10 +103,10 @@ const SimpleOrderTracker: React.FC = () => {
       }
 
       if (trackedOrder) {
-        console.log('🎯 Auto-loading tracked order:', trackedOrder.orderNumber);
+        console.log('🎯 Loading existing tracked order:', trackedOrder.orderNumber);
         await searchOrder(trackedOrder.orderNumber, trackedOrder.customerEmail);
       } else {
-        console.log('❌ No tracked order found');
+        console.log('❌ No orders found');
         setLoading(false);
       }
     };
@@ -181,6 +203,24 @@ const SimpleOrderTracker: React.FC = () => {
     console.log('🗑️ Tracking cleared');
   };
 
+  const debugTracking = () => {
+    console.log('🔍 DEBUGGING TRACKING SYSTEM:');
+    console.log('All cookies:', document.cookie);
+
+    const trackedOrder = getTrackedOrder();
+    console.log('getTrackedOrder result:', trackedOrder);
+
+    // Test email hash
+    const email = 'iamemperor53@gmail.com';
+    const hash = btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+    console.log('Email hash for', email, ':', hash);
+    console.log('Expected cookie name: pizzeria_order_' + hash);
+
+    // Check if specific cookie exists
+    const cookieExists = document.cookie.includes('pizzeria_order_' + hash);
+    console.log('Cookie exists:', cookieExists);
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
       <Card>
@@ -201,13 +241,20 @@ const SimpleOrderTracker: React.FC = () => {
               <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <h3 className="text-lg font-medium mb-2">Nessun ordine attivo</h3>
               <p className="text-gray-600 mb-4">Non hai ordini in corso al momento</p>
-              <Button
-                variant="outline"
-                onClick={createTestOrder}
-                className="mx-auto"
-              >
-                Crea Ordine Test
-              </Button>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  variant="outline"
+                  onClick={createTestOrder}
+                >
+                  Crea Ordine Test
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={debugTracking}
+                >
+                  Debug
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
