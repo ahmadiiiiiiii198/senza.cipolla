@@ -7,6 +7,7 @@ import WeOffer from '../components/WeOffer';
 import YouTubeSection from '../components/YouTubeSection';
 import Products from '../components/Products';
 import Gallery from '../components/Gallery';
+import PersistentOrderTracker from '../components/PersistentOrderTracker';
 import About from '../components/About';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
@@ -42,18 +43,23 @@ const Index = () => {
           <Gallery />
         </div>
       </ErrorBoundary>
+      <ErrorBoundary componentName="PersistentOrderTracker">
+        <div className="animate-fade-in-up animate-stagger-5">
+          <PersistentOrderTracker />
+        </div>
+      </ErrorBoundary>
       <ErrorBoundary componentName="About">
-        <div className="animate-slide-in-up animate-stagger-5">
+        <div className="animate-slide-in-up animate-stagger-6">
           <About />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="ContactSection">
-        <div className="animate-fade-in-up animate-stagger-6">
+        <div className="animate-fade-in-up animate-stagger-7">
           <ContactSection />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="Footer">
-        <div className="animate-fade-in-up animate-stagger-7">
+        <div className="animate-fade-in-up animate-stagger-8">
           <Footer />
         </div>
       </ErrorBoundary>

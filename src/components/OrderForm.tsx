@@ -10,6 +10,7 @@ import { Loader2, ShoppingCart, Phone, Mail, User, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import BusinessHoursStatus from './BusinessHoursStatus';
+import { saveOrderForTracking } from '@/utils/orderTracking';
 
 interface OrderFormData {
   customerName: string;
@@ -194,6 +195,17 @@ const OrderForm = () => {
       if (notificationError) {
         console.error('Failed to create notification:', notificationError);
       }
+
+      // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
+      saveOrderForTracking({
+        id: order.id,
+        order_number: order.order_number,
+        customer_email: order.customer_email,
+        customer_name: order.customer_name,
+        total_amount: order.total_amount,
+        created_at: order.created_at
+      });
+      console.log('✅ OrderForm order automatically saved for tracking:', order.order_number);
 
       toast({
         title: 'Order Submitted Successfully! 🎉',

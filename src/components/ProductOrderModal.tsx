@@ -13,6 +13,7 @@ import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import BusinessHoursStatus from './BusinessHoursStatus';
 import { businessHoursService } from '@/services/businessHoursService';
+import { saveOrderForTracking } from '@/utils/orderTracking';
 
 // Direct payment button component - no abstractions
 interface DirectPaymentButtonProps {
@@ -120,6 +121,17 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
           is_read: false,
           is_acknowledged: false
         });
+
+      // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
+      saveOrderForTracking({
+        id: order.id,
+        order_number: order.order_number,
+        customer_email: order.customer_email,
+        customer_name: order.customer_name,
+        total_amount: order.total_amount,
+        created_at: order.created_at
+      });
+      console.log('✅ Product order automatically saved for tracking:', order.order_number);
 
       // Step 3: Create Stripe session directly
       console.log('💳 Creating Stripe session...');
@@ -453,6 +465,17 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
         is_read: false,
         is_acknowledged: false
       });
+
+    // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
+    saveOrderForTracking({
+      id: order.id,
+      order_number: order.order_number,
+      customer_email: order.customer_email,
+      customer_name: order.customer_name,
+      total_amount: order.total_amount,
+      created_at: order.created_at
+    });
+    console.log('✅ Product Pay Later order automatically saved for tracking:', order.order_number);
 
     return order;
   };

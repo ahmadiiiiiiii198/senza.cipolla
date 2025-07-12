@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import stripeService from '@/services/stripeService';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { saveOrderForTracking } from '@/utils/orderTracking';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -98,16 +99,27 @@ const PaymentSuccess = () => {
               amountPaid: (paymentData.amountTotal || 0) / 100, // Convert from cents
             });
 
-            // Get order details to show order number
+            // Get order details to show order number and save for tracking
             const { supabase } = await import('@/integrations/supabase/client');
             const { data: order } = await supabase
               .from('orders')
-              .select('order_number')
+              .select('id, order_number, customer_name, customer_email, total_amount, created_at')
               .eq('id', orderId)
               .single();
 
             if (order) {
               setOrderNumber(order.order_number);
+
+              // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING AFTER SUCCESSFUL PAYMENT
+              saveOrderForTracking({
+                id: order.id,
+                order_number: order.order_number,
+                customer_email: order.customer_email,
+                customer_name: order.customer_name,
+                total_amount: order.total_amount,
+                created_at: order.created_at
+              });
+              console.log('✅ Paid order automatically saved for tracking:', order.order_number);
             }
 
             toast({
@@ -201,7 +213,7 @@ const PaymentSuccess = () => {
                         className="flex-1"
                       >
                         <Home className="h-4 w-4 mr-2" />
-                        Back to Home
+                        Track Your Order
                       </Button>
                     </div>
                   </div>

@@ -10,6 +10,7 @@ import { CartItem } from '@/hooks/use-simple-cart';
 import { useSimpleCart } from '@/hooks/use-simple-cart';
 import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { saveOrderForTracking } from '@/utils/orderTracking';
 
 interface CartCheckoutModalProps {
   isOpen: boolean;
@@ -211,6 +212,28 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         is_acknowledged: false
       });
 
+    // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
+    console.log('💾 Saving order for tracking:', {
+      id: order.id,
+      order_number: order.order_number,
+      customer_email: order.customer_email,
+      customer_name: order.customer_name,
+      total_amount: order.total_amount,
+      created_at: order.created_at
+    });
+
+    const trackingSaved = saveOrderForTracking({
+      id: order.id,
+      order_number: order.order_number,
+      customer_email: order.customer_email,
+      customer_name: order.customer_name,
+      total_amount: order.total_amount,
+      created_at: order.created_at
+    });
+
+    console.log('✅ Order tracking save result:', trackingSaved);
+    console.log('📦 localStorage after save:', localStorage.getItem('pizzeria_active_order'));
+
     // Create Stripe session
     const stripeItems = cartItems.map(item => ({
       price_data: {
@@ -388,6 +411,17 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         message: `New pay-later cart order from ${customerData.customerName} - ${cartItems.length} items`,
         is_read: false
       });
+
+    // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
+    saveOrderForTracking({
+      id: order.id,
+      order_number: order.order_number,
+      customer_email: order.customer_email,
+      customer_name: order.customer_name,
+      total_amount: order.total_amount,
+      created_at: order.created_at
+    });
+    console.log('✅ Pay Later order automatically saved for tracking:', order.order_number);
 
     return order;
   };

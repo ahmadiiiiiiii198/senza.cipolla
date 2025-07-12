@@ -18,12 +18,14 @@ import AdminMinimal from "./pages/AdminMinimal";
 import Ordini from "./pages/Ordini";
 
 import OrderDashboardPro from "./pages/OrderDashboardPro";
+import OrderTracking from "./pages/OrderTracking";
 import MenuPage from "./pages/MenuPage";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 // DatabaseSetup component removed to prevent accidental initialization
 import SimpleStripeTest from "./components/SimpleStripeTest";
+import OrderStatusWidget from "./components/OrderStatusWidget";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,7 @@ const App = () => (
             {/* ButtonDebugger removed - no more debug overlays */}
             <Toaster />
             <Sonner />
+            <OrderStatusWidget />
             <BrowserRouter>
             <Routes>
               <Route path="/" element={
@@ -63,6 +66,11 @@ const App = () => (
                 </ErrorBoundary>
               } />
 
+              <Route path="/track-order" element={
+                <ErrorBoundary componentName="OrderTracking">
+                  <OrderTracking />
+                </ErrorBoundary>
+              } />
 
               <Route path="/menu" element={
                 <ErrorBoundary componentName="MenuPage">

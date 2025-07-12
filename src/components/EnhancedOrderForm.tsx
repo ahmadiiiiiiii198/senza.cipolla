@@ -12,6 +12,7 @@ import AddressValidator from './AddressValidator';
 import StripeCheckout from './StripeCheckout';
 import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { saveOrderForTracking } from '@/utils/orderTracking';
 
 interface OrderFormData {
   customerName: string;
@@ -164,6 +165,17 @@ const EnhancedOrderForm = () => {
         message: `New order received from ${formData.customerName}`,
         is_read: false
       });
+
+    // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
+    saveOrderForTracking({
+      id: order.id,
+      order_number: order.order_number,
+      customer_email: order.customer_email,
+      customer_name: order.customer_name,
+      total_amount: order.total_amount,
+      created_at: order.created_at
+    });
+    console.log('✅ EnhancedOrderForm order automatically saved for tracking:', order.order_number);
 
     setCreatedOrderId(order.id);
     return order.id;
