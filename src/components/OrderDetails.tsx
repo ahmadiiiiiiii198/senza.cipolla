@@ -81,15 +81,15 @@ const OrderDetails = ({ order, onUpdate, onDelete }: OrderDetailsProps) => {
       const { error } = await supabase.rpc('update_order_status', {
         order_uuid: order.id,
         new_status: status,
-        status_notes: status === 'accepted' ? 'Order accepted and will be prepared' : 'Order rejected',
+        status_notes: status === 'preparing' ? 'Order is being prepared' : status === 'ready' ? 'Order is ready for delivery' : 'Order status updated',
         tracking_num: null,
       });
 
       if (error) throw error;
 
       toast({
-        title: status === 'accepted' ? 'Ordine Accettato' : 'Ordine Rifiutato',
-        description: `Ordine #${order.order_number} è stato ${status === 'accepted' ? 'accettato' : 'rifiutato'}`,
+        title: status === 'preparing' ? 'Ordine in Preparazione' : status === 'ready' ? 'Ordine Pronto' : 'Stato Aggiornato',
+        description: `Ordine #${order.order_number} è stato aggiornato a: ${status}`,
       });
 
       onUpdate();
@@ -97,7 +97,7 @@ const OrderDetails = ({ order, onUpdate, onDelete }: OrderDetailsProps) => {
       console.error('Quick update error:', error);
       toast({
         title: t('updateFailed'),
-        description: `Impossibile ${status === 'accepted' ? 'accettare' : 'rifiutare'} l'ordine`,
+        description: `Impossibile aggiornare l'ordine`,
         variant: 'destructive',
       });
     } finally {
@@ -333,37 +333,36 @@ const OrderDetails = ({ order, onUpdate, onDelete }: OrderDetailsProps) => {
           </div>
         </div>
 
-        {/* Quick Actions for Pending Orders */}
-        {order.status === 'pending' && (
-          <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-            <h4 className="font-bold mb-4 text-base sm:text-lg text-gray-800 border-b border-amber-300 pb-2">Azioni Rapide</h4>
+        {/* Quick Actions - Orders are automatically confirmed */}
+        {(order.status === 'confirmed' || order.status === 'preparing') && (
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h4 className="font-bold mb-4 text-base sm:text-lg text-gray-800 border-b border-blue-300 pb-2">Azioni Rapide</h4>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
-                onClick={() => handleQuickStatusUpdate('accepted')}
+                onClick={() => handleQuickStatusUpdate('preparing')}
+                disabled={updating || order.status === 'preparing'}
+                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3"
+              >
+                {updating ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  <Package className="mr-2 h-5 w-5" />
+                )}
+                <span className="hidden sm:inline">Inizia Preparazione</span>
+                <span className="sm:hidden">Prepara</span>
+              </Button>
+              <Button
+                onClick={() => handleQuickStatusUpdate('ready')}
                 disabled={updating}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3"
               >
                 {updating ? (
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 ) : (
                   <CheckCircle className="mr-2 h-5 w-5" />
                 )}
-                <span className="hidden sm:inline">Accetta Ordine</span>
-                <span className="sm:hidden">Accetta</span>
-              </Button>
-              <Button
-                onClick={() => handleQuickStatusUpdate('rejected')}
-                disabled={updating}
-                variant="destructive"
-                className="flex-1 bg-red-600 hover:bg-red-700 font-semibold py-3"
-              >
-                {updating ? (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                ) : (
-                  <X className="mr-2 h-5 w-5" />
-                )}
-                <span className="hidden sm:inline">Rifiuta Ordine</span>
-                <span className="sm:hidden">Rifiuta</span>
+                <span className="hidden sm:inline">Segna Pronto</span>
+                <span className="sm:hidden">Pronto</span>
               </Button>
             </div>
           </div>

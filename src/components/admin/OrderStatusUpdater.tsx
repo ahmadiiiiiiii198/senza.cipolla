@@ -37,54 +37,47 @@ const OrderStatusUpdater: React.FC<OrderStatusUpdaterProps> = ({
   const [updating, setUpdating] = useState(false);
   const { toast } = useToast();
 
-  // Order status configuration matching the client tracking system
+  // Order status configuration - NO PENDING STATES
   const orderStatuses = [
-    { 
-      value: 'pending', 
-      label: 'In attesa', 
-      color: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
-      icon: Clock,
-      description: 'Ordine ricevuto, in attesa di conferma'
-    },
-    { 
-      value: 'confirmed', 
-      label: 'Confermato', 
-      color: 'bg-blue-100 text-blue-800 border-blue-200', 
+    {
+      value: 'confirmed',
+      label: 'Confermato',
+      color: 'bg-blue-100 text-blue-800 border-blue-200',
       icon: CheckCircle,
       description: 'Ordine confermato, verrà preparato'
     },
-    { 
-      value: 'preparing', 
-      label: 'In preparazione', 
-      color: 'bg-orange-100 text-orange-800 border-orange-200', 
+    {
+      value: 'preparing',
+      label: 'In preparazione',
+      color: 'bg-orange-100 text-orange-800 border-orange-200',
       icon: Package,
       description: 'Ordine in preparazione in cucina'
     },
-    { 
-      value: 'ready', 
-      label: 'Pronto', 
-      color: 'bg-green-100 text-green-800 border-green-200', 
+    {
+      value: 'ready',
+      label: 'Pronto',
+      color: 'bg-green-100 text-green-800 border-green-200',
       icon: CheckCircle,
       description: 'Ordine pronto per la consegna'
     },
-    { 
-      value: 'delivered', 
-      label: 'Consegnato', 
-      color: 'bg-emerald-100 text-emerald-800 border-emerald-200', 
+    {
+      value: 'delivered',
+      label: 'Consegnato',
+      color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       icon: Truck,
       description: 'Ordine consegnato al cliente'
     },
-    { 
-      value: 'cancelled', 
-      label: 'Annullato', 
-      color: 'bg-red-100 text-red-800 border-red-200', 
+    {
+      value: 'cancelled',
+      label: 'Annullato',
+      color: 'bg-red-100 text-red-800 border-red-200',
       icon: XCircle,
       description: 'Ordine annullato'
     }
   ];
 
   // Get current status (check both status and order_status fields)
-  const currentStatus = order.order_status || order.status || 'pending';
+  const currentStatus = order.order_status || order.status || 'confirmed';
 
   // Get current status info
   const getCurrentStatusInfo = () => {
@@ -93,9 +86,9 @@ const OrderStatusUpdater: React.FC<OrderStatusUpdaterProps> = ({
 
   // Get next logical status
   const getNextStatus = () => {
-    const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'];
+    const statusOrder = ['confirmed', 'preparing', 'ready', 'delivered'];
     const currentIndex = statusOrder.indexOf(currentStatus);
-    
+
     if (currentIndex < statusOrder.length - 1) {
       return statusOrder[currentIndex + 1];
     }

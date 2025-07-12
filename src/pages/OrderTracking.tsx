@@ -58,47 +58,40 @@ const OrderTracking: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Order status configuration matching admin system
+  // Order status configuration - NO PENDING STATES
   const orderStatuses = [
-    { 
-      value: 'pending', 
-      label: 'In attesa', 
-      color: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
-      icon: Clock,
-      description: 'Il tuo ordine è stato ricevuto e verrà confermato a breve'
-    },
-    { 
-      value: 'confirmed', 
-      label: 'Confermato', 
-      color: 'bg-blue-100 text-blue-800 border-blue-200', 
+    {
+      value: 'confirmed',
+      label: 'Confermato',
+      color: 'bg-blue-100 text-blue-800 border-blue-200',
       icon: CheckCircle,
       description: 'Il tuo ordine è stato confermato e verrà preparato'
     },
-    { 
-      value: 'preparing', 
-      label: 'In preparazione', 
-      color: 'bg-orange-100 text-orange-800 border-orange-200', 
+    {
+      value: 'preparing',
+      label: 'In preparazione',
+      color: 'bg-orange-100 text-orange-800 border-orange-200',
       icon: Package,
       description: 'I nostri chef stanno preparando il tuo ordine'
     },
-    { 
-      value: 'ready', 
-      label: 'Pronto', 
-      color: 'bg-green-100 text-green-800 border-green-200', 
+    {
+      value: 'ready',
+      label: 'Pronto',
+      color: 'bg-green-100 text-green-800 border-green-200',
       icon: CheckCircle,
       description: 'Il tuo ordine è pronto per la consegna'
     },
-    { 
-      value: 'delivered', 
-      label: 'Consegnato', 
-      color: 'bg-emerald-100 text-emerald-800 border-emerald-200', 
+    {
+      value: 'delivered',
+      label: 'Consegnato',
+      color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       icon: Truck,
       description: 'Il tuo ordine è stato consegnato con successo'
     },
-    { 
-      value: 'cancelled', 
-      label: 'Annullato', 
-      color: 'bg-red-100 text-red-800 border-red-200', 
+    {
+      value: 'cancelled',
+      label: 'Annullato',
+      color: 'bg-red-100 text-red-800 border-red-200',
       icon: XCircle,
       description: 'Il tuo ordine è stato annullato'
     }

@@ -65,7 +65,6 @@ const OrdersAdmin = () => {
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
   const orderStatuses = [
-    { value: 'pending', label: 'In attesa', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
     { value: 'confirmed', label: 'Confermato', color: 'bg-blue-100 text-blue-800', icon: Check },
     { value: 'preparing', label: 'In preparazione', color: 'bg-orange-100 text-orange-800', icon: Clock },
     { value: 'ready', label: 'Pronto', color: 'bg-green-100 text-green-800', icon: CheckCircle },
@@ -294,7 +293,6 @@ const OrdersAdmin = () => {
   const getOrderCounts = () => {
     const counts = {
       all: orders.length,
-      pending: orders.filter(o => o.order_status === 'pending').length,
       confirmed: orders.filter(o => o.order_status === 'confirmed').length,
       preparing: orders.filter(o => o.order_status === 'preparing').length,
       ready: orders.filter(o => o.order_status === 'ready').length,
