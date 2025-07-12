@@ -42,13 +42,14 @@ const DesktopGalleryView: React.FC<DesktopGalleryViewProps> = ({
     <div className="hidden md:block relative">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" key={gridKey}>
         {safeImages.map((image, index) => (
-          <div 
-            key={`${image.id}-${index}-${gridKey}`} 
-            className="transform transition-transform duration-300 hover:scale-[1.02]"
+          <div
+            key={`${image.id}-${index}-${gridKey}`}
+            className="transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl rounded-lg"
           >
-            <GalleryImage 
-              src={image.src} 
-              alt={image.alt || "Gallery Image"} 
+            <GalleryImage
+              src={image.src}
+              alt={image.alt || "Gallery Image"}
+              className="desktop-gallery-image"
               onLoad={handleImageLoad}
               onError={handleImageLoad} // Count errors as loaded to avoid infinite loading state
             />

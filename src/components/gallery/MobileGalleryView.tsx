@@ -69,25 +69,28 @@ const MobileGalleryView: React.FC<MobileGalleryViewProps> = ({
           <p className="text-red-500">{loadError}</p>
         </div>
       )}
-      
+
       <Carousel className="w-full" key={key}>
-        <CarouselContent>
+        <CarouselContent className="-ml-2 md:-ml-4">
           {safeImages.map((image, index) => (
-            <CarouselItem key={`${image.id}-${index}-${key}`}>
-              <GalleryImage
-                src={image.src}
-                alt={image.alt || "Gallery Image"}
-                onLoad={() => console.log("Mobile image loaded:", image.src.substring(0, 30))}
-                onError={() => {
-                  console.error("Failed to load image:", image.src);
-                }}
-              />
+            <CarouselItem key={`${image.id}-${index}-${key}`} className="pl-2 md:pl-4">
+              <div className="p-1">
+                <GalleryImage
+                  src={image.src}
+                  alt={image.alt || "Gallery Image"}
+                  className="mobile-gallery-image"
+                  onLoad={() => console.log("Mobile image loaded:", image.src.substring(0, 30))}
+                  onError={() => {
+                    console.error("Failed to load image:", image.src);
+                  }}
+                />
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <div className="flex justify-center gap-4 mt-4">
-          <CarouselPrevious className="static transform-none bg-persian-gold/10 hover:bg-persian-gold/20 border-persian-gold/30" />
-          <CarouselNext className="static transform-none bg-persian-gold/10 hover:bg-persian-gold/20 border-persian-gold/30" />
+        <div className="flex justify-center gap-6 mt-6">
+          <CarouselPrevious className="static transform-none bg-pizza-orange/10 hover:bg-pizza-orange/20 border-pizza-orange/30 text-pizza-dark hover:text-pizza-orange mobile-gallery-nav h-12 w-12" />
+          <CarouselNext className="static transform-none bg-pizza-orange/10 hover:bg-pizza-orange/20 border-pizza-orange/30 text-pizza-dark hover:text-pizza-orange mobile-gallery-nav h-12 w-12" />
         </div>
       </Carousel>
       

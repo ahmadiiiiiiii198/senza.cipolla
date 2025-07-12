@@ -609,6 +609,49 @@
     .mobile-gap-3 {
       gap: 12px;
     }
+
+    /* Mobile gallery optimizations */
+    .mobile-gallery-image {
+      /* Ensure images are fully visible on mobile */
+      min-height: 320px;
+      max-height: 400px;
+      /* Better touch interaction */
+      touch-action: pan-x pan-y;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .mobile-gallery-image img {
+      /* Better image fitting for mobile */
+      object-fit: contain;
+      background: #f8f9fa;
+      /* Smooth transitions */
+      transition: opacity 0.3s ease;
+    }
+
+    /* Larger touch targets for mobile gallery navigation */
+    .mobile-gallery-nav {
+      min-height: 48px;
+      min-width: 48px;
+      padding: 12px;
+    }
+  }
+
+  /* Desktop gallery optimizations */
+  @media (min-width: 768px) {
+    .desktop-gallery-image {
+      height: 280px;
+    }
+
+    .desktop-gallery-image img {
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .desktop-gallery-image:hover img {
+      transform: scale(1.05);
+    }
   }
 
   /* Admin panel specific mobile improvements */

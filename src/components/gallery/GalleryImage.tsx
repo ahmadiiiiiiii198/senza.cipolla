@@ -95,27 +95,30 @@ const GalleryImage = ({ src, alt, className = "", onLoad, onError }: GalleryImag
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-lg shadow-md h-56 md:h-64 bg-gray-100 ${className}`}>
-      {isLoading && (
-        <Skeleton className="w-full h-full absolute inset-0" />
-      )}
-      
-      {imageSrc && (
-        <img
-          src={imageSrc}
-          alt={alt || "Gallery Image"}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-          loading="eager"
-          onError={handleImageError}
-          onLoad={handleImageLoaded}
-        />
-      )}
-      
-      {hasError && !isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50">
-          <p className="text-sm text-gray-500 text-center p-4">Image could not be loaded</p>
-        </div>
-      )}
+    <div className={`relative overflow-hidden rounded-lg shadow-md bg-gray-100 ${className}`}>
+      {/* Mobile: Larger height and better image fitting */}
+      <div className="h-80 sm:h-96 md:h-64 w-full">
+        {isLoading && (
+          <Skeleton className="w-full h-full absolute inset-0" />
+        )}
+
+        {imageSrc && (
+          <img
+            src={imageSrc}
+            alt={alt || "Gallery Image"}
+            className={`w-full h-full object-contain sm:object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+            loading="eager"
+            onError={handleImageError}
+            onLoad={handleImageLoaded}
+          />
+        )}
+
+        {hasError && !isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50">
+            <p className="text-sm text-gray-500 text-center p-4">Image could not be loaded</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
