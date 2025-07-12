@@ -183,13 +183,10 @@ const SimpleOrderTracker: React.FC = () => {
           filter: `id=eq.${order.id}`
         },
         (payload) => {
-          console.log('🔄 REAL-TIME UPDATE RECEIVED:', payload);
-          console.log('🔄 Old data:', payload.old);
-          console.log('🔄 New data:', payload.new);
+          console.log('🔄 Real-time order update received');
 
           if (payload.new) {
             const updatedOrder = { ...order, ...payload.new };
-            console.log('🔄 Setting updated order:', updatedOrder);
             setOrder(updatedOrder);
 
             // Save updated order for tracking
@@ -211,7 +208,7 @@ const SimpleOrderTracker: React.FC = () => {
               duration: 5000,
             });
 
-            console.log('✅ Order updated successfully via real-time');
+
           }
         }
       )
@@ -331,88 +328,11 @@ const SimpleOrderTracker: React.FC = () => {
     }
   };
 
-  const createTestOrder = () => {
-    const testOrder = {
-      id: `test-${Date.now()}`,
-      order_number: `ORD-TEST${Date.now().toString().slice(-6)}`,
-      customer_name: 'Test Customer',
-      customer_email: 'test@example.com',
-      total_amount: 25.50,
-      created_at: new Date().toISOString()
-    };
 
-    saveOrderForTracking(testOrder);
-    console.log('🧪 Test order created:', testOrder.order_number);
 
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
-  };
 
-  const clearTracking = () => {
-    clearOrderTracking();
-    setOrder(null);
-    console.log('🗑️ Tracking cleared');
-  };
 
-  const debugTracking = () => {
-    console.log('🔍 DEBUGGING TRACKING SYSTEM:');
-    console.log('All cookies:', document.cookie);
 
-    const trackedOrder = getTrackedOrder();
-    console.log('getTrackedOrder result:', trackedOrder);
-
-    // Test email hash
-    const email = 'iamemperor53@gmail.com';
-    const hash = btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
-    console.log('Email hash for', email, ':', hash);
-    console.log('Expected cookie name: pizzeria_order_' + hash);
-
-    // Check if specific cookie exists
-    const cookieExists = document.cookie.includes('pizzeria_order_' + hash);
-    console.log('Cookie exists:', cookieExists);
-
-    // Real-time status
-    console.log('Real-time active:', isRealTimeActive);
-    console.log('Current order:', order);
-  };
-
-  const testRealTimeUpdate = async () => {
-    if (!order) return;
-
-    console.log('🧪 TESTING REAL-TIME: Manually updating order status...');
-
-    // Manually trigger a status update to test real-time
-    const newStatus = order.order_status === 'confirmed' ? 'preparing' : 'confirmed';
-
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({
-          order_status: newStatus,
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', order.id);
-
-      if (error) {
-        console.error('❌ Test update failed:', error);
-        toast({
-          title: '❌ Test Failed',
-          description: 'Could not update order for testing',
-          variant: 'destructive',
-        });
-      } else {
-        console.log('✅ Test update sent, waiting for real-time response...');
-        toast({
-          title: '🧪 Test Update Sent',
-          description: 'Watch for real-time update...',
-        });
-      }
-    } catch (error) {
-      console.error('❌ Test error:', error);
-    }
-  };
 
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
@@ -442,27 +362,7 @@ const SimpleOrderTracker: React.FC = () => {
               <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <h3 className="text-lg font-medium mb-2">Nessun ordine attivo</h3>
               <p className="text-gray-600 mb-4">Non hai ordini in corso al momento</p>
-              <div className="flex gap-2 justify-center">
-                <Button
-                  variant="outline"
-                  onClick={createTestOrder}
-                >
-                  Crea Ordine Test
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={debugTracking}
-                >
-                  Debug
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={testRealTimeUpdate}
-                  className="bg-blue-50"
-                >
-                  Test Real-time
-                </Button>
-              </div>
+
             </div>
           ) : (
             <div className="space-y-4">
@@ -511,30 +411,15 @@ const SimpleOrderTracker: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => searchOrder(order.order_number, order.customer_email)}
-                  >
-                    Aggiorna Stato
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={testRealTimeUpdate}
-                    className="bg-blue-50"
-                  >
-                    Test Real-time
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => searchOrder(order.order_number, order.customer_email)}
+                  className="w-full"
+                >
+                  Aggiorna Stato
+                </Button>
 
-                {/* Debug Info */}
-                <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
-                  <div><strong>Debug Info:</strong></div>
-                  <div>Status: {order.status}</div>
-                  <div>Order Status: {order.order_status}</div>
-                  <div>ID: {order.id}</div>
-                  <div>Created: {new Date(order.created_at).toLocaleString()}</div>
-                </div>
+
               </div>
             </div>
           )}
