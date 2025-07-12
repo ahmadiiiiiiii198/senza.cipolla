@@ -160,59 +160,95 @@ const SimpleOrderTracker: React.FC = () => {
     loadOrder();
   }, []);
 
-  // 🔥 REAL-TIME ORDER STATUS UPDATES
+  // 🔥 BULLETPROOF REAL-TIME ORDER STATUS UPDATES
   useEffect(() => {
-    if (!order) return;
+    if (!order) {
+      console.log('❌ No order found, skipping real-time setup');
+      return;
+    }
 
-    console.log('📡 Setting up real-time subscription for order:', order.id);
+    console.log('📡 BULLETPROOF: Setting up real-time subscription for order:', order.id);
+
+    // Create unique channel name
+    const channelName = `order_updates_${order.id}`;
 
     const channel = supabase
-      .channel(`simple-order-tracker-${order.id}`)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'orders',
-        filter: `id=eq.${order.id}`
-      }, (payload) => {
-        console.log('🔄 REAL-TIME ORDER UPDATE:', payload);
-        const updatedOrder = { ...order, ...payload.new };
-        setOrder(updatedOrder);
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `id=eq.${order.id}`
+        },
+        (payload) => {
+          console.log('🔄 REAL-TIME UPDATE RECEIVED:', payload);
+          console.log('🔄 Old data:', payload.old);
+          console.log('🔄 New data:', payload.new);
 
-        // Save updated order for tracking
-        saveOrderForTracking({
-          id: updatedOrder.id,
-          order_number: updatedOrder.order_number,
-          customer_email: updatedOrder.customer_email,
-          customer_name: updatedOrder.customer_name,
-          total_amount: updatedOrder.total_amount,
-          created_at: updatedOrder.created_at
-        });
+          if (payload.new) {
+            const updatedOrder = { ...order, ...payload.new };
+            console.log('🔄 Setting updated order:', updatedOrder);
+            setOrder(updatedOrder);
 
-        toast({
-          title: '🔄 Ordine Aggiornato!',
-          description: `Stato cambiato a: ${getStatusText(updatedOrder.order_status || updatedOrder.status)}`,
-        });
-      })
+            // Save updated order for tracking
+            saveOrderForTracking({
+              id: updatedOrder.id,
+              order_number: updatedOrder.order_number,
+              customer_email: updatedOrder.customer_email,
+              customer_name: updatedOrder.customer_name,
+              total_amount: updatedOrder.total_amount,
+              created_at: updatedOrder.created_at
+            });
+
+            const newStatus = updatedOrder.order_status || updatedOrder.status;
+            const statusText = getStatusText(newStatus);
+
+            toast({
+              title: '🔄 Ordine Aggiornato!',
+              description: `Stato cambiato a: ${statusText}`,
+              duration: 5000,
+            });
+
+            console.log('✅ Order updated successfully via real-time');
+          }
+        }
+      )
       .subscribe((status) => {
         console.log('📡 Real-time subscription status:', status);
+
         if (status === 'SUBSCRIBED') {
-          console.log('✅ Real-time updates ACTIVE for order tracking');
+          console.log('✅ REAL-TIME SUBSCRIPTION ACTIVE');
           setIsRealTimeActive(true);
           toast({
-            title: '📡 Real-time Attivo',
-            description: 'Il tuo ordine si aggiornerà automaticamente',
+            title: '📡 Real-time Connesso',
+            description: 'Gli aggiornamenti arriveranno automaticamente',
+            duration: 3000,
           });
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Real-time subscription ERROR');
+          console.error('❌ REAL-TIME SUBSCRIPTION ERROR');
+          setIsRealTimeActive(false);
+          toast({
+            title: '❌ Errore Real-time',
+            description: 'Aggiornamenti manuali necessari',
+            variant: 'destructive',
+          });
+        } else if (status === 'TIMED_OUT') {
+          console.error('⏰ REAL-TIME SUBSCRIPTION TIMED OUT');
+          setIsRealTimeActive(false);
+        } else if (status === 'CLOSED') {
+          console.log('🔌 REAL-TIME SUBSCRIPTION CLOSED');
           setIsRealTimeActive(false);
         }
       });
 
     return () => {
-      console.log('🔌 Cleaning up real-time subscription');
+      console.log('🔌 Cleaning up real-time subscription for channel:', channelName);
       supabase.removeChannel(channel);
+      setIsRealTimeActive(false);
     };
-  }, [order, toast]);
+  }, [order?.id, toast]); // Only depend on order.id to avoid unnecessary re-subscriptions
 
   // 🔄 BACKUP AUTO-REFRESH (every 30 seconds)
   useEffect(() => {
@@ -335,6 +371,47 @@ const SimpleOrderTracker: React.FC = () => {
     // Check if specific cookie exists
     const cookieExists = document.cookie.includes('pizzeria_order_' + hash);
     console.log('Cookie exists:', cookieExists);
+
+    // Real-time status
+    console.log('Real-time active:', isRealTimeActive);
+    console.log('Current order:', order);
+  };
+
+  const testRealTimeUpdate = async () => {
+    if (!order) return;
+
+    console.log('🧪 TESTING REAL-TIME: Manually updating order status...');
+
+    // Manually trigger a status update to test real-time
+    const newStatus = order.order_status === 'confirmed' ? 'preparing' : 'confirmed';
+
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          order_status: newStatus,
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', order.id);
+
+      if (error) {
+        console.error('❌ Test update failed:', error);
+        toast({
+          title: '❌ Test Failed',
+          description: 'Could not update order for testing',
+          variant: 'destructive',
+        });
+      } else {
+        console.log('✅ Test update sent, waiting for real-time response...');
+        toast({
+          title: '🧪 Test Update Sent',
+          description: 'Watch for real-time update...',
+        });
+      }
+    } catch (error) {
+      console.error('❌ Test error:', error);
+    }
   };
 
   return (
@@ -377,6 +454,13 @@ const SimpleOrderTracker: React.FC = () => {
                   onClick={debugTracking}
                 >
                   Debug
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={testRealTimeUpdate}
+                  className="bg-blue-50"
+                >
+                  Test Real-time
                 </Button>
               </div>
             </div>
@@ -427,13 +511,21 @@ const SimpleOrderTracker: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  onClick={() => searchOrder(order.order_number, order.customer_email)}
-                  className="w-full"
-                >
-                  Aggiorna Stato
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => searchOrder(order.order_number, order.customer_email)}
+                  >
+                    Aggiorna Stato
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={testRealTimeUpdate}
+                    className="bg-blue-50"
+                  >
+                    Test Real-time
+                  </Button>
+                </div>
 
                 {/* Debug Info */}
                 <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
