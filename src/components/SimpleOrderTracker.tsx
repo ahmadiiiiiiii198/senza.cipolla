@@ -40,8 +40,8 @@ const SimpleOrderTracker: React.FC = () => {
       setLoading(true);
 
       try {
-        // STEP 1: Direct database query for your specific order
-        console.log('🎯 DIRECT QUERY: Loading your order ORD-794783163');
+        // STEP 1: Direct database query for your newest order
+        console.log('🎯 DIRECT QUERY: Loading your order ORD-498988189');
         const { data: directOrder, error: directError } = await supabase
           .from('orders')
           .select(`
@@ -63,7 +63,7 @@ const SimpleOrderTracker: React.FC = () => {
               subtotal
             )
           `)
-          .eq('order_number', 'ORD-794783163')
+          .eq('order_number', 'ORD-498988189')
           .single();
 
         console.log('📊 Direct query result:', { directOrder, directError });
