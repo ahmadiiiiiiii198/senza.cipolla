@@ -1,7 +1,6 @@
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
 
-type Language = "it" | "en" | "fr" | "ar" | "fa";
+type Language = "it" | "en";
 
 interface LanguageContextType {
   language: Language;
@@ -9,293 +8,235 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-// Default translations for common phrases
+// Pizzeria translations for Italian and English
 const translations: Record<Language, Record<string, string>> = {
   it: {
+    // Navigation
     "home": "Home",
-    "specialties": "Categorie",
-    "about": "Chi Siamo",
-    "menu": "Prodotti",
+    "menu": "Menu",
     "gallery": "Galleria",
-    "reviews": "Recensioni",
+    "about": "Chi Siamo",
     "contact": "Contatti",
-    "discover": "Scopri",
-    "ourSpecialties": "Le Nostre Categorie",
-    "reservations": "Ordini",
+    "orders": "Ordini",
+    
+    // Main sections
+    "ourMenu": "Il Nostro Menu",
+    "menuDescription": "Scopri le nostre pizze autentiche preparate con ingredienti freschi",
+    "orderNow": "Ordina Ora",
+    "makeOrder": "Fai un Ordine",
     "contactUs": "Contattaci",
-    "makeReservation": "Fai un Ordine",
+    "findUs": "Trovaci",
+    
+    // Pizza categories
+    "pizzeClassiche": "Pizze Classiche",
+    "pizzeSpeciali": "Pizze Speciali",
+    "pizzeAlMetro": "Pizze al Metro",
+    "bevande": "Bevande",
+    "extras": "Extra",
+    
+    // Order form
     "yourName": "Il Tuo Nome",
     "phoneNumber": "Numero di Telefono",
-    "date": "Data",
-    "time": "Ora",
-    "numberOfGuests": "Quantità",
-    "specialRequests": "Richieste Speciali",
-    "requestReservation": "Invia Ordine",
-    "processingRequest": "Elaborazione...",
-    "findUs": "Trovaci",
     "address": "Indirizzo",
+    "deliveryAddress": "Indirizzo di Consegna",
+    "specialRequests": "Richieste Speciali",
+    "quantity": "Quantità",
+    "submitOrder": "Invia Ordine",
+    "processingOrder": "Elaborazione Ordine...",
+    
+    // Contact info
     "phoneContact": "Telefono",
     "emailContact": "Email",
-    "hours": "Orari",
-    "ourMenu": "I Nostri Prodotti",
-    "menuDescription": "Esplora la nostra varietà di composizioni floreali e servizi",
-    "downloadMenu": "Scarica Catalogo",
-    "menuUnavailable": "Il catalogo PDF non è ancora disponibile",
-    "menuComingSoon": "Il nostro catalogo completo sarà presto disponibile",
-    "freshFlowers": "Fiori freschi per ogni occasione",
-    "indoorOutdoorPlants": "Piante da interno ed esterno per decorare con la natura",
-    "highQualityFakeFlowers": "Fiori finti di alta qualità, ideali per decorazioni durature",
-    "tailorMadeServices": "Servizi floreali su misura per cerimonie, eventi e ambienti",
+    "hours": "Orari di Apertura",
+    "location": "Posizione",
+    
+    // Pizza descriptions
+    "authenticPizza": "Pizza autentica italiana",
+    "freshIngredients": "Ingredienti freschi e di qualità",
+    "traditionalOven": "Cotta nel forno a legna tradizionale",
+    "handmadeDough": "Impasto fatto a mano quotidianamente",
     "yearsExperience": "Anni di Esperienza",
-    "happyCustomers": "Clienti Felici",
-    "flowerVarieties": "Varietà di Fiori",
-    // Admin Panel Translations
-    "adminPanel": "Pannello Amministrativo",
-    "phoneNumberUpdate": "Aggiornamento Numero di Telefono",
-    "heroSectionContent": "Contenuto Sezione Hero",
-    "logoSettings": "Impostazioni Logo",
-    "categoriesContent": "Contenuto Categorie",
-    "pictures": "Immagini",
-    "products": "Prodotti",
-    "orders": "Ordini",
-    "shipping": "Spedizioni",
-    "stripe": "Stripe",
-    "music": "Musica",
-    "saveChanges": "Salva Modifiche",
-    "resetToDefault": "Ripristina Predefinito",
-    "alternativeText": "Testo Alternativo",
-    "describeLogoForScreenReaders": "Descrivi il tuo logo per i lettori di schermo",
-    "accessibilityAndSeoHelp": "Questo testo aiuta con l'accessibilità e la SEO",
-    "languageAndAuthentication": "Lingua e Autenticazione",
-    "defaultLanguage": "Lingua Predefinita",
-    "selectLanguage": "Seleziona lingua",
-    "italian": "Italiano",
-    "english": "Inglese",
-    "french": "Francese",
-    "arabic": "Arabo",
-    "farsi": "Farsi",
-    "updatingCredentials": "Aggiornamento...",
-    "updateCredentials": "Aggiorna Credenziali",
-    "defaultCredentialsNote": "Nota: Le credenziali predefinite sono username: \"admin\", password: \"persian123\"",
-    "logoUpdated": "Logo aggiornato",
-    "logoUpdatedDescription": "Il logo del tuo sito web è stato modificato",
-    "logoUpdatedLocally": "Logo aggiornato localmente",
-    "logoUpdatedLocallyDescription": "Impostazioni salvate localmente e sincronizzate quando la connessione sarà ripristinata",
-    "dedicatedOrderDashboard": "Dashboard Ordini Dedicata",
-    "orderManagementMoved": "La gestione degli ordini è stata spostata in una dashboard dedicata con funzionalità avanzate:",
-    "realTimeNotifications": "Notifiche in tempo reale anche quando lo schermo è spento",
-    "backgroundProcessing": "Elaborazione e sincronizzazione in background",
-    "comprehensiveSystemTesting": "Test completi del sistema",
-    "enhancedMobileExperience": "Esperienza mobile migliorata",
-    "persistentNotifications": "Notifiche persistenti",
-    "openOrderDashboard": "Apri Dashboard Ordini",
-    "allContentSections": "Tutte le Sezioni di Contenuto",
-    // Order Dashboard Translations
-    "orderDashboard": "Dashboard Ordini",
-    "realTimeOrderManagement": "Gestione ordini in tempo reale e notifiche",
-    "online": "Online",
-    "offline": "Offline",
-    "soundOn": "Audio Attivo",
-    "soundOff": "Audio Disattivo",
-    "testSound": "Test Audio",
-    "stopRinging": "Ferma Suoneria",
-    "refresh": "Aggiorna",
-    "lastUpdatedDashboard": "Ultimo aggiornamento",
-    "totalOrders": "Ordini Totali",
-    "pending": "In Attesa",
-    "accepted": "Accettati",
-    "completed": "Completati",
-    "today": "Oggi",
-    "revenue": "Ricavi",
-    "loadingOrderDashboard": "Caricamento Dashboard Ordini...",
-    "dashboard": "Dashboard",
-    "systemTesting": "Test di Sistema",
-    "recentOrders": "Ordini Recenti",
-    "allOrders": "Tutti gli Ordini",
-    "orderDetails": "Dettagli Ordine",
-    "selectOrderToView": "Seleziona un ordine per visualizzare i dettagli",
-    "noOrdersFound": "Nessun ordine trovato",
-    "createFirstOrder": "Crea il tuo primo ordine dal sito web",
-    "newOrderReceived": "NUOVO ORDINE RICEVUTO!",
-    "orderPaymentCompleted": "PAGAMENTO ORDINE COMPLETATO!",
-    "backOnline": "Torna Online",
-    "connectionRestored": "Connessione ripristinata. Sincronizzazione dati...",
-    "connectionLost": "Connessione Persa",
-    "workingOffline": "Lavoro offline. Sincronizzerà quando la connessione sarà ripristinata.",
-    "notificationsEnabled": "Notifiche Abilitate",
-    "browserNotificationsEnabled": "Riceverai notifiche del browser per i nuovi ordini",
-    "backgroundServiceStarted": "Servizio in Background Avviato",
-    "backgroundMonitoringActive": "Monitoraggio in background attivo (notifiche gestite dalla dashboard)",
-    "backgroundServiceWarning": "Avviso Servizio in Background",
-    "notificationFeaturesMayNotWork": "Alcune funzionalità di notifica potrebbero non funzionare correttamente",
-    "soundDisabled": "Audio Disabilitato",
-    "soundEnabled": "Audio Abilitato",
-    "orderNotificationsSilent": "Le notifiche degli ordini saranno silenziose",
-    "orderNotificationsSound": "Le notifiche degli ordini riprodurranno un suono",
-    "testingNotificationSound": "Test Audio Notifica",
-    "playingTestNotification": "Riproduzione notifica di test per l'ordine TEST-001",
-    // Order Details Translations
-    "customerInformation": "Informazioni Cliente",
-    "name": "Nome",
-    "email": "Email",
-    "phone": "Telefono",
-    "orderInformation": "Informazioni Ordine",
-    "totalAmount": "Importo Totale",
-    "created": "Creato",
-    "lastUpdated": "Ultimo Aggiornamento",
-    "trackingNumber": "Numero di Tracciamento",
-    "shipped": "Spedito",
-    "delivered": "Consegnato",
-    "updateOrderStatus": "Aggiorna Stato Ordine",
-    "status": "Stato",
-    "selectStatus": "Seleziona stato",
-    "processing": "In Elaborazione",
-    "cancelled": "Annullato",
-    "rejected": "Rifiutato",
-    "addTrackingNumber": "Aggiungi Numero di Tracciamento",
-    "trackingNumberOptional": "Numero di tracciamento (opzionale)",
-    "addNotes": "Aggiungi Note",
-    "notesOptional": "Note aggiuntive (opzionale)",
-    "updateOrder": "Aggiorna Ordine",
-    "updating": "Aggiornamento...",
+    "happyCustomers": "Clienti Soddisfatti",
+    "pizzaVarieties": "Varietà di Pizza",
+    
+    // Order tracking
+    "trackOrder": "Traccia il tuo Ordine",
+    "orderStatus": "Stato Ordine",
+    "orderNumber": "Numero Ordine",
+    "orderTotal": "Totale Ordine",
+    "orderItems": "Articoli Ordinati",
+    "orderConfirmed": "Ordine Confermato",
+    "orderPreparing": "In Preparazione",
+    "orderReady": "Pronto",
+    "orderDelivered": "Consegnato",
+    "orderCancelled": "Annullato",
+    "refreshStatus": "Aggiorna Stato",
+    "noActiveOrder": "Nessun ordine attivo",
     "orderUpdated": "Ordine Aggiornato",
-    "orderUpdatedSuccessfully": "L'ordine è stato aggiornato con successo",
-    "updateFailed": "Aggiornamento Fallito",
-    "failedToUpdateOrder": "Impossibile aggiornare l'ordine",
-    "deleteOrder": "Elimina Ordine",
-    "confirmDeleteOrder": "Sei sicuro di voler eliminare questo ordine? Questa azione non può essere annullata.",
-    "orderDeleted": "Ordine Eliminato",
-    "orderDeletedSuccessfully": "L'ordine è stato eliminato con successo",
-    "deleteFailed": "Eliminazione Fallita",
-    "failedToDeleteOrder": "Impossibile eliminare l'ordine"
+    "realTimeActive": "Real-time Attivo",
+    
+    // Payment
+    "paymentMethod": "Metodo di Pagamento",
+    "cashOnDelivery": "Contanti alla Consegna",
+    "creditCard": "Carta di Credito",
+    "paymentCompleted": "Pagamento Completato",
+    "paymentPending": "Pagamento in Attesa",
+    
+    // Admin Panel
+    "adminPanel": "Pannello Amministrativo",
+    "manageOrders": "Gestione Ordini",
+    "manageProducts": "Gestione Prodotti",
+    "settings": "Impostazioni",
+    "notifications": "Notifiche",
+    
+    // Common actions
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "add": "Aggiungi",
+    "search": "Cerca",
+    "filter": "Filtra",
+    "refresh": "Aggiorna",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "confirm": "Conferma",
+    "close": "Chiudi",
+    "back": "Indietro",
+    "next": "Avanti",
+    "total": "Totale",
+    "all": "Tutti",
+    "none": "Nessuno",
+    "clear": "Pulisci",
+    "apply": "Applica",
+    "submit": "Invia",
+    "create": "Crea",
+    "update": "Aggiorna",
+    "view": "Visualizza",
+    "details": "Dettagli",
+    
+    // Order statuses
+    "pending": "In Attesa",
+    "confirmed": "Confermato",
+    "preparing": "In Preparazione",
+    "ready": "Pronto",
+    "delivered": "Consegnato",
+    "cancelled": "Annullato"
   },
   en: {
+    // Navigation
     "home": "Home",
-    "specialties": "Categories",
-    "about": "About",
-    "menu": "Products",
+    "menu": "Menu",
     "gallery": "Gallery",
-    "reviews": "Reviews",
+    "about": "About Us",
     "contact": "Contact",
-    "discover": "Discover",
-    "ourSpecialties": "Our Categories",
-    "reservations": "Orders",
+    "orders": "Orders",
+    
+    // Main sections
+    "ourMenu": "Our Menu",
+    "menuDescription": "Discover our authentic pizzas made with fresh ingredients",
+    "orderNow": "Order Now",
+    "makeOrder": "Place an Order",
     "contactUs": "Contact Us",
-    "makeReservation": "Place an Order",
+    "findUs": "Find Us",
+    
+    // Pizza categories
+    "pizzeClassiche": "Classic Pizzas",
+    "pizzeSpeciali": "Specialty Pizzas",
+    "pizzeAlMetro": "Meter Pizzas",
+    "bevande": "Beverages",
+    "extras": "Extras",
+    
+    // Order form
     "yourName": "Your Name",
     "phoneNumber": "Phone Number",
-    "date": "Date",
-    "time": "Time",
-    "numberOfGuests": "Quantity",
-    "specialRequests": "Special Requests",
-    "requestReservation": "Submit Order",
-    "processingRequest": "Processing...",
-    "findUs": "Find Us",
     "address": "Address",
-    "phone": "Phone",
-    "email": "Email",
-    "hours": "Hours",
-    "ourMenu": "Our Products",
-    "menuDescription": "Explore our diverse selection of floral arrangements and services",
-    "downloadMenu": "Download Catalog",
-    "menuUnavailable": "Product catalog PDF is not available yet",
-    "menuComingSoon": "Our complete catalog will be available soon",
-  },
-  fr: {
-    "home": "Accueil",
-    "specialties": "Catégories",
-    "about": "À Propos",
-    "menu": "Produits",
-    "gallery": "Galerie",
-    "reviews": "Avis",
-    "contact": "Contact",
-    "discover": "Découvrir",
-    "ourSpecialties": "Nos Catégories",
-    "reservations": "Commandes",
-    "contactUs": "Nous Contacter",
-    "makeReservation": "Passer Commande",
-    "yourName": "Votre Nom",
-    "phoneNumber": "Numéro de Téléphone",
-    "date": "Date",
-    "time": "Heure",
-    "numberOfGuests": "Quantité",
-    "specialRequests": "Demandes Spéciales",
-    "requestReservation": "Envoyer Commande",
-    "processingRequest": "Traitement...",
-    "findUs": "Nous Trouver",
-    "address": "Adresse",
-    "phone": "Téléphone",
-    "email": "Email",
-    "hours": "Horaires",
-    "ourMenu": "Nos Produits",
-    "menuDescription": "Explorez notre sélection variée d'arrangements floraux et services",
-    "downloadMenu": "Télécharger Catalogue",
-    "menuUnavailable": "Le catalogue PDF n'est pas encore disponible",
-    "menuComingSoon": "Notre catalogue complet sera bientôt disponible",
-  },
-  ar: {
-    "home": "الرئيسية",
-    "specialties": "الفئات",
-    "about": "من نحن",
-    "menu": "المنتجات",
-    "gallery": "المعرض",
-    "reviews": "التقييمات",
-    "contact": "اتصل بنا",
-    "discover": "اكتشف",
-    "ourSpecialties": "فئاتنا",
-    "reservations": "الطلبات",
-    "contactUs": "اتصل بنا",
-    "makeReservation": "اطلب الآن",
-    "yourName": "اسمك",
-    "phoneNumber": "رقم الهاتف",
-    "date": "التاريخ",
-    "time": "الوقت",
-    "numberOfGuests": "الكمية",
-    "specialRequests": "طلبات خاصة",
-    "requestReservation": "إرسال الطلب",
-    "processingRequest": "جاري المعالجة...",
-    "findUs": "جدنا",
-    "address": "العنوان",
-    "phone": "الهاتف",
-    "email": "البريد الإلكتروني",
-    "hours": "ساعات العمل",
-    "ourMenu": "منتجاتنا",
-    "menuDescription": "استكشف مجموعتنا المتنوعة من التنسيقات الزهرية والخدمات",
-    "downloadMenu": "تحميل الكتالوج",
-    "menuUnavailable": "كتالوج المنتجات PDF غير متوفر بعد",
-    "menuComingSoon": "سيكون كتالوجنا الكامل متاحًا قريبًا",
-  },
-  fa: {
-    "home": "خانه",
-    "specialties": "دسته‌بندی‌ها",
-    "about": "درباره ما",
-    "menu": "محصولات",
-    "gallery": "گالری",
-    "reviews": "نظرات",
-    "contact": "تماس با ما",
-    "discover": "کشف کنید",
-    "ourSpecialties": "دسته‌بندی‌های ما",
-    "reservations": "سفارشات",
-    "contactUs": "با ما تماس بگیرید",
-    "makeReservation": "ثبت سفارش",
-    "yourName": "نام شما",
-    "phoneNumber": "شماره تلفن",
-    "date": "تاریخ",
-    "time": "زمان",
-    "numberOfGuests": "تعداد",
-    "specialRequests": "درخواست های خاص",
-    "requestReservation": "ارسال سفارش",
-    "processingRequest": "در حال پردازش...",
-    "findUs": "ما را پیدا کنید",
-    "address": "آدرس",
-    "phone": "تلفن",
-    "email": "ایمیل",
-    "hours": "ساعات کاری",
-    "ourMenu": "محصولات ما",
-    "menuDescription": "مجموعه متنوعی از تنظیمات گل و خدمات ما را کاوش کنید",
-    "downloadMenu": "دانلود کاتالوگ",
-    "menuUnavailable": "کاتالوگ محصولات PDF هنوز در دسترس نیست",
-    "menuComingSoon": "کاتالوگ کامل ما به زودی در دسترس خواهد بود",
+    "deliveryAddress": "Delivery Address",
+    "specialRequests": "Special Requests",
+    "quantity": "Quantity",
+    "submitOrder": "Submit Order",
+    "processingOrder": "Processing Order...",
+    
+    // Contact info
+    "phoneContact": "Phone",
+    "emailContact": "Email",
+    "hours": "Opening Hours",
+    "location": "Location",
+    
+    // Pizza descriptions
+    "authenticPizza": "Authentic Italian Pizza",
+    "freshIngredients": "Fresh and quality ingredients",
+    "traditionalOven": "Cooked in traditional wood-fired oven",
+    "handmadeDough": "Handmade dough prepared daily",
+    "yearsExperience": "Years of Experience",
+    "happyCustomers": "Happy Customers",
+    "pizzaVarieties": "Pizza Varieties",
+    
+    // Order tracking
+    "trackOrder": "Track Your Order",
+    "orderStatus": "Order Status",
+    "orderNumber": "Order Number",
+    "orderTotal": "Order Total",
+    "orderItems": "Ordered Items",
+    "orderConfirmed": "Order Confirmed",
+    "orderPreparing": "Preparing",
+    "orderReady": "Ready",
+    "orderDelivered": "Delivered",
+    "orderCancelled": "Cancelled",
+    "refreshStatus": "Refresh Status",
+    "noActiveOrder": "No Active Order",
+    "orderUpdated": "Order Updated",
+    "realTimeActive": "Real-time Active",
+    
+    // Payment
+    "paymentMethod": "Payment Method",
+    "cashOnDelivery": "Cash on Delivery",
+    "creditCard": "Credit Card",
+    "paymentCompleted": "Payment Completed",
+    "paymentPending": "Payment Pending",
+    
+    // Admin Panel
+    "adminPanel": "Admin Panel",
+    "manageOrders": "Manage Orders",
+    "manageProducts": "Manage Products",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    
+    // Common actions
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "total": "Total",
+    "all": "All",
+    "none": "None",
+    "clear": "Clear",
+    "apply": "Apply",
+    "submit": "Submit",
+    "create": "Create",
+    "update": "Update",
+    "view": "View",
+    "details": "Details",
+    
+    // Order statuses
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "preparing": "Preparing",
+    "ready": "Ready",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
   }
 };
 
@@ -306,17 +247,17 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   
   useEffect(() => {
     // Initialize default language settings if they don't exist
-    const savedSettings = localStorage.getItem('flowerShopSettings');
+    const savedSettings = localStorage.getItem('pizzeriaSettings');
     if (!savedSettings) {
       const defaultSettings = {
         totalSeats: 50,
         reservationDuration: 120,
-        openingTime: "08:00",
-        closingTime: "19:00",
-        languages: ["it", "en", "fr", "ar", "fa"],
+        openingTime: "11:30",
+        closingTime: "22:00",
+        languages: ["it", "en"],
         defaultLanguage: "it"
       };
-      localStorage.setItem('flowerShopSettings', JSON.stringify(defaultSettings));
+      localStorage.setItem('pizzeriaSettings', JSON.stringify(defaultSettings));
     } else {
       try {
         const parsedSettings = JSON.parse(savedSettings);
@@ -331,24 +272,20 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     // Set the html lang attribute
     document.documentElement.lang = language;
     
-    // Set RTL for Arabic and Persian
-    if (language === "ar" || language === "fa") {
-      document.documentElement.dir = "rtl";
-    } else {
-      document.documentElement.dir = "ltr";
-    }
+    // No RTL needed for Italian and English
+    document.documentElement.dir = "ltr";
   }, [language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     
     // Update settings in localStorage
-    const savedSettings = localStorage.getItem('flowerShopSettings');
+    const savedSettings = localStorage.getItem('pizzeriaSettings');
     if (savedSettings) {
       try {
         const parsedSettings = JSON.parse(savedSettings);
         parsedSettings.defaultLanguage = lang;
-        localStorage.setItem('flowerShopSettings', JSON.stringify(parsedSettings));
+        localStorage.setItem('pizzeriaSettings', JSON.stringify(parsedSettings));
       } catch (e) {
         console.error('Failed to update language setting');
       }

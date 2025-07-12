@@ -7,16 +7,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useLanguage } from "@/hooks/use-language";
 
 const LanguageSelector = () => {
-  // Static language to avoid hook errors
-  const [language, setLanguageState] = useState("it");
+  const { language, setLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
-
-  const setLanguage = (lang: string) => {
-    setLanguageState(lang);
-    // You can add localStorage or other persistence here later
-  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -52,7 +47,13 @@ const LanguageSelector = () => {
           >
             🇬🇧 English
           </Button>
-          <Button
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+export default LanguageSelector;
             variant={language === "fr" ? "default" : "ghost"}
             onClick={() => {
               setLanguage("fr");
