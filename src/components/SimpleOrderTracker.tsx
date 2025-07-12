@@ -31,6 +31,7 @@ interface OrderItem {
 const SimpleOrderTracker: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRealTimeActive, setIsRealTimeActive] = useState(false);
   const { toast } = useToast();
 
   // BULLETPROOF ORDER DETECTION
@@ -159,6 +160,72 @@ const SimpleOrderTracker: React.FC = () => {
     loadOrder();
   }, []);
 
+  // 🔥 REAL-TIME ORDER STATUS UPDATES
+  useEffect(() => {
+    if (!order) return;
+
+    console.log('📡 Setting up real-time subscription for order:', order.id);
+
+    const channel = supabase
+      .channel(`simple-order-tracker-${order.id}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'orders',
+        filter: `id=eq.${order.id}`
+      }, (payload) => {
+        console.log('🔄 REAL-TIME ORDER UPDATE:', payload);
+        const updatedOrder = { ...order, ...payload.new };
+        setOrder(updatedOrder);
+
+        // Save updated order for tracking
+        saveOrderForTracking({
+          id: updatedOrder.id,
+          order_number: updatedOrder.order_number,
+          customer_email: updatedOrder.customer_email,
+          customer_name: updatedOrder.customer_name,
+          total_amount: updatedOrder.total_amount,
+          created_at: updatedOrder.created_at
+        });
+
+        toast({
+          title: '🔄 Ordine Aggiornato!',
+          description: `Stato cambiato a: ${getStatusText(updatedOrder.order_status || updatedOrder.status)}`,
+        });
+      })
+      .subscribe((status) => {
+        console.log('📡 Real-time subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Real-time updates ACTIVE for order tracking');
+          setIsRealTimeActive(true);
+          toast({
+            title: '📡 Real-time Attivo',
+            description: 'Il tuo ordine si aggiornerà automaticamente',
+          });
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Real-time subscription ERROR');
+          setIsRealTimeActive(false);
+        }
+      });
+
+    return () => {
+      console.log('🔌 Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [order, toast]);
+
+  // 🔄 BACKUP AUTO-REFRESH (every 30 seconds)
+  useEffect(() => {
+    if (!order) return;
+
+    const interval = setInterval(() => {
+      console.log('🔄 Auto-refreshing order status...');
+      searchOrder(order.order_number, order.customer_email);
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [order]);
+
   const searchOrder = async (orderNum: string, email: string) => {
     try {
       const { data: orderData, error } = await supabase
@@ -274,9 +341,17 @@ const SimpleOrderTracker: React.FC = () => {
     <div className="w-full max-w-2xl mx-auto p-4">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-6 w-6" />
-            Traccia il tuo Ordine
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Package className="h-6 w-6" />
+              Traccia il tuo Ordine
+            </div>
+            {isRealTimeActive && (
+              <div className="flex items-center gap-1 text-xs text-green-600">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                Live
+              </div>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
