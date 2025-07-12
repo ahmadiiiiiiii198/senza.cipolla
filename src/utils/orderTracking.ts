@@ -25,6 +25,13 @@ export const saveOrderForTracking = (orderData: {
   total_amount: number;
   created_at: string;
 }) => {
+  // Generate or get client ID for this browser/device
+  let clientId = localStorage.getItem('pizzeria_client_id');
+  if (!clientId) {
+    clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('pizzeria_client_id', clientId);
+  }
+
   const trackingData: OrderTrackingData = {
     orderId: orderData.id,
     orderNumber: orderData.order_number,
@@ -38,16 +45,24 @@ export const saveOrderForTracking = (orderData: {
   try {
     // Save to localStorage for immediate access
     localStorage.setItem(ORDER_TRACKING_KEY, JSON.stringify(trackingData));
-    
+
     // Also save to cookies for cross-session persistence (30 days)
     const expires = new Date();
     expires.setDate(expires.getDate() + 30);
     document.cookie = `${ORDER_TRACKING_KEY}=${encodeURIComponent(JSON.stringify(trackingData))}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
-    
+
+    // Save client-specific order data
+    const clientSpecificData = {
+      ...orderData,
+      clientId: clientId,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(`order_${orderData.id}`, JSON.stringify(clientSpecificData));
+
     // Add to order history
     addToOrderHistory(trackingData);
-    
-    console.log('✅ Order saved for automatic tracking:', orderData.order_number);
+
+    console.log('✅ Order saved for client-specific tracking:', orderData.order_number, 'Client ID:', clientId);
     return true;
   } catch (error) {
     console.error('❌ Failed to save order for tracking:', error);
@@ -94,11 +109,21 @@ export const hasActiveOrder = (): boolean => {
 export const clearOrderTracking = () => {
   try {
     localStorage.removeItem(ORDER_TRACKING_KEY);
-    
+
     // Clear cookie by setting expired date
     document.cookie = `${ORDER_TRACKING_KEY}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    
-    console.log('✅ Order tracking cleared');
+
+    // Clear client-specific order data
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('order_')) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+
+    console.log('✅ Order tracking cleared (including client-specific data)');
     return true;
   } catch (error) {
     console.error('❌ Failed to clear order tracking:', error);

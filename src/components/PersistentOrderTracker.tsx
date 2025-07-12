@@ -235,67 +235,70 @@ const PersistentOrderTracker: React.FC = () => {
     }
   };
 
-  // Smart auto-detection system for orders
-  const smartOrderDetection = async () => {
-    console.log('🧠 Starting smart order detection...');
+  // Client-specific order detection system
+  const clientSpecificOrderDetection = async () => {
+    console.log('🧠 Starting client-specific order detection...');
 
-    // Method 1: Check existing tracking data
+    // Method 1: Check existing tracking data (client-specific)
     const trackedOrder = getTrackedOrder();
     if (trackedOrder) {
-      console.log('✅ Found tracked order:', trackedOrder.orderNumber);
+      console.log('✅ Found client-specific tracked order:', trackedOrder.orderNumber);
       return trackedOrder;
     }
 
-    // Method 2: Check for recent orders from database (last 24 hours)
-    console.log('🔍 No tracking data found, checking recent orders...');
-    try {
-      const { data: recentOrders, error } = await supabase
-        .from('orders')
-        .select('id, order_number, customer_name, customer_email, total_amount, created_at, status')
-        .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24 hours
-        .in('status', ['pending', 'confirmed', 'preparing', 'ready']) // Active statuses
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) {
-        console.error('❌ Error fetching recent orders:', error);
-        return null;
+    // Method 2: Generate client identifier for this session/device
+    const getClientIdentifier = () => {
+      // Try to get existing client ID from localStorage
+      let clientId = localStorage.getItem('pizzeria_client_id');
+      if (!clientId) {
+        // Create unique client ID based on timestamp + random
+        clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('pizzeria_client_id', clientId);
+        console.log('🆔 Created new client ID:', clientId);
       }
+      return clientId;
+    };
 
-      if (recentOrders && recentOrders.length > 0) {
-        console.log('📋 Found recent orders:', recentOrders.length);
+    const clientId = getClientIdentifier();
+    console.log('🔍 Client ID:', clientId);
 
-        // Try to match with browser session or use most recent
-        const mostRecentOrder = recentOrders[0];
-        console.log('🎯 Auto-selecting most recent order:', mostRecentOrder.order_number);
+    // Method 3: Check for orders from this specific session/browser
+    console.log('🔍 No tracking data found, checking for client-specific orders...');
 
-        // Convert to tracking format
-        const autoDetectedOrder = {
-          orderId: mostRecentOrder.id,
-          orderNumber: mostRecentOrder.order_number,
-          customerName: mostRecentOrder.customer_name,
-          customerEmail: mostRecentOrder.customer_email,
-          totalAmount: mostRecentOrder.total_amount,
-          createdAt: mostRecentOrder.created_at
-        };
-
-        // Save for future tracking
-        saveOrderForTracking({
-          id: mostRecentOrder.id,
-          order_number: mostRecentOrder.order_number,
-          customer_email: mostRecentOrder.customer_email,
-          customer_name: mostRecentOrder.customer_name,
-          total_amount: mostRecentOrder.total_amount,
-          created_at: mostRecentOrder.created_at
-        });
-
-        console.log('💾 Auto-detected order saved for tracking');
-        return autoDetectedOrder;
+    // First, try to find orders that were created in this browser session
+    const sessionOrders = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('order_')) {
+        try {
+          const orderData = JSON.parse(localStorage.getItem(key) || '{}');
+          if (orderData.clientId === clientId) {
+            sessionOrders.push(orderData);
+          }
+        } catch (e) {
+          // Ignore invalid JSON
+        }
       }
-    } catch (error) {
-      console.error('❌ Smart detection error:', error);
     }
 
+    if (sessionOrders.length > 0) {
+      console.log('📱 Found session-specific orders:', sessionOrders.length);
+      const mostRecentSessionOrder = sessionOrders.sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )[0];
+
+      console.log('🎯 Using session-specific order:', mostRecentSessionOrder.order_number);
+      return {
+        orderId: mostRecentSessionOrder.id,
+        orderNumber: mostRecentSessionOrder.order_number,
+        customerName: mostRecentSessionOrder.customer_name,
+        customerEmail: mostRecentSessionOrder.customer_email,
+        totalAmount: mostRecentSessionOrder.total_amount,
+        createdAt: mostRecentSessionOrder.created_at
+      };
+    }
+
+    console.log('❌ No client-specific orders found - showing search form');
     return null;
   };
 
@@ -310,7 +313,7 @@ const PersistentOrderTracker: React.FC = () => {
       console.log('📦 localStorage content:', localStorageContent);
       console.log('🍪 Cookie exists:', hasCookie);
 
-      const detectedOrder = await smartOrderDetection();
+      const detectedOrder = await clientSpecificOrderDetection();
 
       if (detectedOrder) {
         setOrderNumber(detectedOrder.orderNumber);
