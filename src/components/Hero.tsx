@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Pizza, ChefHat, Clock, Star, Camera, Phone } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 const Hero = () => {
+  const { t } = useLanguage();
+
   const [heroContent, setHeroContent] = useState({
     heading: "Pizzeria Regina 2000 Torino",
     subheading: "Autentica pizza italiana nel cuore di Torino dal 2000",
@@ -247,7 +250,7 @@ const Hero = () => {
                 Regina 2000
               </h2>
               <h3 className="text-2xl md:text-3xl font-roboto text-pizza-yellow drop-shadow-md animate-fade-in-up animate-stagger-2 mt-2">
-                Torino • Autentica Pizza Italiana
+                {t('pizzeriaLocation')} • {t('heroSubtitle')}
               </h3>
             </div>
 
@@ -319,12 +322,12 @@ const Hero = () => {
                   }
                 }}
                 className="group bg-gradient-to-r from-pizza-brown to-pizza-dark text-white px-8 py-4 rounded-full font-bold font-fredoka text-xl hover:from-pizza-brown hover:to-pizza-brown transform hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-3xl hover-lift border-2 border-pizza-orange/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-pizza-orange focus:ring-offset-2"
-                aria-label="Vai alla galleria"
-                title="Vai alla galleria"
+                aria-label={t('goToGallery')}
+                title={t('goToGallery')}
               >
                 <span className="flex items-center justify-center space-x-3">
                   <Camera className="group-hover:animate-bounce" size={28} />
-                  <span>📸 GALLERIA</span>
+                  <span>📸 {t('gallery').toUpperCase()}</span>
                 </span>
               </button>
             </div>

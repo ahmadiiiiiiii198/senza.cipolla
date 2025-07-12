@@ -122,7 +122,28 @@ const translations: Record<Language, Record<string, string>> = {
     "preparing": "In Preparazione",
     "ready": "Pronto",
     "delivered": "Consegnato",
-    "cancelled": "Annullato"
+    "cancelled": "Annullato",
+
+    // Hero section
+    "pizzeriaName": "Pizzeria Regina 2000",
+    "pizzeriaLocation": "Torino",
+    "heroSubtitle": "Autentica Pizza Italiana",
+    "heroDescription": "Autentica pizza italiana nel cuore di Torino dal 2000",
+    "gallery": "Galleria",
+    "goToGallery": "Vai alla Galleria",
+
+    // Footer services
+    "ourServices": "I Nostri Servizi",
+    "pizzaAlTaglio": "Pizza al Taglio",
+    "homeDelivery": "Consegna a Domicilio",
+    "eventCatering": "Catering per Eventi",
+    "customPizza": "Pizza Personalizzata",
+    "beveragesAndDesserts": "Bevande e Dolci",
+    "openingHours": "Orari di Apertura",
+    "defaultHours": "Lun-Dom: 08:00 - 19:00",
+
+    // Navigation
+    "products": "Menu"
   },
   en: {
     // Navigation
@@ -236,7 +257,28 @@ const translations: Record<Language, Record<string, string>> = {
     "preparing": "Preparing",
     "ready": "Ready",
     "delivered": "Delivered",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+
+    // Hero section
+    "pizzeriaName": "Pizzeria Regina 2000",
+    "pizzeriaLocation": "Turin",
+    "heroSubtitle": "Authentic Italian Pizza",
+    "heroDescription": "Authentic Italian pizza in the heart of Turin since 2000",
+    "gallery": "Gallery",
+    "goToGallery": "Go to Gallery",
+
+    // Footer services
+    "ourServices": "Our Services",
+    "pizzaAlTaglio": "Pizza by the Slice",
+    "homeDelivery": "Home Delivery",
+    "eventCatering": "Event Catering",
+    "customPizza": "Custom Pizza",
+    "beveragesAndDesserts": "Beverages and Desserts",
+    "openingHours": "Opening Hours",
+    "defaultHours": "Mon-Sun: 08:00 - 19:00",
+
+    // Navigation
+    "products": "Menu"
   }
 };
 

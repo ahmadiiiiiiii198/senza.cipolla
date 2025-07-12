@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Pizza, ChefHat, Clock, MapPin, Phone, Mail } from 'lucide-react';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useLanguage } from '@/hooks/use-language';
 import { supabase } from '@/integrations/supabase/client';
 
 const Footer = () => {
   const { formattedHours } = useBusinessHours();
+  const { t } = useLanguage();
   const [contactHours, setContactHours] = useState<string>('');
 
   // Load contact hours from database
@@ -90,20 +92,20 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">I Nostri Servizi</h3>
+            <h3 className="font-semibold mb-4">{t('ourServices')}</h3>
             <ul className="space-y-2 text-gray-300">
-              <li>🍕 Pizza al Taglio</li>
-              <li>🚚 Consegna a Domicilio</li>
-              <li>🎉 Catering per Eventi</li>
-              <li>👨‍🍳 Pizza Personalizzata</li>
-              <li>🥤 Bevande e Dolci</li>
+              <li>🍕 {t('pizzaAlTaglio')}</li>
+              <li>🚚 {t('homeDelivery')}</li>
+              <li>🎉 {t('eventCatering')}</li>
+              <li>👨‍🍳 {t('customPizza')}</li>
+              <li>🥤 {t('beveragesAndDesserts')}</li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Orari di Apertura</h3>
+            <h3 className="font-semibold mb-4">{t('openingHours')}</h3>
             <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
-              {contactHours || formattedHours || 'Lun-Dom: 08:00 - 19:00'}
+              {contactHours || formattedHours || t('defaultHours')}
             </div>
           </div>
         </div>

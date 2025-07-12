@@ -7,11 +7,13 @@ import { useSimpleCart } from '@/hooks/use-simple-cart';
 import SimpleCart from './SimpleCart';
 import ProductSearch from './ProductSearch';
 import MobileSearchModal from './MobileSearchModal';
+import { useLanguage } from '@/hooks/use-language';
 import logoImage from '@/assets/logo.png';
 
 
 const Header = () => {
   const { getTotalItems, openCart } = useSimpleCart();
+  const { t } = useLanguage();
 
   // Use static logo settings to avoid hook issues
   const logoSettings = {
@@ -23,20 +25,6 @@ const Header = () => {
   const [logoError, setLogoError] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-
-
-  // Static translations to avoid hook errors
-  const t = (key: string) => {
-    const translations: Record<string, string> = {
-      'home': 'Home',
-      'products': 'Menu',
-      'gallery': 'Galleria',
-      'about': 'Chi Siamo',
-      'contact': 'Contatti',
-      'makeReservation': 'Ordina Ora'
-    };
-    return translations[key] || key;
-  };
 
   return (
     <>
@@ -69,7 +57,7 @@ const Header = () => {
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pizza-red to-pizza-orange transition-all duration-300 group-hover:w-full animate-shimmer"></span>
                 </a>
                 <a href="/#products" className="text-pizza-dark hover:text-pizza-orange transition-colors font-medium font-roboto relative group animate-fade-in-up animate-stagger-2 hover-scale">
-                  🍕 {t('products')}
+                  🍕 {t('menu')}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pizza-orange to-pizza-red transition-all duration-300 group-hover:w-full animate-shimmer"></span>
                 </a>
                 <a href="/#gallery" className="text-pizza-dark hover:text-pizza-green transition-colors font-medium font-roboto relative group animate-fade-in-up animate-stagger-3 hover-scale">
