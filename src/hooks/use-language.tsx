@@ -156,7 +156,10 @@ const translations: Record<Language, Record<string, string>> = {
     "italianPizzaDesc": "Dalla classica Margherita alle specialità gourmet, realizziamo ogni pizza con passione, utilizzando tecniche tradizionali e i migliori ingredienti per un'autentica esperienza italiana.",
     "specialtyBadge": "Specialità",
     "qualityBadge": "Qualità",
-    "authenticBadge": "Autentico"
+    "authenticBadge": "Autentico",
+
+    // Store Address
+    "storeAddress": "📍 Via Roma 123, 10121 Torino (TO), Italia"
   },
   en: {
     // Navigation
@@ -304,7 +307,10 @@ const translations: Record<Language, Record<string, string>> = {
     "italianPizzaDesc": "From classic Margherita to gourmet specialties, we craft every pizza with passion, using traditional techniques and the finest ingredients for an authentic Italian experience.",
     "specialtyBadge": "Specialty",
     "qualityBadge": "Quality",
-    "authenticBadge": "Authentic"
+    "authenticBadge": "Authentic",
+
+    // Store Address
+    "storeAddress": "📍 Via Roma 123, 10121 Turin (TO), Italy"
   }
 };
 
