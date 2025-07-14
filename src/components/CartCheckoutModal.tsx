@@ -11,6 +11,7 @@ import { useSimpleCart } from '@/hooks/use-simple-cart';
 import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
+import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 
 interface CartCheckoutModalProps {
   isOpen: boolean;
@@ -103,13 +104,17 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       throw new Error('Indirizzo non valido o fuori zona di consegna');
     }
 
+    // Get client identity for order tracking
+    const clientIdentity = await getOrCreateClientIdentity();
+    console.log('🆔 Creating Stripe order with client ID:', clientIdentity.clientId.slice(-12));
+
     const orderNumber = generateOrderNumber();
     const deliveryFee = addressValidation.deliveryFee || 0;
     const subtotal = totalAmount || 0;
     const finalTotal = subtotal + deliveryFee;
     console.log('💰 CartCheckout - subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'finalTotal:', finalTotal);
 
-    // Create order
+    // Create order with client identification
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -135,7 +140,12 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
             quantity: item.quantity,
             unit_price: item.product.price,
             special_requests: item.specialRequests
-          }))
+          })),
+          // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
+          clientId: clientIdentity.clientId,
+          deviceFingerprint: clientIdentity.deviceFingerprint,
+          sessionId: clientIdentity.sessionId,
+          orderCreatedAt: new Date().toISOString()
         },
         special_instructions: `Cart Order - ${cartItems.length} items\n${cartItems.map(item =>
           `${item.product.name} x${item.quantity}${item.specialRequests ? ` (${item.specialRequests})` : ''}`
@@ -307,13 +317,17 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       throw new Error('Indirizzo di consegna è richiesto');
     }
 
+    // Get client identity for order tracking
+    const clientIdentity = await getOrCreateClientIdentity();
+    console.log('🆔 Creating PayLater order with client ID:', clientIdentity.clientId.slice(-12));
+
     const orderNumber = generateOrderNumber();
     const deliveryFee = addressValidation.deliveryFee || 0;
     const subtotal = totalAmount || 0;
     const finalTotal = subtotal + deliveryFee;
     console.log('💰 CartCheckout PayLater - subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'finalTotal:', finalTotal);
 
-    // Create order
+    // Create order with client identification
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -339,7 +353,12 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
             quantity: item.quantity,
             unit_price: item.product.price,
             special_requests: item.specialRequests
-          }))
+          })),
+          // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
+          clientId: clientIdentity.clientId,
+          deviceFingerprint: clientIdentity.deviceFingerprint,
+          sessionId: clientIdentity.sessionId,
+          orderCreatedAt: new Date().toISOString()
         },
         special_instructions: `Pay Later Cart Order - ${cartItems.length} items\n${cartItems.map(item =>
           `${item.product.name} x${item.quantity}${item.specialRequests ? ` (${item.specialRequests})` : ''}`

@@ -179,7 +179,69 @@ export const searchClientOrderInDatabase = async (): Promise<OrderSearchResult> 
       }
     }
 
-    // STEP 2: Search recent orders from last 24 hours (fallback for new orders)
+    // STEP 2: Search database for orders with matching client ID in metadata
+    console.log('🔍 DATABASE SEARCH: Looking for orders with client ID in metadata...');
+    const { data: clientOrders, error: clientError } = await supabase
+      .from('orders')
+      .select(`
+        id,
+        order_number,
+        customer_name,
+        customer_email,
+        customer_phone,
+        customer_address,
+        total_amount,
+        status,
+        order_status,
+        created_at,
+        metadata,
+        order_items (
+          id,
+          product_name,
+          quantity,
+          product_price,
+          subtotal
+        )
+      `)
+      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()) // Last 7 days
+      .in('status', ['confirmed', 'preparing', 'ready', 'arrived', 'delivered'])
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (!clientError && clientOrders && clientOrders.length > 0) {
+      console.log(`📋 Found ${clientOrders.length} recent orders, checking for client ID matches...`);
+
+      // Look for orders with matching client ID in metadata
+      const matchingOrder = clientOrders.find(order => {
+        if (order.metadata && typeof order.metadata === 'object') {
+          const metadata = order.metadata as any;
+          return metadata.clientId === clientIdentity.clientId;
+        }
+        return false;
+      });
+
+      if (matchingOrder) {
+        console.log('✅ Found order with matching client ID:', matchingOrder.order_number);
+
+        // Save this order for future quick access
+        await saveClientOrder({
+          id: matchingOrder.id,
+          order_number: matchingOrder.order_number,
+          customer_email: matchingOrder.customer_email,
+          customer_name: matchingOrder.customer_name,
+          total_amount: matchingOrder.total_amount,
+          created_at: matchingOrder.created_at
+        });
+
+        return {
+          order: matchingOrder,
+          source: 'database',
+          clientId: clientIdentity.clientId
+        };
+      }
+    }
+
+    // STEP 3: Search recent orders from last 24 hours (fallback for new orders)
     console.log('🔍 FALLBACK: Searching recent orders from last 24 hours...');
     const { data: recentOrders, error: recentError } = await supabase
       .from('orders')
@@ -226,7 +288,7 @@ export const searchClientOrderInDatabase = async (): Promise<OrderSearchResult> 
         }
       }
 
-      // STEP 3: Smart matching - try to find the most recent order that could belong to this client
+      // STEP 4: Smart matching - try to find the most recent order that could belong to this client
       // This helps when orders were created but client tracking failed
       console.log('🤖 SMART MATCHING: Analyzing recent orders for potential matches...');
 

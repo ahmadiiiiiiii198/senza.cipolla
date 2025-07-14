@@ -13,6 +13,7 @@ import StripeCheckout from './StripeCheckout';
 import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
+import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 
 interface OrderFormData {
   customerName: string;
@@ -117,10 +118,14 @@ const EnhancedOrderForm = () => {
       throw new Error('Address validation required');
     }
 
+    // Get client identity for order tracking
+    const clientIdentity = await getOrCreateClientIdentity();
+    console.log('🆔 Creating Enhanced order with client ID:', clientIdentity.clientId.slice(-12));
+
     const orderNumber = generateOrderNumber();
     const totalAmount = calculateEstimatedPrice();
 
-    // Create order
+    // Create order with client identification
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -133,7 +138,12 @@ const EnhancedOrderForm = () => {
         status: 'confirmed',
         metadata: {
           coordinates: addressValidation.coordinates,
-          deliveryFee: addressValidation.deliveryFee
+          deliveryFee: addressValidation.deliveryFee,
+          // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
+          clientId: clientIdentity.clientId,
+          deviceFingerprint: clientIdentity.deviceFingerprint,
+          sessionId: clientIdentity.sessionId,
+          orderCreatedAt: new Date().toISOString()
         },
         notes: `Category: ${formData.category}\nProduct: ${formData.productDescription}\nQuantity: ${formData.quantity}\nSpecial Requests: ${formData.specialRequests}`
       })

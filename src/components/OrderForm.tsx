@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import BusinessHoursStatus from './BusinessHoursStatus';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
+import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 
 interface OrderFormData {
   customerName: string;
@@ -141,13 +142,17 @@ const OrderForm = () => {
       const orderNumber = generateOrderNumber();
       const estimatedPrice = calculateEstimatedPrice();
 
+      // Get client identity for order tracking
+      const clientIdentity = await getOrCreateClientIdentity();
+      console.log('🆔 Creating Standard order with client ID:', clientIdentity.clientId.slice(-12));
+
       // Prepare addresses
       const billingAddress = formData.billingAddress;
-      const shippingAddress = formData.shippingAddress.sameAsBilling 
-        ? formData.billingAddress 
+      const shippingAddress = formData.shippingAddress.sameAsBilling
+        ? formData.billingAddress
         : formData.shippingAddress;
 
-      // Create order
+      // Create order with client identification
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -161,7 +166,12 @@ const OrderForm = () => {
           payment_status: 'pending',
           payment_method: 'stripe',
           metadata: {
-            billing_address: billingAddress
+            billing_address: billingAddress,
+            // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
+            clientId: clientIdentity.clientId,
+            deviceFingerprint: clientIdentity.deviceFingerprint,
+            sessionId: clientIdentity.sessionId,
+            orderCreatedAt: new Date().toISOString()
           },
           notes: `Category: ${formData.category}\nProduct: ${formData.productDescription}\nQuantity: ${formData.quantity}\nSpecial Requests: ${formData.specialRequests}\nDelivery Date: ${formData.deliveryDate}`
         })
