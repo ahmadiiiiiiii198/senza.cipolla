@@ -14,6 +14,8 @@ import { useBusinessHours } from '@/hooks/useBusinessHours';
 import BusinessHoursStatus from './BusinessHoursStatus';
 import { businessHoursService } from '@/services/businessHoursService';
 import { saveOrderForTracking } from '@/utils/orderTracking';
+import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
+import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 
 // Direct payment button component - no abstractions
 interface DirectPaymentButtonProps {
@@ -44,13 +46,17 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
       }
       console.log('✅ Business hours validation passed');
 
+      // Get client identity for order tracking
+      const clientIdentity = await getOrCreateClientIdentity();
+      console.log('🆔 Creating Product order with client ID:', clientIdentity.clientId.slice(-12));
+
       // Step 1: Create order directly
       console.log('📝 Creating order directly...');
 
       const totalAmount = (product.price || 0) * (orderData.quantity || 1);
       console.log('💰 ProductOrder - price:', product.price, 'quantity:', orderData.quantity, 'totalAmount:', totalAmount);
 
-      // Create order with correct schema
+      // Create order with client identification
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -70,7 +76,12 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
             product_name: product.name,
             quantity: orderData.quantity,
             unit_price: product.price,
-            special_requests: orderData.specialRequests
+            special_requests: orderData.specialRequests,
+            // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
+            clientId: clientIdentity.clientId,
+            deviceFingerprint: clientIdentity.deviceFingerprint,
+            sessionId: clientIdentity.sessionId,
+            orderCreatedAt: new Date().toISOString()
           }
         })
         .select()
@@ -124,6 +135,16 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
 
       // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
       saveOrderForTracking({
+        id: order.id,
+        order_number: order.order_number,
+        customer_email: order.customer_email,
+        customer_name: order.customer_name,
+        total_amount: order.total_amount,
+        created_at: order.created_at
+      });
+
+      // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
+      await saveClientOrder({
         id: order.id,
         order_number: order.order_number,
         customer_email: order.customer_email,
@@ -394,13 +415,17 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
       throw new Error('Product or address validation missing');
     }
 
+    // Get client identity for order tracking
+    const clientIdentity = await getOrCreateClientIdentity();
+    console.log('🆔 Creating Product PayLater order with client ID:', clientIdentity.clientId.slice(-12));
+
     const orderNumber = generateOrderNumber();
     const subtotal = (product.price || 0) * (orderData.quantity || 1);
     const deliveryFee = addressValidation.deliveryFee || 0;
     const totalAmount = subtotal + deliveryFee;
     console.log('💰 ProductOrder PayLater - price:', product.price, 'quantity:', orderData.quantity, 'subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'totalAmount:', totalAmount);
 
-    // Create order with "pending" status for pay later
+    // Create order with client identification
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -419,7 +444,12 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
           deliveryFee: addressValidation.deliveryFee,
           estimatedTime: addressValidation.estimatedTime,
           coordinates: addressValidation.coordinates,
-          formattedAddress: addressValidation.formattedAddress
+          formattedAddress: addressValidation.formattedAddress,
+          // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
+          clientId: clientIdentity.clientId,
+          deviceFingerprint: clientIdentity.deviceFingerprint,
+          sessionId: clientIdentity.sessionId,
+          orderCreatedAt: new Date().toISOString()
         },
         special_instructions: `Pay Later Order - Product: ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`
       })
@@ -468,6 +498,16 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
 
     // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
     saveOrderForTracking({
+      id: order.id,
+      order_number: order.order_number,
+      customer_email: order.customer_email,
+      customer_name: order.customer_name,
+      total_amount: order.total_amount,
+      created_at: order.created_at
+    });
+
+    // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
+    await saveClientOrder({
       id: order.id,
       order_number: order.order_number,
       customer_email: order.customer_email,

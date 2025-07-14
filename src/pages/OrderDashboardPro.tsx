@@ -702,7 +702,15 @@ const OrderDashboardPro: React.FC = () => {
         payment_status: 'pending',
         payment_method: 'pay_later',
         notes: 'Ordine di test per verifica sistema notifiche',
-        metadata: { test: true, created_by: 'dashboard_test' }
+        metadata: {
+          test: true,
+          created_by: 'dashboard_test',
+          // Admin test orders don't need client tracking
+          clientId: 'admin_test',
+          deviceFingerprint: 'admin_dashboard',
+          sessionId: 'admin_session',
+          orderCreatedAt: new Date().toISOString()
+        }
       };
 
       const { data, error } = await supabase

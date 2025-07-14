@@ -9,6 +9,8 @@ import { CartItem, useSimpleCart } from '@/hooks/use-simple-cart';
 import { supabase } from '@/integrations/supabase/client';
 import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
+import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 
 interface SimpleCheckoutModalProps {
   isOpen: boolean;
@@ -213,7 +215,11 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
     }
 
     try {
-      // Create order in database
+      // Get client identity for order tracking
+      const clientIdentity = await getOrCreateClientIdentity();
+      console.log('🆔 Creating Simple Stripe order with client ID:', clientIdentity.clientId.slice(-12));
+
+      // Create order in database with client identification
       const orderData = {
         order_number: generateOrderNumber(),
         customer_name: customerData.customerName,
@@ -225,7 +231,14 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         delivery_fee: addressValidation?.deliveryFee || 0,
         status: 'pending',
         payment_status: 'pending',
-        payment_method: 'stripe'
+        payment_method: 'stripe',
+        metadata: {
+          // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
+          clientId: clientIdentity.clientId,
+          deviceFingerprint: clientIdentity.deviceFingerprint,
+          sessionId: clientIdentity.sessionId,
+          orderCreatedAt: new Date().toISOString()
+        }
       };
 
       const { data: order, error: orderError } = await supabase
@@ -381,6 +394,17 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         .update({ stripe_session_id: session.id })
         .eq('id', order.id);
 
+      // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
+      await saveClientOrder({
+        id: order.id,
+        order_number: order.order_number,
+        customer_email: order.customer_email,
+        customer_name: order.customer_name,
+        total_amount: order.total_amount,
+        created_at: order.created_at
+      });
+      console.log('✅ Simple Stripe order automatically saved for tracking:', order.order_number);
+
       // Redirect to Stripe
       console.log('🚀 Redirecting to Stripe...');
       window.location.href = session.url;
@@ -408,7 +432,11 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
     }
 
     try {
-      // Create order in database
+      // Get client identity for order tracking
+      const clientIdentity = await getOrCreateClientIdentity();
+      console.log('🆔 Creating Simple PayLater order with client ID:', clientIdentity.clientId.slice(-12));
+
+      // Create order in database with client identification
       const orderData = {
         order_number: generateOrderNumber(),
         customer_name: customerData.customerName,
@@ -420,7 +448,14 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         delivery_fee: addressValidation?.deliveryFee || 0,
         status: 'confirmed',
         payment_status: 'pending',
-        payment_method: 'cash_on_delivery'
+        payment_method: 'cash_on_delivery',
+        metadata: {
+          // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
+          clientId: clientIdentity.clientId,
+          deviceFingerprint: clientIdentity.deviceFingerprint,
+          sessionId: clientIdentity.sessionId,
+          orderCreatedAt: new Date().toISOString()
+        }
       };
 
       const { data: order, error: orderError } = await supabase
@@ -478,6 +513,17 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
           is_read: false,
           is_acknowledged: false
         });
+
+      // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
+      await saveClientOrder({
+        id: order.id,
+        order_number: order.order_number,
+        customer_email: order.customer_email,
+        customer_name: order.customer_name,
+        total_amount: order.total_amount,
+        created_at: order.created_at
+      });
+      console.log('✅ Simple PayLater order automatically saved for tracking:', order.order_number);
 
       return order;
 
