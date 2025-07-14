@@ -28,11 +28,11 @@ const ClientTrackingTest = () => {
     loadClientData();
   }, []);
 
-  const loadClientData = () => {
-    const identity = getOrCreateClientIdentity();
+  const loadClientData = async () => {
+    const identity = await getOrCreateClientIdentity();
     setClientIdentity(identity);
-    
-    const order = getClientOrder();
+
+    const order = await getClientOrder();
     setStoredOrder(order);
     
     addLog(`Client ID: ${identity.clientId.slice(-12)}`);
@@ -44,9 +44,9 @@ const ClientTrackingTest = () => {
     }
   };
 
-  const simulateClientA = () => {
+  const simulateClientA = async () => {
     // Simulate saving order for Client A
-    const success = saveClientOrder({
+    const success = await saveClientOrder({
       id: 'ba35ba00-18b3-4f8a-8477-18ca73ce3bda',
       order_number: 'ORD-CLIENT-TEST-001',
       customer_email: 'client-a@test.com',
@@ -57,15 +57,15 @@ const ClientTrackingTest = () => {
     
     if (success) {
       addLog('✅ Saved order for Client A');
-      loadClientData();
+      await loadClientData();
     } else {
       addLog('❌ Failed to save order for Client A');
     }
   };
 
-  const simulateClientB = () => {
+  const simulateClientB = async () => {
     // Simulate saving order for Client B
-    const success = saveClientOrder({
+    const success = await saveClientOrder({
       id: 'f1d29cd2-43c9-4ce4-a7e6-bff07f071c13',
       order_number: 'ORD-CLIENT-TEST-002',
       customer_email: 'client-b@test.com',
@@ -76,7 +76,7 @@ const ClientTrackingTest = () => {
     
     if (success) {
       addLog('✅ Saved order for Client B');
-      loadClientData();
+      await loadClientData();
     } else {
       addLog('❌ Failed to save order for Client B');
     }
@@ -94,8 +94,8 @@ const ClientTrackingTest = () => {
     }
   };
 
-  const clearData = () => {
-    clearClientOrder();
+  const clearData = async () => {
+    await clearClientOrder();
     clearClientIdentity();
     setClientIdentity(null);
     setStoredOrder(null);

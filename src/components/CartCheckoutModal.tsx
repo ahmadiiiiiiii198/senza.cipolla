@@ -222,7 +222,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       created_at: order.created_at
     });
 
-    const trackingSaved = saveClientOrder({
+    const trackingSaved = await saveClientOrder({
       id: order.id,
       order_number: order.order_number,
       customer_email: order.customer_email,
@@ -413,7 +413,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       });
 
     // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
-    saveClientOrder({
+    await saveClientOrder({
       id: order.id,
       order_number: order.order_number,
       customer_email: order.customer_email,

@@ -43,16 +43,16 @@ const deleteCookie = (name: string) => {
 };
 
 // Save order for specific client
-export const saveClientOrder = (orderData: {
+export const saveClientOrder = async (orderData: {
   id: string;
   order_number: string;
   customer_email: string;
   customer_name: string;
   total_amount: number;
   created_at: string;
-}): boolean => {
+}): Promise<boolean> => {
   try {
-    const clientIdentity = getOrCreateClientIdentity();
+    const clientIdentity = await getOrCreateClientIdentity();
     
     const clientOrderData: ClientOrderData = {
       orderId: orderData.id,
@@ -91,9 +91,9 @@ export const saveClientOrder = (orderData: {
 };
 
 // Get order for current client
-export const getClientOrder = (): ClientOrderData | null => {
+export const getClientOrder = async (): Promise<ClientOrderData | null> => {
   try {
-    const clientIdentity = getOrCreateClientIdentity();
+    const clientIdentity = await getOrCreateClientIdentity();
     const storageKey = `pizzeria_order_${clientIdentity.clientId}`;
     
     // Try localStorage first
@@ -134,11 +134,11 @@ export const getClientOrder = (): ClientOrderData | null => {
 // Search for client-specific order in database with enhanced fallback mechanisms
 export const searchClientOrderInDatabase = async (): Promise<OrderSearchResult> => {
   try {
-    const clientIdentity = getOrCreateClientIdentity();
+    const clientIdentity = await getOrCreateClientIdentity();
     console.log('🔍 Searching for orders with client ID:', clientIdentity.clientId.slice(-12));
 
     // STEP 1: Try to get stored order data (most reliable)
-    const storedOrder = getClientOrder();
+    const storedOrder = await getClientOrder();
     if (storedOrder && storedOrder.orderNumber) {
       console.log('📖 Found stored order:', storedOrder.orderNumber);
       // Search database for this specific order
@@ -241,7 +241,7 @@ export const searchClientOrderInDatabase = async (): Promise<OrderSearchResult> 
         console.log('💡 Auto-associating recent order with current client:', mostRecentOrder.order_number);
 
         // Save this order for the current client
-        const saved = saveClientOrder({
+        const saved = await saveClientOrder({
           id: mostRecentOrder.id,
           order_number: mostRecentOrder.order_number,
           customer_email: mostRecentOrder.customer_email,
@@ -273,7 +273,7 @@ export const searchClientOrderInDatabase = async (): Promise<OrderSearchResult> 
     
   } catch (error) {
     console.error('❌ Error searching client order in database:', error);
-    const clientIdentity = getOrCreateClientIdentity();
+    const clientIdentity = await getOrCreateClientIdentity();
     return {
       order: null,
       source: 'none',
@@ -309,9 +309,9 @@ const getAllStoredClientOrders = (): ClientOrderData[] => {
 };
 
 // Clear client-specific order data
-export const clearClientOrder = (): boolean => {
+export const clearClientOrder = async (): Promise<boolean> => {
   try {
-    const clientIdentity = getOrCreateClientIdentity();
+    const clientIdentity = await getOrCreateClientIdentity();
     const storageKey = `pizzeria_order_${clientIdentity.clientId}`;
     const cookieKey = `pizzeria_order_${clientIdentity.deviceFingerprint.slice(-8)}`;
     

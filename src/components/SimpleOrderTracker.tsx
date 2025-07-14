@@ -43,7 +43,7 @@ const SimpleOrderTracker: React.FC = () => {
 
       try {
         // Get client identity
-        const clientIdentity = getOrCreateClientIdentity();
+        const clientIdentity = await getOrCreateClientIdentity();
         console.log('🆔 Client ID:', clientIdentity.clientId.slice(-12));
 
         // Search for client-specific order
@@ -170,8 +170,8 @@ const SimpleOrderTracker: React.FC = () => {
     return () => clearInterval(interval);
   }, [order]);
 
-  const clearTracking = () => {
-    clearClientOrder();
+  const clearTracking = async () => {
+    await clearClientOrder();
     setOrder(null);
     console.log('🗑️ Client order tracking cleared');
   };
@@ -234,7 +234,7 @@ const SimpleOrderTracker: React.FC = () => {
       setOrder(orderData);
 
       // Save updated order data for this client
-      saveClientOrder({
+      await saveClientOrder({
         id: orderData.id,
         order_number: orderData.order_number,
         customer_email: orderData.customer_email,

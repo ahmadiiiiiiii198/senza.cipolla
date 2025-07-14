@@ -167,7 +167,7 @@ const EnhancedOrderForm = () => {
       });
 
     // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
-    saveClientOrder({
+    await saveClientOrder({
       id: order.id,
       order_number: order.order_number,
       customer_email: order.customer_email,

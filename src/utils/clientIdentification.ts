@@ -13,6 +13,10 @@ interface DeviceFingerprint {
   webglFingerprint: string;
   hardwareConcurrency: number;
   deviceMemory: number;
+  ipAddress: string;
+  sessionStorage: boolean;
+  localStorage: boolean;
+  touchSupport: boolean;
 }
 
 interface ClientIdentity {
@@ -68,10 +72,51 @@ const generateWebGLFingerprint = (): string => {
   }
 };
 
+// Get client IP address
+const getClientIPAddress = async (): Promise<string> => {
+  try {
+    // Try multiple IP detection services for reliability
+    const ipServices = [
+      'https://api.ipify.org?format=json',
+      'https://ipapi.co/json/',
+      'https://httpbin.org/ip'
+    ];
+
+    for (const service of ipServices) {
+      try {
+        const response = await fetch(service);
+        const data = await response.json();
+
+        // Different services return IP in different formats
+        const ip = data.ip || data.origin || data.query;
+        if (ip && typeof ip === 'string') {
+          console.log('🌐 Client IP detected:', ip.slice(0, 8) + '...');
+          return ip;
+        }
+      } catch (e) {
+        console.log('⚠️ IP service failed:', service);
+        continue;
+      }
+    }
+
+    // Fallback to a unique identifier based on timestamp
+    return `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  } catch (error) {
+    console.error('❌ Failed to get IP address:', error);
+    return `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+};
+
 // Generate comprehensive device fingerprint
-export const generateDeviceFingerprint = (): DeviceFingerprint => {
+export const generateDeviceFingerprint = async (): Promise<DeviceFingerprint> => {
   const nav = navigator as any;
-  
+
+  // Get IP address
+  const ipAddress = await getClientIPAddress();
+
+  // Check touch support
+  const touchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
   return {
     userAgent: navigator.userAgent,
     language: navigator.language,
@@ -84,7 +129,11 @@ export const generateDeviceFingerprint = (): DeviceFingerprint => {
     canvasFingerprint: generateCanvasFingerprint(),
     webglFingerprint: generateWebGLFingerprint(),
     hardwareConcurrency: nav.hardwareConcurrency || 0,
-    deviceMemory: nav.deviceMemory || 0
+    deviceMemory: nav.deviceMemory || 0,
+    ipAddress,
+    sessionStorage: typeof sessionStorage !== 'undefined',
+    localStorage: typeof localStorage !== 'undefined',
+    touchSupport
   };
 };
 
@@ -92,23 +141,23 @@ export const generateDeviceFingerprint = (): DeviceFingerprint => {
 const hashFingerprint = (fingerprint: DeviceFingerprint): string => {
   const fingerprintString = JSON.stringify(fingerprint);
   let hash = 0;
-  
+
   for (let i = 0; i < fingerprintString.length; i++) {
     const char = fingerprintString.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
-  
+
   return Math.abs(hash).toString(36);
 };
 
 // Generate unique client ID
-export const generateClientId = (): string => {
-  const fingerprint = generateDeviceFingerprint();
+export const generateClientId = async (): Promise<string> => {
+  const fingerprint = await generateDeviceFingerprint();
   const fingerprintHash = hashFingerprint(fingerprint);
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substr(2, 5);
-  
+
   return `pizzeria_${fingerprintHash}_${timestamp}_${random}`;
 };
 
@@ -135,10 +184,10 @@ const getCookie = (name: string): string | null => {
 };
 
 // Get or create client identity
-export const getOrCreateClientIdentity = (): ClientIdentity => {
+export const getOrCreateClientIdentity = async (): Promise<ClientIdentity> => {
   const STORAGE_KEY = 'pizzeria_client_identity';
   const COOKIE_KEY = 'pizzeria_client_id';
-  
+
   try {
     // Try to get from localStorage first
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -148,15 +197,18 @@ export const getOrCreateClientIdentity = (): ClientIdentity => {
       identity.lastSeen = new Date().toISOString();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
       setCookie(COOKIE_KEY, identity.clientId, 30);
+      console.log('🔄 Existing client identity:', identity.clientId.slice(-12));
       return identity;
     }
-    
-    // Try to get from cookie
+
+    // Try to get from cookie and regenerate identity
     const cookieClientId = getCookie(COOKIE_KEY);
     if (cookieClientId) {
+      console.log('🍪 Found cookie client ID, regenerating identity...');
+      const fingerprint = await generateDeviceFingerprint();
       const identity: ClientIdentity = {
         clientId: cookieClientId,
-        deviceFingerprint: hashFingerprint(generateDeviceFingerprint()),
+        deviceFingerprint: hashFingerprint(fingerprint),
         sessionId: generateSessionId(),
         createdAt: new Date().toISOString(),
         lastSeen: new Date().toISOString()
@@ -164,22 +216,27 @@ export const getOrCreateClientIdentity = (): ClientIdentity => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
       return identity;
     }
-    
-    // Create new identity
+
+    // Create new identity with IP-based fingerprinting
+    console.log('🆕 Creating new client identity with IP detection...');
+    const fingerprint = await generateDeviceFingerprint();
+    const clientId = await generateClientId();
+
     const newIdentity: ClientIdentity = {
-      clientId: generateClientId(),
-      deviceFingerprint: hashFingerprint(generateDeviceFingerprint()),
+      clientId,
+      deviceFingerprint: hashFingerprint(fingerprint),
       sessionId: generateSessionId(),
       createdAt: new Date().toISOString(),
       lastSeen: new Date().toISOString()
     };
-    
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newIdentity));
     setCookie(COOKIE_KEY, newIdentity.clientId, 30);
-    
-    console.log('🆔 Created new client identity:', newIdentity.clientId);
+
+    console.log('🆔 Created new client identity:', newIdentity.clientId.slice(-12));
+    console.log('🌐 IP-based fingerprint:', fingerprint.ipAddress.slice(0, 8) + '...');
     return newIdentity;
-    
+
   } catch (error) {
     console.error('Error managing client identity:', error);
     // Fallback identity
