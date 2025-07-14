@@ -23,6 +23,7 @@ import MenuPage from "./pages/MenuPage";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
+import ClientTrackingTest from "./pages/ClientTrackingTest";
 // DatabaseSetup component removed to prevent accidental initialization
 import SimpleStripeTest from "./components/SimpleStripeTest";
 import OrderStatusWidget from "./components/OrderStatusWidget";
@@ -94,6 +95,11 @@ const App = () => (
                     <SimpleStripeTest />
                   </ErrorBoundary>
                 </div>
+              } />
+              <Route path="/client-test" element={
+                <ErrorBoundary componentName="ClientTrackingTest">
+                  <ClientTrackingTest />
+                </ErrorBoundary>
               } />
               <Route path="*" element={<NotFound />} />
             </Routes>

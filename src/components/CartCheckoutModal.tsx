@@ -10,7 +10,7 @@ import { CartItem } from '@/hooks/use-simple-cart';
 import { useSimpleCart } from '@/hooks/use-simple-cart';
 import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
-import { saveOrderForTracking } from '@/utils/orderTracking';
+import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 
 interface CartCheckoutModalProps {
   isOpen: boolean;
@@ -222,7 +222,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
       created_at: order.created_at
     });
 
-    const trackingSaved = saveOrderForTracking({
+    const trackingSaved = saveClientOrder({
       id: order.id,
       order_number: order.order_number,
       customer_email: order.customer_email,
@@ -412,8 +412,8 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         is_read: false
       });
 
-    // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
-    saveOrderForTracking({
+    // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
+    saveClientOrder({
       id: order.id,
       order_number: order.order_number,
       customer_email: order.customer_email,

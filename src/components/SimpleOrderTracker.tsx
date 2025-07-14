@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Package, Clock, CheckCircle, AlertCircle, Search, Trash2, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { getTrackedOrder, saveOrderForTracking, clearOrderTracking } from '@/utils/orderTracking';
+import { searchClientOrderInDatabase, saveClientOrder, clearClientOrder } from '@/utils/clientSpecificOrderTracking';
+import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 
 interface Order {
   id: string;
@@ -34,130 +35,51 @@ const SimpleOrderTracker: React.FC = () => {
   const [isRealTimeActive, setIsRealTimeActive] = useState(false);
   const { toast } = useToast();
 
-  // BULLETPROOF ORDER DETECTION
+  // CLIENT-SPECIFIC ORDER DETECTION
   useEffect(() => {
-    const loadOrder = async () => {
-      console.log('🔍 BULLETPROOF: Starting order detection...');
+    const loadClientOrder = async () => {
+      console.log('🔍 CLIENT-SPECIFIC: Starting order detection...');
       setLoading(true);
 
       try {
-        // STEP 1: Direct database query for your newest order
-        console.log('🎯 DIRECT QUERY: Loading your order ORD-498988189');
-        const { data: directOrder, error: directError } = await supabase
-          .from('orders')
-          .select(`
-            id,
-            order_number,
-            customer_name,
-            customer_email,
-            customer_phone,
-            customer_address,
-            total_amount,
-            status,
-            order_status,
-            created_at,
-            order_items (
-              id,
-              product_name,
-              quantity,
-              product_price,
-              subtotal
-            )
-          `)
-          .eq('order_number', 'ORD-498988189')
-          .single();
+        // Get client identity
+        const clientIdentity = getOrCreateClientIdentity();
+        console.log('🆔 Client ID:', clientIdentity.clientId);
 
-        console.log('📊 Direct query result:', { directOrder, directError });
+        // Search for client-specific order
+        const searchResult = await searchClientOrderInDatabase();
+        console.log('📊 Search result:', searchResult);
 
-        if (!directError && directOrder) {
-          console.log('✅ FOUND YOUR ORDER:', directOrder);
-          setOrder(directOrder);
+        if (searchResult.order) {
+          console.log('✅ FOUND CLIENT ORDER:', searchResult.order.order_number, 'Source:', searchResult.source);
+          setOrder(searchResult.order);
 
-          // Save for future tracking
-          saveOrderForTracking({
-            id: directOrder.id,
-            order_number: directOrder.order_number,
-            customer_email: directOrder.customer_email,
-            customer_name: directOrder.customer_name,
-            total_amount: directOrder.total_amount,
-            created_at: directOrder.created_at
+          // Save/update client order data
+          saveClientOrder({
+            id: searchResult.order.id,
+            order_number: searchResult.order.order_number,
+            customer_email: searchResult.order.customer_email,
+            customer_name: searchResult.order.customer_name,
+            total_amount: searchResult.order.total_amount,
+            created_at: searchResult.order.created_at
           });
 
           setLoading(false);
           return;
         }
 
-        // STEP 2: Check recent orders from last 24 hours
-        console.log('🔍 FALLBACK: Checking recent orders...');
-        const { data: recentOrders, error: recentError } = await supabase
-          .from('orders')
-          .select(`
-            id,
-            order_number,
-            customer_name,
-            customer_email,
-            customer_phone,
-            customer_address,
-            total_amount,
-            status,
-            order_status,
-            created_at,
-            order_items (
-              id,
-              product_name,
-              quantity,
-              product_price,
-              subtotal
-            )
-          `)
-          .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-          .in('status', ['confirmed', 'preparing', 'ready'])
-          .order('created_at', { ascending: false })
-          .limit(5);
-
-        console.log('📋 Recent orders result:', { count: recentOrders?.length, recentError });
-
-        if (!recentError && recentOrders && recentOrders.length > 0) {
-          console.log('📋 Found recent orders:', recentOrders);
-          const mostRecentOrder = recentOrders[0];
-
-          setOrder(mostRecentOrder);
-
-          saveOrderForTracking({
-            id: mostRecentOrder.id,
-            order_number: mostRecentOrder.order_number,
-            customer_email: mostRecentOrder.customer_email,
-            customer_name: mostRecentOrder.customer_name,
-            total_amount: mostRecentOrder.total_amount,
-            created_at: mostRecentOrder.created_at
-          });
-
-          console.log('✅ Auto-loaded recent order:', mostRecentOrder.order_number);
-          setLoading(false);
-          return;
-        }
-
-        // STEP 3: Check cookies as last resort
-        console.log('🍪 LAST RESORT: Checking cookies...');
-        const trackedOrder = getTrackedOrder();
-        if (trackedOrder) {
-          console.log('🍪 Found cookie order:', trackedOrder.orderNumber);
-          await searchOrder(trackedOrder.orderNumber, trackedOrder.customerEmail);
-          return;
-        }
-
-        console.log('❌ No orders found anywhere');
+        console.log('❌ No client-specific orders found');
         setOrder(null);
         setLoading(false);
 
       } catch (error) {
-        console.error('❌ CRITICAL ERROR in order detection:', error);
+        console.error('❌ CRITICAL ERROR in client order detection:', error);
         setOrder(null);
         setLoading(false);
       }
     };
 
-    loadOrder();
+    loadClientOrder();
   }, []);
 
   // 🔥 BULLETPROOF REAL-TIME ORDER STATUS UPDATES
@@ -260,9 +182,9 @@ const SimpleOrderTracker: React.FC = () => {
   }, [order]);
 
   const clearTracking = () => {
-    clearOrderTracking();
+    clearClientOrder();
     setOrder(null);
-    console.log('🗑️ Order tracking cleared');
+    console.log('🗑️ Client order tracking cleared');
   };
 
   const searchOrder = async (orderNum: string, email: string) => {
@@ -291,6 +213,17 @@ const SimpleOrderTracker: React.FC = () => {
       }
 
       setOrder(orderData);
+
+      // Save updated order data for this client
+      saveClientOrder({
+        id: orderData.id,
+        order_number: orderData.order_number,
+        customer_email: orderData.customer_email,
+        customer_name: orderData.customer_name,
+        total_amount: orderData.total_amount,
+        created_at: orderData.created_at
+      });
+
       console.log('✅ Order found and displayed:', orderData.order_number);
     } catch (error) {
       console.error('Search error:', error);

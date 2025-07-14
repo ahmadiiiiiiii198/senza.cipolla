@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import stripeService from '@/services/stripeService';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { saveOrderForTracking } from '@/utils/orderTracking';
+import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -110,8 +110,8 @@ const PaymentSuccess = () => {
             if (order) {
               setOrderNumber(order.order_number);
 
-              // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING AFTER SUCCESSFUL PAYMENT
-              saveOrderForTracking({
+              // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING AFTER SUCCESSFUL PAYMENT
+              saveClientOrder({
                 id: order.id,
                 order_number: order.order_number,
                 customer_email: order.customer_email,
