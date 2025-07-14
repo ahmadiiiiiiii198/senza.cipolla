@@ -534,134 +534,196 @@ const PersistentOrderTracker: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Motorcycle Delivery Tracking */}
-                  <div className="relative bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-xl border-2 border-dashed border-blue-200">
-                    {/* Road Background */}
-                    <div className="absolute inset-x-0 bottom-8 h-2 bg-gray-800 rounded-full">
-                      <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-900 rounded-full"></div>
-                      {/* Road markings */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-full h-0.5 bg-yellow-400 opacity-80 animate-pulse"></div>
+                  {/* Premium Motorcycle Delivery Tracking */}
+                  <div className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-green-50 p-8 rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
+
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 opacity-5">
+                      <div className="absolute inset-0" style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                        backgroundSize: '30px 30px'
+                      }}></div>
+                    </div>
+
+                    {/* Header */}
+                    <div className="relative z-10 text-center mb-8">
+                      <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full border border-slate-200 shadow-sm">
+                        <div className="w-10 h-10 bg-gradient-to-r from-pizza-orange to-red-500 rounded-full flex items-center justify-center">
+                          <Package className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="font-semibold text-slate-700 text-lg">Tracciamento Consegna Live</span>
+                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                       </div>
                     </div>
 
-                    {/* Status Points */}
-                    <div className="relative flex justify-between items-center mb-8">
-                      {orderStatuses
-                        .filter(status => status.value !== 'cancelled')
-                        .map((status, index) => {
-                          const isCompleted = orderStatuses.findIndex(s => s.value === currentStatus) >= index;
-                          const isCurrent = status.value === currentStatus;
-                          const StatusIcon = status.icon;
-                          const totalSteps = orderStatuses.filter(s => s.value !== 'cancelled').length;
-                          const progressPercentage = (index / (totalSteps - 1)) * 100;
+                    {/* Professional Road with Motorcycle */}
+                    <div className="relative h-32 mb-8">
+                      {/* Road Base */}
+                      <div className="absolute inset-x-0 bottom-12 h-5 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-700 rounded-full shadow-inner">
+                        {/* Road Surface Texture */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full"></div>
 
-                          return (
-                            <div
-                              key={status.value}
-                              className="relative flex flex-col items-center z-10"
-                              style={{ left: `${progressPercentage}%`, transform: 'translateX(-50%)' }}
-                            >
-                              {/* Status Point */}
-                              <div className={`relative w-12 h-12 rounded-full border-4 transition-all duration-500 ${
-                                isCurrent
-                                  ? 'bg-pizza-orange border-pizza-orange shadow-lg scale-110 animate-pulse'
-                                  : isCompleted
-                                  ? 'bg-green-500 border-green-500 shadow-md'
-                                  : 'bg-gray-300 border-gray-400'
-                              }`}>
-                                <StatusIcon className={`h-6 w-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${
-                                  isCurrent || isCompleted ? 'text-white' : 'text-gray-600'
-                                }`} />
-
-                                {/* Ripple effect for current status */}
-                                {isCurrent && (
-                                  <div className="absolute inset-0 rounded-full bg-pizza-orange opacity-30 animate-ping"></div>
-                                )}
-                              </div>
-
-                              {/* Status Label */}
-                              <div className="mt-3 text-center">
-                                <p className={`text-xs font-semibold ${
-                                  isCurrent ? 'text-pizza-orange' : isCompleted ? 'text-green-700' : 'text-gray-500'
-                                }`}>
-                                  {status.label}
-                                </p>
-                              </div>
-                            </div>
-                          );
-                        })}
-                    </div>
-
-                    {/* Animated Motorcycle */}
-                    <div
-                      className="absolute bottom-6 transition-all duration-1000 ease-in-out z-20"
-                      style={{
-                        left: `${Math.max(0, Math.min(95, progress))}%`,
-                        transform: 'translateX(-50%)'
-                      }}
-                    >
-                      <div className="relative">
-                        {/* Motorcycle SVG */}
-                        <div className={`text-4xl transition-transform duration-300 ${
-                          currentStatus === 'delivered' ? 'animate-bounce' : 'animate-pulse'
-                        }`}>
-                          🏍️
-                        </div>
-
-                        {/* Speed lines when in transit */}
-                        {(currentStatus === 'out_for_delivery' || currentStatus === 'preparing') && (
-                          <div className="absolute -left-8 top-1/2 transform -translate-y-1/2">
-                            <div className="flex space-x-1">
-                              <div className="w-2 h-0.5 bg-blue-400 animate-pulse"></div>
-                              <div className="w-1 h-0.5 bg-blue-300 animate-pulse delay-75"></div>
-                              <div className="w-1 h-0.5 bg-blue-200 animate-pulse delay-150"></div>
-                            </div>
+                        {/* Animated Road Markings */}
+                        <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full">
+                          <div className="w-full h-0.5 bg-yellow-400 opacity-90 relative">
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-300 to-transparent animate-pulse"></div>
                           </div>
-                        )}
+                        </div>
+                      </div>
 
-                        {/* Delivery box */}
-                        <div className="absolute -top-2 -right-1 text-lg">📦</div>
+                      {/* Status Checkpoints */}
+                      <div className="absolute inset-x-0 bottom-0 flex justify-between items-end px-6">
+                        {orderStatuses
+                          .filter(status => status.value !== 'cancelled')
+                          .map((status, index) => {
+                            const isCompleted = orderStatuses.findIndex(s => s.value === currentStatus) >= index;
+                            const isCurrent = status.value === currentStatus;
+                            const StatusIcon = status.icon;
+
+                            return (
+                              <div key={status.value} className="flex flex-col items-center">
+                                {/* Checkpoint Pole */}
+                                <div className={`w-1.5 h-16 mb-3 rounded-full transition-all duration-500 ${
+                                  isCompleted ? 'bg-gradient-to-t from-green-500 to-green-400' : 'bg-slate-300'
+                                }`}></div>
+
+                                {/* Checkpoint Circle */}
+                                <div className={`relative w-12 h-12 rounded-full border-3 transition-all duration-500 ${
+                                  isCurrent
+                                    ? 'bg-pizza-orange border-pizza-orange shadow-xl scale-110'
+                                    : isCompleted
+                                    ? 'bg-green-500 border-green-500 shadow-lg'
+                                    : 'bg-white border-slate-300'
+                                }`}>
+                                  <StatusIcon className={`h-6 w-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${
+                                    isCurrent || isCompleted ? 'text-white' : 'text-slate-400'
+                                  }`} />
+
+                                  {/* Pulse Animation for Current Status */}
+                                  {isCurrent && (
+                                    <div className="absolute inset-0 rounded-full bg-pizza-orange opacity-30 animate-ping"></div>
+                                  )}
+                                </div>
+
+                                {/* Label */}
+                                <div className="mt-3 text-center max-w-24">
+                                  <p className={`text-sm font-semibold ${
+                                    isCurrent ? 'text-pizza-orange' : isCompleted ? 'text-green-700' : 'text-slate-500'
+                                  }`}>
+                                    {status.label}
+                                  </p>
+                                  <p className={`text-xs mt-1 ${
+                                    isCurrent ? 'text-pizza-orange/70' : isCompleted ? 'text-green-600' : 'text-slate-400'
+                                  }`}>
+                                    {status.description}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+
+                      {/* Premium Motorcycle with Realistic Movement */}
+                      <div
+                        className="absolute bottom-8 transition-all duration-2000 ease-in-out z-20"
+                        style={{
+                          left: `${Math.max(8, Math.min(85, progress * 0.8 + 10))}%`,
+                          transform: 'translateX(-50%)'
+                        }}
+                      >
+                        <div className="relative">
+                          {/* Motorcycle Shadow */}
+                          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-10 h-3 bg-black/20 rounded-full blur-sm"></div>
+
+                          {/* High-Quality Motorcycle SVG */}
+                          <div className={`relative text-5xl transition-all duration-300 ${
+                            currentStatus === 'delivered'
+                              ? 'animate-bounce'
+                              : currentStatus === 'out_for_delivery' || currentStatus === 'preparing'
+                              ? 'animate-pulse'
+                              : ''
+                          }`}>
+                            <svg width="60" height="40" viewBox="0 0 60 40" className="text-slate-700">
+                              {/* Motorcycle Body */}
+                              <rect x="15" y="15" width="30" height="10" rx="5" fill="currentColor" />
+                              {/* Front Wheel */}
+                              <circle cx="10" cy="30" r="8" fill="currentColor" />
+                              <circle cx="10" cy="30" r="4" fill="white" />
+                              {/* Rear Wheel */}
+                              <circle cx="50" cy="30" r="8" fill="currentColor" />
+                              <circle cx="50" cy="30" r="4" fill="white" />
+                              {/* Handlebars */}
+                              <rect x="8" y="10" width="10" height="3" rx="1.5" fill="currentColor" />
+                            </svg>
+
+                            {/* Delivery Box */}
+                            <div className="absolute -top-3 -right-2 w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded border-2 border-white shadow-lg flex items-center justify-center">
+                              <span className="text-sm">🍕</span>
+                            </div>
+
+                            {/* Speed Effect */}
+                            {(currentStatus === 'out_for_delivery' || currentStatus === 'preparing') && (
+                              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-full">
+                                <div className="flex space-x-1">
+                                  {[...Array(4)].map((_, i) => (
+                                    <div
+                                      key={i}
+                                      className={`w-4 h-1 bg-blue-400 rounded-full animate-pulse`}
+                                      style={{ animationDelay: `${i * 0.1}s` }}
+                                    ></div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="absolute inset-x-6 bottom-4 h-1 bg-gray-300 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-pizza-orange to-green-500 rounded-full transition-all duration-1000 ease-out"
-                        style={{ width: `${progress}%` }}
-                      ></div>
+                    <div className="relative mb-6">
+                      <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-pizza-orange via-yellow-400 to-green-500 rounded-full transition-all duration-2000 ease-out relative"
+                          style={{ width: `${progress}%` }}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Current Status Message */}
-                    <div className="mt-4 text-center">
-                      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
+                    {/* Status Message */}
+                    <div className="text-center">
+                      <div className={`inline-flex items-center gap-4 px-6 py-3 rounded-full text-base font-medium backdrop-blur-sm ${
                         currentStatus === 'delivered'
-                          ? 'bg-green-100 text-green-800 border border-green-200'
+                          ? 'bg-green-100/80 text-green-800 border border-green-200'
                           : currentStatus === 'out_for_delivery'
-                          ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                          ? 'bg-blue-100/80 text-blue-800 border border-blue-200'
                           : currentStatus === 'preparing'
-                          ? 'bg-orange-100 text-orange-800 border border-orange-200'
-                          : 'bg-gray-100 text-gray-800 border border-gray-200'
+                          ? 'bg-orange-100/80 text-orange-800 border border-orange-200'
+                          : 'bg-slate-100/80 text-slate-800 border border-slate-200'
                       }`}>
-                        <div className={`w-2 h-2 rounded-full ${
+                        <div className={`w-3 h-3 rounded-full ${
                           currentStatus === 'delivered' ? 'bg-green-500' :
                           currentStatus === 'out_for_delivery' ? 'bg-blue-500 animate-pulse' :
                           currentStatus === 'preparing' ? 'bg-orange-500 animate-pulse' :
-                          'bg-gray-500'
+                          'bg-slate-500'
                         }`}></div>
-                        {currentStatusInfo.description}
+                        <span className="font-semibold">{currentStatusInfo.description}</span>
+                        {currentStatus === 'out_for_delivery' && <span className="text-sm opacity-75">• In arrivo</span>}
+                        {currentStatus === 'preparing' && <span className="text-sm opacity-75">• Nel forno</span>}
+                        {currentStatus === 'delivered' && <span className="text-sm opacity-75">• Consegnato!</span>}
                       </div>
-                    </div>
 
-                    {/* Estimated Time (if in delivery) */}
-                    {currentStatus === 'out_for_delivery' && (
-                      <div className="mt-3 text-center">
-                        <p className="text-sm text-gray-600">
-                          🕒 Tempo stimato di consegna: <span className="font-semibold text-blue-600">15-30 minuti</span>
-                        </p>
-                      </div>
-                    )}
+                      {/* Estimated Time (if in delivery) */}
+                      {currentStatus === 'out_for_delivery' && (
+                        <div className="mt-4">
+                          <p className="text-sm text-slate-600">
+                            🕒 Tempo stimato di consegna: <span className="font-semibold text-blue-600">15-30 minuti</span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
