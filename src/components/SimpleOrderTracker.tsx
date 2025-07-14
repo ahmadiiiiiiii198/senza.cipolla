@@ -334,6 +334,16 @@ const SimpleOrderTracker: React.FC = () => {
     }
   };
 
+  const getProgressPercentage = (status: string) => {
+    switch (status) {
+      case 'confirmed': return 25;
+      case 'preparing': return 50;
+      case 'ready': return 75;
+      case 'delivered': return 100;
+      default: return 0;
+    }
+  };
+
 
 
 
@@ -386,11 +396,125 @@ const SimpleOrderTracker: React.FC = () => {
                 </Button>
               </div>
 
-              <div className="flex items-center gap-2">
-                {getStatusIcon(order.status)}
-                <Badge className={getStatusColor(order.status)}>
-                  {getStatusText(order.status)}
-                </Badge>
+              {/* Motorcycle Delivery Tracking */}
+              <div className="relative bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-xl border-2 border-dashed border-blue-200 mb-4">
+                {/* Road Background */}
+                <div className="absolute inset-x-0 bottom-6 h-2 bg-gray-800 rounded-full">
+                  <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-900 rounded-full"></div>
+                  {/* Road markings */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-full h-0.5 bg-yellow-400 opacity-80 animate-pulse"></div>
+                  </div>
+                </div>
+
+                {/* Status Points */}
+                <div className="relative flex justify-between items-center mb-6">
+                  {['confirmed', 'preparing', 'ready', 'delivered'].map((status, index) => {
+                    const isCompleted = ['confirmed', 'preparing', 'ready', 'delivered'].findIndex(s => s === order.status) >= index;
+                    const isCurrent = status === order.status;
+                    const totalSteps = 4;
+                    const progressPercentage = (index / (totalSteps - 1)) * 100;
+
+                    return (
+                      <div
+                        key={status}
+                        className="relative flex flex-col items-center z-10"
+                        style={{ left: `${progressPercentage}%`, transform: 'translateX(-50%)' }}
+                      >
+                        {/* Status Point */}
+                        <div className={`relative w-8 h-8 rounded-full border-2 transition-all duration-500 ${
+                          isCurrent
+                            ? 'bg-pizza-orange border-pizza-orange shadow-lg scale-110 animate-pulse'
+                            : isCompleted
+                            ? 'bg-green-500 border-green-500 shadow-md'
+                            : 'bg-gray-300 border-gray-400'
+                        }`}>
+                          <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${
+                            isCurrent || isCompleted ? 'text-white' : 'text-gray-600'
+                          }`}>
+                            {React.cloneElement(getStatusIcon(status), {
+                              className: "h-4 w-4"
+                            })}
+                          </div>
+
+                          {/* Ripple effect for current status */}
+                          {isCurrent && (
+                            <div className="absolute inset-0 rounded-full bg-pizza-orange opacity-30 animate-ping"></div>
+                          )}
+                        </div>
+
+                        {/* Status Label */}
+                        <div className="mt-2 text-center">
+                          <p className={`text-xs font-semibold ${
+                            isCurrent ? 'text-pizza-orange' : isCompleted ? 'text-green-700' : 'text-gray-500'
+                          }`}>
+                            {getStatusText(status)}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Animated Motorcycle */}
+                <div
+                  className="absolute bottom-4 transition-all duration-1000 ease-in-out z-20"
+                  style={{
+                    left: `${Math.max(0, Math.min(95, getProgressPercentage(order.status)))}%`,
+                    transform: 'translateX(-50%)'
+                  }}
+                >
+                  <div className="relative">
+                    {/* Motorcycle SVG */}
+                    <div className={`text-2xl transition-transform duration-300 ${
+                      order.status === 'delivered' ? 'animate-bounce' : 'animate-pulse'
+                    }`}>
+                      🏍️
+                    </div>
+
+                    {/* Speed lines when in transit */}
+                    {(order.status === 'ready' || order.status === 'preparing') && (
+                      <div className="absolute -left-6 top-1/2 transform -translate-y-1/2">
+                        <div className="flex space-x-1">
+                          <div className="w-1 h-0.5 bg-blue-400 animate-pulse"></div>
+                          <div className="w-1 h-0.5 bg-blue-300 animate-pulse delay-75"></div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Delivery box */}
+                    <div className="absolute -top-1 -right-1 text-sm">📦</div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="absolute inset-x-4 bottom-2 h-1 bg-gray-300 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-pizza-orange to-green-500 rounded-full transition-all duration-1000 ease-out"
+                    style={{ width: `${getProgressPercentage(order.status)}%` }}
+                  ></div>
+                </div>
+
+                {/* Current Status Message */}
+                <div className="mt-4 text-center">
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                    order.status === 'delivered'
+                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      : order.status === 'ready'
+                      ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                      : order.status === 'preparing'
+                      ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                      : 'bg-gray-100 text-gray-800 border border-gray-200'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full ${
+                      order.status === 'delivered' ? 'bg-green-500' :
+                      order.status === 'ready' ? 'bg-blue-500 animate-pulse' :
+                      order.status === 'preparing' ? 'bg-orange-500 animate-pulse' :
+                      'bg-gray-500'
+                    }`}></div>
+                    {getStatusText(order.status)}
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 text-sm">
