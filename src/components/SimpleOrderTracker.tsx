@@ -35,7 +35,7 @@ const SimpleOrderTracker: React.FC = () => {
   const [isRealTimeActive, setIsRealTimeActive] = useState(false);
   const { toast } = useToast();
 
-  // CLIENT-SPECIFIC ORDER DETECTION
+  // CLIENT-SPECIFIC ORDER DETECTION WITH SMART FALLBACK
   useEffect(() => {
     const loadClientOrder = async () => {
       console.log('🔍 CLIENT-SPECIFIC: Starting order detection...');
@@ -44,7 +44,7 @@ const SimpleOrderTracker: React.FC = () => {
       try {
         // Get client identity
         const clientIdentity = getOrCreateClientIdentity();
-        console.log('🆔 Client ID:', clientIdentity.clientId);
+        console.log('🆔 Client ID:', clientIdentity.clientId.slice(-12));
 
         // Search for client-specific order
         const searchResult = await searchClientOrderInDatabase();
@@ -53,17 +53,6 @@ const SimpleOrderTracker: React.FC = () => {
         if (searchResult.order) {
           console.log('✅ FOUND CLIENT ORDER:', searchResult.order.order_number, 'Source:', searchResult.source);
           setOrder(searchResult.order);
-
-          // Save/update client order data
-          saveClientOrder({
-            id: searchResult.order.id,
-            order_number: searchResult.order.order_number,
-            customer_email: searchResult.order.customer_email,
-            customer_name: searchResult.order.customer_name,
-            total_amount: searchResult.order.total_amount,
-            created_at: searchResult.order.created_at
-          });
-
           setLoading(false);
           return;
         }
@@ -185,6 +174,36 @@ const SimpleOrderTracker: React.FC = () => {
     clearClientOrder();
     setOrder(null);
     console.log('🗑️ Client order tracking cleared');
+  };
+
+  const forceRefresh = async () => {
+    console.log('🔄 Force refreshing order search...');
+    setLoading(true);
+    try {
+      const searchResult = await searchClientOrderInDatabase();
+      if (searchResult.order) {
+        setOrder(searchResult.order);
+        toast({
+          title: "Ordine trovato!",
+          description: `Ordine ${searchResult.order.order_number} caricato con successo`,
+        });
+      } else {
+        toast({
+          title: "Nessun ordine trovato",
+          description: "Crea un nuovo ordine per vedere il tracciamento",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Force refresh error:', error);
+      toast({
+        title: "Errore di ricerca",
+        description: "Si è verificato un errore durante la ricerca",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const searchOrder = async (orderNum: string, email: string) => {
@@ -330,9 +349,22 @@ const SimpleOrderTracker: React.FC = () => {
                 </div>
                 <h3 className="text-xl font-semibold text-slate-700 mb-2">Nessun ordine trovato</h3>
                 <p className="text-slate-500 mb-6">Effettua un ordine per vedere il tracciamento qui</p>
-                <div className="inline-flex items-center gap-2 bg-pizza-orange/10 px-4 py-2 rounded-full text-sm text-pizza-orange">
-                  <Clock className="h-4 w-4" />
-                  Ordina ora per iniziare il tracciamento
+
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 bg-pizza-orange/10 px-4 py-2 rounded-full text-sm text-pizza-orange">
+                    <Clock className="h-4 w-4" />
+                    Ordina ora per iniziare il tracciamento
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline"
+                      onClick={forceRefresh}
+                      className="mt-4"
+                    >
+                      <Package className="h-4 w-4 mr-2" />
+                      Ricarica Ordini
+                    </Button>
+                  </div>
                 </div>
               </div>
             ) : (

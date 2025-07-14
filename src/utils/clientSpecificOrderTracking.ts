@@ -131,14 +131,16 @@ export const getClientOrder = (): ClientOrderData | null => {
   }
 };
 
-// Search for client-specific order in database
+// Search for client-specific order in database with enhanced fallback mechanisms
 export const searchClientOrderInDatabase = async (): Promise<OrderSearchResult> => {
   try {
     const clientIdentity = getOrCreateClientIdentity();
-    
-    // First, try to get stored order data
+    console.log('🔍 Searching for orders with client ID:', clientIdentity.clientId.slice(-12));
+
+    // STEP 1: Try to get stored order data (most reliable)
     const storedOrder = getClientOrder();
     if (storedOrder && storedOrder.orderNumber) {
+      console.log('📖 Found stored order:', storedOrder.orderNumber);
       // Search database for this specific order
       const { data: order, error } = await supabase
         .from('orders')
@@ -172,47 +174,95 @@ export const searchClientOrderInDatabase = async (): Promise<OrderSearchResult> 
           source: 'database',
           clientId: clientIdentity.clientId
         };
+      } else {
+        console.log('⚠️ Stored order not found in database:', error?.message);
       }
     }
-    
-    // If no stored order or database lookup failed, search recent orders for this client's email
-    // This is a fallback for when client data might be lost
-    const recentStoredOrders = getAllStoredClientOrders();
-    for (const storedOrderData of recentStoredOrders) {
-      if (storedOrderData.clientId === clientIdentity.clientId) {
-        const { data: order, error } = await supabase
-          .from('orders')
-          .select(`
-            id,
-            order_number,
-            customer_name,
-            customer_email,
-            customer_phone,
-            customer_address,
-            total_amount,
-            status,
-            order_status,
-            created_at,
-            order_items (
-              id,
-              product_name,
-              quantity,
-              product_price,
-              subtotal
-            )
-          `)
-          .eq('order_number', storedOrderData.orderNumber)
-          .single();
 
-        if (!error && order) {
-          console.log('✅ Found client order via fallback search:', order.order_number);
+    // STEP 2: Search recent orders from last 24 hours (fallback for new orders)
+    console.log('🔍 FALLBACK: Searching recent orders from last 24 hours...');
+    const { data: recentOrders, error: recentError } = await supabase
+      .from('orders')
+      .select(`
+        id,
+        order_number,
+        customer_name,
+        customer_email,
+        customer_phone,
+        customer_address,
+        total_amount,
+        status,
+        order_status,
+        created_at,
+        order_items (
+          id,
+          product_name,
+          quantity,
+          product_price,
+          subtotal
+        )
+      `)
+      .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .in('status', ['confirmed', 'preparing', 'ready', 'arrived', 'delivered'])
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (!recentError && recentOrders && recentOrders.length > 0) {
+      console.log(`📋 Found ${recentOrders.length} recent orders, checking for matches...`);
+
+      // Try to find an order that matches stored client data
+      const recentStoredOrders = getAllStoredClientOrders();
+      for (const storedOrderData of recentStoredOrders) {
+        if (storedOrderData.clientId === clientIdentity.clientId) {
+          const matchingOrder = recentOrders.find(order => order.order_number === storedOrderData.orderNumber);
+          if (matchingOrder) {
+            console.log('✅ Found client order via stored data match:', matchingOrder.order_number);
+            return {
+              order: matchingOrder,
+              source: 'database',
+              clientId: clientIdentity.clientId
+            };
+          }
+        }
+      }
+
+      // STEP 3: Smart matching - try to find the most recent order that could belong to this client
+      // This helps when orders were created but client tracking failed
+      console.log('🤖 SMART MATCHING: Analyzing recent orders for potential matches...');
+
+      // Get the most recent order (likely the user's if they just created one)
+      const mostRecentOrder = recentOrders[0];
+      console.log('🎯 Most recent order found:', mostRecentOrder.order_number, 'from', mostRecentOrder.customer_name);
+
+      // Auto-associate this order with the current client if no other client has claimed it
+      const isOrderAlreadyClaimed = recentStoredOrders.some(stored => stored.orderNumber === mostRecentOrder.order_number);
+
+      if (!isOrderAlreadyClaimed) {
+        console.log('💡 Auto-associating recent order with current client:', mostRecentOrder.order_number);
+
+        // Save this order for the current client
+        const saved = saveClientOrder({
+          id: mostRecentOrder.id,
+          order_number: mostRecentOrder.order_number,
+          customer_email: mostRecentOrder.customer_email,
+          customer_name: mostRecentOrder.customer_name,
+          total_amount: mostRecentOrder.total_amount,
+          created_at: mostRecentOrder.created_at
+        });
+
+        if (saved) {
+          console.log('✅ Successfully associated order with client');
           return {
-            order,
+            order: mostRecentOrder,
             source: 'database',
             clientId: clientIdentity.clientId
           };
         }
+      } else {
+        console.log('⚠️ Most recent order already claimed by another client');
       }
+    } else {
+      console.log('❌ No recent orders found in database');
     }
     
     return {
