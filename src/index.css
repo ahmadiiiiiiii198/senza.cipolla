@@ -982,6 +982,11 @@
   }
 }
 
+@keyframes roadDash {
+  0% { background-position: 0px 0px; }
+  100% { background-position: 40px 0px; }
+}
+
 .animate-motorcycle-ride {
   animation: motorcycle-ride 2s ease-in-out infinite;
 }

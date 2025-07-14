@@ -4,14 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Clock, 
-  CheckCircle, 
-  Package, 
-  Truck, 
+import {
+  Clock,
+  CheckCircle,
+  Package,
+  Truck,
   XCircle,
   ArrowRight,
-  Loader2
+  Loader2,
+  MapPin
 } from 'lucide-react';
 
 interface Order {
@@ -61,6 +62,13 @@ const OrderStatusUpdater: React.FC<OrderStatusUpdaterProps> = ({
       description: 'Ordine pronto per la consegna'
     },
     {
+      value: 'arrived',
+      label: 'Arrivato',
+      color: 'bg-purple-100 text-purple-800 border-purple-200',
+      icon: MapPin,
+      description: 'Ordine arrivato alla porta del cliente'
+    },
+    {
       value: 'delivered',
       label: 'Consegnato',
       color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
@@ -86,7 +94,7 @@ const OrderStatusUpdater: React.FC<OrderStatusUpdaterProps> = ({
 
   // Get next logical status
   const getNextStatus = () => {
-    const statusOrder = ['confirmed', 'preparing', 'ready', 'delivered'];
+    const statusOrder = ['confirmed', 'preparing', 'ready', 'arrived', 'delivered'];
     const currentIndex = statusOrder.indexOf(currentStatus);
 
     if (currentIndex < statusOrder.length - 1) {

@@ -19,7 +19,8 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
-  Loader2
+  Loader2,
+  MapPin
 } from 'lucide-react';
 
 interface Order {
@@ -92,10 +93,17 @@ const PersistentOrderTracker: React.FC = () => {
       icon: CheckCircle,
       description: 'Il tuo ordine è pronto per la consegna'
     },
-    { 
-      value: 'delivered', 
-      label: 'Consegnato', 
-      color: 'bg-emerald-100 text-emerald-800 border-emerald-200', 
+    {
+      value: 'arrived',
+      label: 'Arrivato',
+      color: 'bg-purple-100 text-purple-800 border-purple-200',
+      icon: MapPin,
+      description: 'Il tuo ordine è arrivato alla porta'
+    },
+    {
+      value: 'delivered',
+      label: 'Consegnato',
+      color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       icon: Truck,
       description: 'Il tuo ordine è stato consegnato'
     },
@@ -115,13 +123,13 @@ const PersistentOrderTracker: React.FC = () => {
 
   // Get status progress
   const getStatusProgress = (currentStatus: string) => {
-    const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'];
+    const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'arrived', 'delivered'];
     const currentIndex = statusOrder.indexOf(currentStatus);
-    
+
     if (currentStatus === 'cancelled') {
       return { current: -1, total: statusOrder.length, percentage: 0 };
     }
-    
+
     return {
       current: currentIndex + 1,
       total: statusOrder.length,
@@ -635,41 +643,88 @@ const PersistentOrderTracker: React.FC = () => {
                           {/* Motorcycle Shadow */}
                           <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-10 h-3 bg-black/20 rounded-full blur-sm"></div>
 
-                          {/* High-Quality Motorcycle SVG */}
-                          <div className={`relative text-5xl transition-all duration-300 ${
+                          {/* Beautiful Delivery Motorcycle SVG */}
+                          <div className={`relative transition-all duration-300 ${
                             currentStatus === 'delivered'
                               ? 'animate-bounce'
                               : currentStatus === 'out_for_delivery' || currentStatus === 'preparing'
                               ? 'animate-pulse'
                               : ''
                           }`}>
-                            <svg width="60" height="40" viewBox="0 0 60 40" className="text-slate-700">
-                              {/* Motorcycle Body */}
-                              <rect x="15" y="15" width="30" height="10" rx="5" fill="currentColor" />
+                            <svg width="64" height="40" viewBox="0 0 64 40" className="drop-shadow-lg">
+                              {/* Motorcycle Shadow */}
+                              <ellipse cx="32" cy="38" rx="28" ry="2" fill="rgba(0,0,0,0.2)" />
+
                               {/* Front Wheel */}
-                              <circle cx="10" cy="30" r="8" fill="currentColor" />
-                              <circle cx="10" cy="30" r="4" fill="white" />
+                              <circle cx="12" cy="30" r="8" fill="#2d3748" stroke="#4a5568" strokeWidth="1"/>
+                              <circle cx="12" cy="30" r="5" fill="#e2e8f0" stroke="#cbd5e0" strokeWidth="1"/>
+                              <circle cx="12" cy="30" r="2" fill="#4a5568"/>
+
                               {/* Rear Wheel */}
-                              <circle cx="50" cy="30" r="8" fill="currentColor" />
-                              <circle cx="50" cy="30" r="4" fill="white" />
+                              <circle cx="52" cy="30" r="8" fill="#2d3748" stroke="#4a5568" strokeWidth="1"/>
+                              <circle cx="52" cy="30" r="5" fill="#e2e8f0" stroke="#cbd5e0" strokeWidth="1"/>
+                              <circle cx="52" cy="30" r="2" fill="#4a5568"/>
+
+                              {/* Main Frame */}
+                              <path d="M20 30 L44 30 L42 20 L22 20 Z" fill="#3182ce" stroke="#2c5282" strokeWidth="1"/>
+
+                              {/* Seat */}
+                              <ellipse cx="35" cy="18" rx="8" ry="3" fill="#2d3748"/>
+
                               {/* Handlebars */}
-                              <rect x="8" y="10" width="10" height="3" rx="1.5" fill="currentColor" />
+                              <path d="M18 22 L8 18 M18 22 L8 26" stroke="#4a5568" strokeWidth="2" strokeLinecap="round"/>
+                              <circle cx="8" cy="22" r="1.5" fill="#4a5568"/>
+
+                              {/* Front Fork */}
+                              <line x1="12" y1="22" x2="12" y2="30" stroke="#4a5568" strokeWidth="2"/>
+
+                              {/* Exhaust Pipe */}
+                              <path d="M44 25 Q50 25 54 28" stroke="#6b7280" strokeWidth="2" fill="none"/>
+
+                              {/* Headlight */}
+                              <circle cx="6" cy="22" r="3" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1"/>
+                              <circle cx="6" cy="22" r="1.5" fill="#fef3c7"/>
                             </svg>
 
-                            {/* Delivery Box */}
-                            <div className="absolute -top-3 -right-2 w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded border-2 border-white shadow-lg flex items-center justify-center">
-                              <span className="text-sm">🍕</span>
+                            {/* Premium Delivery Box */}
+                            <div className="absolute -top-1 -right-2 w-8 h-8 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-lg border-2 border-white shadow-lg flex items-center justify-center transform rotate-12">
+                              <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded flex items-center justify-center">
+                                <span className="text-xs font-bold text-white">🍕</span>
+                              </div>
                             </div>
 
-                            {/* Speed Effect */}
+                            {/* Speed Lines Effect */}
                             {(currentStatus === 'out_for_delivery' || currentStatus === 'preparing') && (
                               <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-full">
                                 <div className="flex space-x-1">
                                   {[...Array(4)].map((_, i) => (
                                     <div
                                       key={i}
-                                      className={`w-4 h-1 bg-blue-400 rounded-full animate-pulse`}
-                                      style={{ animationDelay: `${i * 0.1}s` }}
+                                      className={`bg-blue-400 rounded-full animate-pulse`}
+                                      style={{
+                                        width: `${4 - i}px`,
+                                        height: '2px',
+                                        animationDelay: `${i * 0.1}s`,
+                                        opacity: 1 - (i * 0.2)
+                                      }}
+                                    ></div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Exhaust Smoke when moving */}
+                            {(currentStatus === 'out_for_delivery' || currentStatus === 'preparing') && (
+                              <div className="absolute right-0 top-2 transform translate-x-full">
+                                <div className="flex space-x-1">
+                                  {[...Array(3)].map((_, i) => (
+                                    <div
+                                      key={i}
+                                      className="w-1 h-1 bg-gray-400 rounded-full animate-ping"
+                                      style={{
+                                        animationDelay: `${i * 0.2}s`,
+                                        opacity: 0.6 - (i * 0.2)
+                                      }}
                                     ></div>
                                   ))}
                                 </div>

@@ -68,6 +68,7 @@ const OrdersAdmin = () => {
     { value: 'confirmed', label: 'Confermato', color: 'bg-blue-100 text-blue-800', icon: Check },
     { value: 'preparing', label: 'In preparazione', color: 'bg-orange-100 text-orange-800', icon: Clock },
     { value: 'ready', label: 'Pronto', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+    { value: 'arrived', label: 'Arrivato', color: 'bg-purple-100 text-purple-800', icon: MapPin },
     { value: 'delivered', label: 'Consegnato', color: 'bg-green-100 text-green-800', icon: Truck },
     { value: 'cancelled', label: 'Annullato', color: 'bg-red-100 text-red-800', icon: XCircle }
   ];

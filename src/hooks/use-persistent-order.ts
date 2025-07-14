@@ -229,16 +229,22 @@ export const getOrderStatusInfo = (status: string) => {
       color: 'bg-orange-100 text-orange-800 border-orange-200', 
       description: 'I nostri chef stanno preparando il tuo ordine'
     },
-    { 
-      value: 'ready', 
-      label: 'Pronto', 
-      color: 'bg-green-100 text-green-800 border-green-200', 
+    {
+      value: 'ready',
+      label: 'Pronto',
+      color: 'bg-green-100 text-green-800 border-green-200',
       description: 'Il tuo ordine è pronto per la consegna'
     },
-    { 
-      value: 'delivered', 
-      label: 'Consegnato', 
-      color: 'bg-emerald-100 text-emerald-800 border-emerald-200', 
+    {
+      value: 'arrived',
+      label: 'Arrivato',
+      color: 'bg-purple-100 text-purple-800 border-purple-200',
+      description: 'Il tuo ordine è arrivato alla porta'
+    },
+    {
+      value: 'delivered',
+      label: 'Consegnato',
+      color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       description: 'Il tuo ordine è stato consegnato'
     },
     { 
@@ -253,13 +259,13 @@ export const getOrderStatusInfo = (status: string) => {
 };
 
 export const getOrderProgress = (currentStatus: string) => {
-  const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'];
+  const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'arrived', 'delivered'];
   const currentIndex = statusOrder.indexOf(currentStatus);
-  
+
   if (currentStatus === 'cancelled') {
     return { current: -1, total: statusOrder.length, percentage: 0 };
   }
-  
+
   return {
     current: currentIndex + 1,
     total: statusOrder.length,

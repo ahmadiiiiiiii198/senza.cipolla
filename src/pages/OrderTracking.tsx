@@ -82,6 +82,13 @@ const OrderTracking: React.FC = () => {
       description: 'Il tuo ordine è pronto per la consegna'
     },
     {
+      value: 'arrived',
+      label: 'Arrivato',
+      color: 'bg-purple-100 text-purple-800 border-purple-200',
+      icon: MapPin,
+      description: 'Il tuo ordine è arrivato alla porta'
+    },
+    {
       value: 'delivered',
       label: 'Consegnato',
       color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
@@ -104,13 +111,13 @@ const OrderTracking: React.FC = () => {
 
   // Get status progress
   const getStatusProgress = (currentStatus: string) => {
-    const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'];
+    const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'arrived', 'delivered'];
     const currentIndex = statusOrder.indexOf(currentStatus);
-    
+
     if (currentStatus === 'cancelled') {
       return { current: -1, total: statusOrder.length, percentage: 0 };
     }
-    
+
     return {
       current: currentIndex + 1,
       total: statusOrder.length,
@@ -445,11 +452,51 @@ const OrderTracking: React.FC = () => {
                       }}
                     >
                       <div className="relative">
-                        {/* Motorcycle SVG */}
-                        <div className={`text-5xl transition-transform duration-300 ${
+                        {/* Beautiful Delivery Motorcycle SVG */}
+                        <div className={`transition-transform duration-300 ${
                           order.status === 'delivered' ? 'animate-bounce' : 'animate-pulse'
                         }`}>
-                          🏍️
+                          <svg width="64" height="40" viewBox="0 0 64 40" className="drop-shadow-lg">
+                            {/* Motorcycle Shadow */}
+                            <ellipse cx="32" cy="38" rx="28" ry="2" fill="rgba(0,0,0,0.2)" />
+
+                            {/* Front Wheel */}
+                            <circle cx="12" cy="30" r="8" fill="#2d3748" stroke="#4a5568" strokeWidth="1"/>
+                            <circle cx="12" cy="30" r="5" fill="#e2e8f0" stroke="#cbd5e0" strokeWidth="1"/>
+                            <circle cx="12" cy="30" r="2" fill="#4a5568"/>
+
+                            {/* Rear Wheel */}
+                            <circle cx="52" cy="30" r="8" fill="#2d3748" stroke="#4a5568" strokeWidth="1"/>
+                            <circle cx="52" cy="30" r="5" fill="#e2e8f0" stroke="#cbd5e0" strokeWidth="1"/>
+                            <circle cx="52" cy="30" r="2" fill="#4a5568"/>
+
+                            {/* Main Frame */}
+                            <path d="M20 30 L44 30 L42 20 L22 20 Z" fill="#3182ce" stroke="#2c5282" strokeWidth="1"/>
+
+                            {/* Seat */}
+                            <ellipse cx="35" cy="18" rx="8" ry="3" fill="#2d3748"/>
+
+                            {/* Handlebars */}
+                            <path d="M18 22 L8 18 M18 22 L8 26" stroke="#4a5568" strokeWidth="2" strokeLinecap="round"/>
+                            <circle cx="8" cy="22" r="1.5" fill="#4a5568"/>
+
+                            {/* Front Fork */}
+                            <line x1="12" y1="22" x2="12" y2="30" stroke="#4a5568" strokeWidth="2"/>
+
+                            {/* Exhaust Pipe */}
+                            <path d="M44 25 Q50 25 54 28" stroke="#6b7280" strokeWidth="2" fill="none"/>
+
+                            {/* Headlight */}
+                            <circle cx="6" cy="22" r="3" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1"/>
+                            <circle cx="6" cy="22" r="1.5" fill="#fef3c7"/>
+                          </svg>
+
+                          {/* Premium Delivery Box */}
+                          <div className="absolute -top-1 -right-2 w-8 h-8 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-lg border-2 border-white shadow-lg flex items-center justify-center transform rotate-12">
+                            <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded flex items-center justify-center">
+                              <span className="text-xs font-bold text-white">🍕</span>
+                            </div>
+                          </div>
                         </div>
 
                         {/* Speed lines when in transit */}
