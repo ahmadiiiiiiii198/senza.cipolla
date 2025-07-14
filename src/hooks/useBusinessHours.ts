@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { businessHoursService } from '@/services/businessHoursService';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DayHours {
   isOpen: boolean;
@@ -100,25 +101,46 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
     checkBusinessStatus();
   }, [checkBusinessStatus]);
 
-  // Auto-refresh every 5 minutes if enabled (reasonable frequency for business hours)
+  // Real-time subscription for business hours changes + auto-refresh
   useEffect(() => {
     if (!autoRefresh) return;
 
+    // Set up real-time subscription for immediate updates
+    const channel = supabase
+      .channel('business-hours-updates')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'settings',
+        filter: 'key=eq.businessHours'
+      }, async (payload) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🕒 [useBusinessHours] Real-time business hours update received:', payload);
+        }
+
+        // Force refresh business hours service to get latest data
+        await businessHoursService.forceRefresh();
+        await checkBusinessStatus();
+      })
+      .subscribe();
+
+    // Auto-refresh every 5 minutes as backup (reduced frequency since we have real-time updates)
     const interval = setInterval(async () => {
-      // Reduced logging - only log in debug mode
       if (process.env.NODE_ENV === 'development') {
         console.log('⏰ [useBusinessHours] Auto-refreshing business hours...');
       }
       try {
-        // Use regular refresh instead of force refresh to respect caching
         await businessHoursService.getBusinessHours();
         await checkBusinessStatus();
       } catch (error) {
         console.error('❌ [useBusinessHours] Auto-refresh failed:', error);
       }
-    }, 300000); // 5 minutes (300,000ms) - much more reasonable for business hours
+    }, 300000); // 5 minutes (300,000ms)
 
-    return () => clearInterval(interval);
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, [autoRefresh, checkBusinessStatus]);
 
   return {
