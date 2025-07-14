@@ -534,31 +534,134 @@ const PersistentOrderTracker: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Quick Status Timeline */}
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                    {orderStatuses
-                      .filter(status => status.value !== 'cancelled')
-                      .map((status, index) => {
-                        const isCompleted = orderStatuses.findIndex(s => s.value === currentStatus) >= index;
-                        const isCurrent = status.value === currentStatus;
-                        const StatusIcon = status.icon;
+                  {/* Motorcycle Delivery Tracking */}
+                  <div className="relative bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-xl border-2 border-dashed border-blue-200">
+                    {/* Road Background */}
+                    <div className="absolute inset-x-0 bottom-8 h-2 bg-gray-800 rounded-full">
+                      <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-900 rounded-full"></div>
+                      {/* Road markings */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-full h-0.5 bg-yellow-400 opacity-80 animate-pulse"></div>
+                      </div>
+                    </div>
 
-                        return (
-                          <div
-                            key={status.value}
-                            className={`text-center p-2 rounded-lg transition-all ${
-                              isCurrent
-                                ? 'bg-pizza-orange text-white'
-                                : isCompleted
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-gray-100 text-gray-500'
-                            }`}
-                          >
-                            <StatusIcon className="h-4 w-4 mx-auto mb-1" />
-                            <p className="text-xs font-medium">{status.label}</p>
+                    {/* Status Points */}
+                    <div className="relative flex justify-between items-center mb-8">
+                      {orderStatuses
+                        .filter(status => status.value !== 'cancelled')
+                        .map((status, index) => {
+                          const isCompleted = orderStatuses.findIndex(s => s.value === currentStatus) >= index;
+                          const isCurrent = status.value === currentStatus;
+                          const StatusIcon = status.icon;
+                          const totalSteps = orderStatuses.filter(s => s.value !== 'cancelled').length;
+                          const progressPercentage = (index / (totalSteps - 1)) * 100;
+
+                          return (
+                            <div
+                              key={status.value}
+                              className="relative flex flex-col items-center z-10"
+                              style={{ left: `${progressPercentage}%`, transform: 'translateX(-50%)' }}
+                            >
+                              {/* Status Point */}
+                              <div className={`relative w-12 h-12 rounded-full border-4 transition-all duration-500 ${
+                                isCurrent
+                                  ? 'bg-pizza-orange border-pizza-orange shadow-lg scale-110 animate-pulse'
+                                  : isCompleted
+                                  ? 'bg-green-500 border-green-500 shadow-md'
+                                  : 'bg-gray-300 border-gray-400'
+                              }`}>
+                                <StatusIcon className={`h-6 w-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${
+                                  isCurrent || isCompleted ? 'text-white' : 'text-gray-600'
+                                }`} />
+
+                                {/* Ripple effect for current status */}
+                                {isCurrent && (
+                                  <div className="absolute inset-0 rounded-full bg-pizza-orange opacity-30 animate-ping"></div>
+                                )}
+                              </div>
+
+                              {/* Status Label */}
+                              <div className="mt-3 text-center">
+                                <p className={`text-xs font-semibold ${
+                                  isCurrent ? 'text-pizza-orange' : isCompleted ? 'text-green-700' : 'text-gray-500'
+                                }`}>
+                                  {status.label}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+
+                    {/* Animated Motorcycle */}
+                    <div
+                      className="absolute bottom-6 transition-all duration-1000 ease-in-out z-20"
+                      style={{
+                        left: `${Math.max(0, Math.min(95, progress))}%`,
+                        transform: 'translateX(-50%)'
+                      }}
+                    >
+                      <div className="relative">
+                        {/* Motorcycle SVG */}
+                        <div className={`text-4xl transition-transform duration-300 ${
+                          currentStatus === 'delivered' ? 'animate-bounce' : 'animate-pulse'
+                        }`}>
+                          🏍️
+                        </div>
+
+                        {/* Speed lines when in transit */}
+                        {(currentStatus === 'out_for_delivery' || currentStatus === 'preparing') && (
+                          <div className="absolute -left-8 top-1/2 transform -translate-y-1/2">
+                            <div className="flex space-x-1">
+                              <div className="w-2 h-0.5 bg-blue-400 animate-pulse"></div>
+                              <div className="w-1 h-0.5 bg-blue-300 animate-pulse delay-75"></div>
+                              <div className="w-1 h-0.5 bg-blue-200 animate-pulse delay-150"></div>
+                            </div>
                           </div>
-                        );
-                      })}
+                        )}
+
+                        {/* Delivery box */}
+                        <div className="absolute -top-2 -right-1 text-lg">📦</div>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="absolute inset-x-6 bottom-4 h-1 bg-gray-300 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-pizza-orange to-green-500 rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    </div>
+
+                    {/* Current Status Message */}
+                    <div className="mt-4 text-center">
+                      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
+                        currentStatus === 'delivered'
+                          ? 'bg-green-100 text-green-800 border border-green-200'
+                          : currentStatus === 'out_for_delivery'
+                          ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                          : currentStatus === 'preparing'
+                          ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                          : 'bg-gray-100 text-gray-800 border border-gray-200'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          currentStatus === 'delivered' ? 'bg-green-500' :
+                          currentStatus === 'out_for_delivery' ? 'bg-blue-500 animate-pulse' :
+                          currentStatus === 'preparing' ? 'bg-orange-500 animate-pulse' :
+                          'bg-gray-500'
+                        }`}></div>
+                        {currentStatusInfo.description}
+                      </div>
+                    </div>
+
+                    {/* Estimated Time (if in delivery) */}
+                    {currentStatus === 'out_for_delivery' && (
+                      <div className="mt-3 text-center">
+                        <p className="text-sm text-gray-600">
+                          🕒 Tempo stimato di consegna: <span className="font-semibold text-blue-600">15-30 minuti</span>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

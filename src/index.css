@@ -921,3 +921,83 @@
     animation: flegreaFadeIn 0.8s ease-out forwards;
   }
 }
+
+/* Motorcycle delivery tracking animations */
+@keyframes motorcycle-ride {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(1deg);
+  }
+  75% {
+    transform: translateY(2px) rotate(-1deg);
+  }
+}
+
+@keyframes speed-lines {
+  0% {
+    opacity: 0;
+    transform: translateX(0px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes delivery-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes road-scroll {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pizza-steam {
+  0%, 100% {
+    opacity: 0.7;
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.1);
+  }
+}
+
+.animate-motorcycle-ride {
+  animation: motorcycle-ride 2s ease-in-out infinite;
+}
+
+.animate-speed-lines {
+  animation: speed-lines 1s ease-out infinite;
+}
+
+.animate-delivery-bounce {
+  animation: delivery-bounce 1s ease-in-out infinite;
+}
+
+.animate-road-scroll {
+  animation: road-scroll 3s linear infinite;
+}
+
+.animate-pizza-steam {
+  animation: pizza-steam 2s ease-in-out infinite;
+}
