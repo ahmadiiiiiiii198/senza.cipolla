@@ -239,49 +239,114 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Bottom Section - Text and Buttons */}
-        <div className="text-center space-y-8 animate-fade-in-up animate-stagger-2 mt-12">
+        {/* Bottom Section - Modern Hero Design */}
+        <div className="text-center z-10 relative max-w-6xl mx-auto px-4 space-y-12 animate-fade-in-up animate-stagger-2 mt-12">
+          {/* Main Title Section */}
           <div className="space-y-8">
-            <div className="text-center">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-fredoka font-bold text-white leading-tight animate-scale-in mb-4">
-                <span className="text-pizza-red drop-shadow-lg">🍕 PIZZERIA</span>
-              </h1>
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-pacifico text-pizza-orange drop-shadow-lg animate-fade-in-up animate-stagger-1">
-                Regina 2000
-              </h2>
-              <h3 className="text-2xl md:text-3xl font-roboto text-pizza-yellow drop-shadow-md animate-fade-in-up animate-stagger-2 mt-2">
-                {t('pizzeriaLocation')} • {t('heroSubtitle')}
-              </h3>
-
-              {/* Store Address */}
-              <div className="text-lg md:text-xl font-roboto text-pizza-cream drop-shadow-md animate-fade-in-up animate-stagger-3 mt-3 bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm inline-block">
-                {t('storeAddress')}
+            {/* Pizza Icon + PIZZERIA - Bigger and Better */}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-8">
+              <div className="text-7xl md:text-9xl lg:text-[10rem] animate-pizza-spin filter drop-shadow-2xl">
+                🍕
+              </div>
+              <div className="text-center md:text-left">
+                <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-tight leading-none transform hover:scale-105 transition-all duration-500 font-serif">
+                  <span className="relative inline-block">
+                    PIZZERIA
+                    <div className="absolute -inset-2 bg-gradient-to-r from-orange-600/30 to-red-600/30 rounded-2xl blur-xl opacity-50"></div>
+                  </span>
+                </h1>
               </div>
             </div>
 
-            <p className="text-xl md:text-2xl text-white font-roboto font-light max-w-4xl mx-auto leading-relaxed animate-fade-in-up animate-stagger-3 text-center drop-shadow-md">
-              🔥 <strong>Forno a Legna Tradizionale</strong> • 🇮🇹 <strong>Ingredienti Freschi</strong> • 👨‍🍳 <strong>Ricette Autentiche</strong>
-            </p>
+            {/* Regina 2000 - Elegant Typography */}
+            <div className="relative mb-6">
+              <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif italic text-transparent bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text font-bold tracking-wide drop-shadow-2xl">
+                Regina 2000
+              </h2>
+              <div className="absolute inset-0 text-5xl md:text-7xl lg:text-8xl font-serif italic text-yellow-400/20 blur-sm">
+                Regina 2000
+              </div>
+            </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-6 text-pizza-cream animate-fade-in-up animate-stagger-4">
-              <div className="flex items-center space-x-2 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
-                <Clock className="animate-wiggle text-pizza-orange" size={24} />
-                <span className="font-roboto font-medium">Aperto 12:00-24:00</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
-                <Star className="fill-current animate-wiggle animation-delay-2000 text-pizza-yellow" size={24} />
-                <span className="font-roboto font-medium">Dal 2000</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
-                <Pizza className="animate-pizza-spin text-pizza-red" size={24} />
-                <span className="font-roboto font-medium">Pizza Italiana</span>
+            {/* Subtitle with Better Typography */}
+            <h3 className="text-2xl md:text-3xl lg:text-4xl text-white/90 font-light tracking-wide mb-6 drop-shadow-lg">
+              {t('pizzeriaLocation')} • {t('heroSubtitle')}
+            </h3>
+
+            {/* Store Address - Modern Card Design */}
+            <div className="mb-10">
+              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-black/50 to-black/30 backdrop-blur-xl rounded-2xl px-8 py-4 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105">
+                <div className="text-2xl animate-pulse">📍</div>
+                <p className="text-white text-lg md:text-xl font-medium tracking-wide">
+                  {t('storeAddress')}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center pt-4 animate-fade-in-up animate-stagger-2">
-            <div className="flex flex-wrap gap-4 justify-center">
+          {/* Feature Pills - Modern Design */}
+          <div className="mb-12">
+            <div className="flex flex-wrap justify-center gap-6 max-w-5xl mx-auto">
+              <div className="group flex items-center gap-4 bg-gradient-to-r from-orange-500/30 to-red-500/30 backdrop-blur-xl rounded-full px-8 py-4 border border-orange-400/30 hover:border-orange-400/60 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <span className="text-3xl group-hover:animate-bounce">🔥</span>
+                <span className="text-white font-semibold text-lg tracking-wide">
+                  Forno a Legna Tradizionale
+                </span>
+              </div>
+
+              <div className="group flex items-center gap-4 bg-gradient-to-r from-green-500/30 to-emerald-500/30 backdrop-blur-xl rounded-full px-8 py-4 border border-green-400/30 hover:border-green-400/60 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <span className="text-3xl group-hover:animate-bounce">🇮🇹</span>
+                <span className="text-white font-semibold text-lg tracking-wide">
+                  Ingredienti Freschi
+                </span>
+              </div>
+
+              <div className="group flex items-center gap-4 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 backdrop-blur-xl rounded-full px-8 py-4 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <span className="text-3xl group-hover:animate-bounce">👨‍🍳</span>
+                <span className="text-white font-semibold text-lg tracking-wide">
+                  Ricette Autentiche
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Info Cards - Premium Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+            <div className="group bg-gradient-to-br from-yellow-500/25 to-orange-500/25 backdrop-blur-xl rounded-3xl p-8 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform hover:-translate-y-2">
+              <div className="text-5xl mb-4 group-hover:animate-pulse">⏰</div>
+              <div className="text-white">
+                <div className="font-bold text-xl mb-2 tracking-wide">
+                  Aperto Oggi
+                </div>
+                <div className="text-yellow-300 font-mono text-2xl font-bold">12:00 - 24:00</div>
+              </div>
+            </div>
+
+            <div className="group bg-gradient-to-br from-blue-500/25 to-purple-500/25 backdrop-blur-xl rounded-3xl p-8 border border-blue-400/30 hover:border-blue-400/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform hover:-translate-y-2">
+              <div className="text-5xl mb-4 group-hover:animate-pulse">⭐</div>
+              <div className="text-white">
+                <div className="font-bold text-xl mb-2 tracking-wide">
+                  Dal 2000
+                </div>
+                <div className="text-blue-300 font-mono text-2xl font-bold">24+ anni</div>
+              </div>
+            </div>
+
+            <div className="group bg-gradient-to-br from-red-500/25 to-pink-500/25 backdrop-blur-xl rounded-3xl p-8 border border-red-400/30 hover:border-red-400/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform hover:-translate-y-2">
+              <div className="text-5xl mb-4 group-hover:animate-pulse">🇮🇹</div>
+              <div className="text-white">
+                <div className="font-bold text-xl mb-2 tracking-wide">
+                  Pizza Italiana
+                </div>
+                <div className="text-red-300 font-mono text-2xl font-bold">100% Autentica</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons - Premium Design */}
+          <div className="flex flex-col lg:flex-row gap-8 justify-center items-center pt-8 animate-fade-in-up animate-stagger-2">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+              {/* Primary CTA - Order Pizza */}
               <button
                 onClick={() => {
                   const productsSection = document.getElementById('products');
@@ -289,26 +354,30 @@ const Hero = () => {
                     productsSection.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="group bg-gradient-to-r from-pizza-red via-pizza-orange to-pizza-red text-white px-8 py-4 rounded-full font-bold font-fredoka text-xl hover:from-pizza-red hover:via-pizza-tomato hover:to-pizza-red transform hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-3xl hover-lift animate-pulse-glow border-2 border-pizza-yellow/50"
+                className="group relative bg-gradient-to-r from-red-600 via-orange-500 to-red-600 text-white px-12 py-5 rounded-2xl font-bold text-xl hover:from-red-500 hover:via-orange-400 hover:to-red-500 transform hover:scale-110 transition-all duration-500 shadow-2xl hover:shadow-3xl border-2 border-yellow-400/60 hover:border-yellow-300 overflow-hidden"
               >
-                <span className="flex items-center justify-center space-x-3">
-                  <Pizza className="group-hover:animate-bounce" size={28} />
-                  <span>🍕 ORDINA PIZZA</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+                <span className="relative flex items-center justify-center gap-4 z-10">
+                  <Pizza className="group-hover:animate-spin" size={32} />
+                  <span className="tracking-wide">🍕 ORDINA PIZZA</span>
                 </span>
               </button>
 
+              {/* Secondary CTA - Call Now */}
               <button
                 onClick={() => {
                   window.open('tel:0110769211', '_self');
                 }}
-                className="group bg-gradient-to-r from-pizza-green to-pizza-basil text-white px-8 py-4 rounded-full font-bold font-fredoka text-xl hover:from-pizza-green hover:to-pizza-green transform hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-3xl hover-lift animate-bounce-gentle border-2 border-pizza-cream/50"
+                className="group relative bg-gradient-to-r from-green-600 to-emerald-600 text-white px-12 py-5 rounded-2xl font-bold text-xl hover:from-green-500 hover:to-emerald-500 transform hover:scale-110 transition-all duration-500 shadow-2xl hover:shadow-3xl border-2 border-green-300/60 hover:border-green-200 overflow-hidden"
               >
-                <span className="flex items-center justify-center space-x-3">
-                  <Phone className="group-hover:animate-bounce" size={28} />
-                  <span>📞 CHIAMA ORA</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+                <span className="relative flex items-center justify-center gap-4 z-10">
+                  <Phone className="group-hover:animate-bounce" size={32} />
+                  <span className="tracking-wide">📞 CHIAMA ORA</span>
                 </span>
               </button>
 
+              {/* Tertiary CTA - Gallery */}
               <button
                 type="button"
                 onClick={(e) => {
@@ -326,13 +395,14 @@ const Hero = () => {
                     console.error('❌ Error scrolling to gallery:', error);
                   }
                 }}
-                className="group bg-gradient-to-r from-pizza-brown to-pizza-dark text-white px-8 py-4 rounded-full font-bold font-fredoka text-xl hover:from-pizza-brown hover:to-pizza-brown transform hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-3xl hover-lift border-2 border-pizza-orange/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-pizza-orange focus:ring-offset-2"
+                className="group relative bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-12 py-5 rounded-2xl font-bold text-xl hover:from-purple-500 hover:to-indigo-500 transform hover:scale-110 transition-all duration-500 shadow-2xl hover:shadow-3xl border-2 border-purple-300/60 hover:border-purple-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
                 aria-label={t('goToGallery')}
                 title={t('goToGallery')}
               >
-                <span className="flex items-center justify-center space-x-3">
-                  <Camera className="group-hover:animate-bounce" size={28} />
-                  <span>📸 {t('gallery').toUpperCase()}</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+                <span className="relative flex items-center justify-center gap-4 z-10">
+                  <Camera className="group-hover:animate-pulse" size={32} />
+                  <span className="tracking-wide">📸 {t('gallery').toUpperCase()}</span>
                 </span>
               </button>
             </div>

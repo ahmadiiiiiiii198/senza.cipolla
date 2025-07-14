@@ -333,6 +333,117 @@
   animation: bounce-gentle 2s ease-in-out infinite;
 }
 
+/* Modern PIZZERIA animations */
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(5deg);
+  }
+}
+
+@keyframes pizza-ingredients-dance {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-5px) rotate(5deg) scale(1.05);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-3deg) scale(1.1);
+  }
+  75% {
+    transform: translateY(-5px) rotate(3deg) scale(1.05);
+  }
+}
+
+@keyframes chef-cooking {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+@keyframes logo-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3), 0 0 40px rgba(251, 146, 60, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.6), 0 0 80px rgba(251, 146, 60, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes logo-float-rotate {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(-1deg);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+
+.animate-pizza-ingredients-dance {
+  animation: pizza-ingredients-dance 2.5s ease-in-out infinite;
+}
+
+.animate-chef-cooking {
+  animation: chef-cooking 2s ease-in-out infinite;
+}
+
+.animate-sparkle-twinkle {
+  animation: sparkle-twinkle 1.5s ease-in-out infinite;
+}
+
+.animate-logo-glow-pulse {
+  animation: logo-glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-logo-float-rotate {
+  animation: logo-float-rotate 4s ease-in-out infinite;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animation-delay-3000 {
+  animation-delay: 3s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animation-delay-5000 {
+  animation-delay: 5s;
+}
+
 .animate-wiggle {
   animation: wiggle 1s ease-in-out;
 }

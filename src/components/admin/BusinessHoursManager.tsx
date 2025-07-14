@@ -28,13 +28,13 @@ interface WeeklyHours {
 const BusinessHoursManager = () => {
   const { toast } = useToast();
   const [hours, setHours] = useState<WeeklyHours>({
-    monday: { isOpen: true, openTime: '08:00', closeTime: '19:00' },
-    tuesday: { isOpen: true, openTime: '08:00', closeTime: '19:00' },
-    wednesday: { isOpen: true, openTime: '08:00', closeTime: '19:00' },
-    thursday: { isOpen: true, openTime: '08:00', closeTime: '19:00' },
-    friday: { isOpen: true, openTime: '08:00', closeTime: '19:00' },
-    saturday: { isOpen: true, openTime: '08:00', closeTime: '19:00' },
-    sunday: { isOpen: true, openTime: '08:00', closeTime: '19:00' }
+    monday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
+    tuesday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
+    wednesday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
+    thursday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
+    friday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
+    saturday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
+    sunday: { isOpen: true, openTime: '18:30', closeTime: '22:30' }
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);

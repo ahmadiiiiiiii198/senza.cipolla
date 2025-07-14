@@ -85,8 +85,8 @@ class BusinessHoursService {
    * Get default business hours (fallback)
    */
   private getDefaultHours(): WeeklyHours {
-    const defaultDay: DayHours = { isOpen: true, openTime: '08:00', closeTime: '19:00' };
-    
+    const defaultDay: DayHours = { isOpen: true, openTime: '18:30', closeTime: '22:30' };
+
     return {
       monday: { ...defaultDay },
       tuesday: { ...defaultDay },

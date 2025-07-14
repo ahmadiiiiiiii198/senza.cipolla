@@ -151,18 +151,32 @@ const YouTubeSection = () => {
           
           {/* Video Info */}
           <div className="mt-8 text-center animate-fade-in-up animate-stagger-2">
-            <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8">
-              <div className="flex items-center space-x-2 text-red-600">
-                <Youtube className="w-5 h-5" />
-                <span className="font-semibold">Canale Ufficiale</span>
+            {/* Pizza Design Animation - No Text */}
+            <div className="flex items-center justify-center space-x-6 md:space-x-12 py-6">
+              {/* Animated Pizza Elements */}
+              <div className="relative">
+                <div className="text-5xl md:text-6xl animate-pizza-spin">🍕</div>
+                <div className="absolute -top-2 -right-2 text-xl md:text-2xl animate-bounce">🔥</div>
               </div>
-              <div className="flex items-center space-x-2 text-orange-500">
-                <Play className="w-5 h-5" />
-                <span className="font-semibold">Contenuti Esclusivi</span>
+
+              <div className="flex flex-col items-center space-y-2">
+                <div className="text-3xl md:text-4xl animate-pizza-ingredients-dance">🍅</div>
+                <div className="text-2xl md:text-3xl animate-pizza-ingredients-dance animation-delay-1000">🧀</div>
               </div>
-              <div className="flex items-center space-x-2 text-green-600">
-                <Video className="w-5 h-5" />
-                <span className="font-semibold">Dietro le Quinte</span>
+
+              <div className="relative">
+                <div className="text-4xl md:text-5xl animate-pizza-ingredients-dance animation-delay-2000">🌿</div>
+                <div className="absolute -bottom-1 -left-1 text-xl md:text-2xl animate-sparkle-twinkle">✨</div>
+              </div>
+
+              <div className="flex flex-col items-center space-y-2">
+                <div className="text-3xl md:text-4xl animate-chef-cooking">👨‍🍳</div>
+                <div className="text-2xl md:text-3xl animate-pizza-ingredients-dance animation-delay-4000">🥄</div>
+              </div>
+
+              <div className="relative">
+                <div className="text-5xl md:text-6xl animate-pizza-spin animation-delay-2000">🍕</div>
+                <div className="absolute -top-2 -left-2 text-xl md:text-2xl animate-sparkle-twinkle animation-delay-1000">⭐</div>
               </div>
             </div>
             
@@ -180,30 +194,58 @@ const YouTubeSection = () => {
           </div>
         </div>
         
-        {/* Additional Video Features */}
-        <div className="mt-16 grid md:grid-cols-3 gap-8 animate-fade-in-up animate-stagger-3">
-          <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Video className="w-8 h-8 text-red-600" />
+        {/* Animated Logo Section */}
+        <div className="mt-16 flex justify-center animate-fade-in-up animate-stagger-3">
+          <div className="relative">
+            {/* Main Logo with Animation */}
+            <div className="relative group">
+              <img
+                src="/logo.png"
+                alt="Pizzeria Regina 2000 Torino Logo"
+                className="h-48 md:h-64 lg:h-80 w-auto object-contain animate-logo-float-rotate hover:animate-logo-glow-pulse transition-all duration-500 filter drop-shadow-2xl group-hover:drop-shadow-3xl cursor-pointer"
+                onError={(e) => {
+                  // Try alternative logo paths in order of preference
+                  const alternatives = [
+                    '/flegrea-logo.png',
+                    '/pizzeria-regina-logo.png',
+                    '/lovable-uploads/72b893e6-73f5-4bd7-b55c-1b555cee0e99.png',
+                    '/lovable-uploads/44e4c09e-3903-45ca-ad9a-3f959538961b.png',
+                    '/lovable-uploads/37fe252a-4e9e-4c35-ab69-05ac659f434b.png'
+                  ];
+
+                  const currentSrc = e.currentTarget.src;
+                  const currentIndex = alternatives.findIndex(alt => currentSrc.includes(alt.split('/').pop()));
+                  const nextAlt = alternatives[currentIndex + 1];
+
+                  if (nextAlt) {
+                    console.log(`🔄 Trying alternative logo: ${nextAlt}`);
+                    e.currentTarget.src = nextAlt;
+                  } else {
+                    // All alternatives failed, show beautiful fallback
+                    console.log('🍕 Using animated pizza fallback');
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                  }
+                }}
+              />
+
+              {/* Fallback Pizza Logo */}
+              <div className="hidden flex-col items-center justify-center h-48 md:h-64 lg:h-80 w-48 md:w-64 lg:w-80 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full backdrop-blur-sm border-4 border-yellow-400/30">
+                <div className="text-8xl md:text-9xl animate-pizza-spin">🍕</div>
+                <div className="text-2xl md:text-3xl font-bold text-red-600 mt-4 font-serif">Regina 2000</div>
+              </div>
+
+              {/* Animated Elements Around Logo */}
+              <div className="absolute -top-4 -left-4 text-3xl animate-sparkle-twinkle">✨</div>
+              <div className="absolute -top-2 -right-6 text-2xl animate-bounce animation-delay-1000">🔥</div>
+              <div className="absolute -bottom-4 -left-6 text-3xl animate-sparkle-twinkle animation-delay-2000">⭐</div>
+              <div className="absolute -bottom-2 -right-4 text-2xl animate-bounce animation-delay-3000">🍅</div>
+              <div className="absolute top-1/2 -left-8 text-2xl animate-pizza-ingredients-dance animation-delay-4000">🌿</div>
+              <div className="absolute top-1/2 -right-8 text-2xl animate-pizza-ingredients-dance animation-delay-5000">🧀</div>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Ricette Tradizionali</h3>
-            <p className="text-gray-600">Scopri i segreti delle nostre ricette tramandate di generazione in generazione</p>
-          </div>
-          
-          <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Play className="w-8 h-8 text-orange-500" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Processo Artigianale</h3>
-            <p className="text-gray-600">Guarda come prepariamo ogni pizza con passione e dedizione artigianale</p>
-          </div>
-          
-          <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Youtube className="w-8 h-8 text-green-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Contenuti Esclusivi</h3>
-            <p className="text-gray-600">Accedi a contenuti esclusivi e dietro le quinte della nostra pizzeria</p>
+
+            {/* Glowing Ring Effect */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500/20 via-orange-500/20 to-yellow-500/20 blur-xl animate-pulse-glow -z-10"></div>
           </div>
         </div>
       </div>

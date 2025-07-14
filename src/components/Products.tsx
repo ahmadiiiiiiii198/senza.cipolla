@@ -189,7 +189,7 @@ const Products = () => {
       case 'extra':
         return 'EXTRA - Toppings';
       case 'pizze-al-metro-per-4-5-persone':
-        return 'Pizze al-metro-per-4-5-persone';
+        return 'Pizze al metro per 4-5 persone';
       default:
         return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1).replace('-', ' ');
     }
@@ -219,8 +219,13 @@ const Products = () => {
   }
 
   // Show all categories that have products, with preferred order for pizza categories
-  const categoryOrder = ['semplici', 'speciali', 'extra'];
-  const allCategoriesWithProducts = Object.keys(filteredProducts).filter(slug => filteredProducts[slug] && filteredProducts[slug].length > 0);
+  // Exclude 'extra' category as it should only appear in pizza customization modal
+  const categoryOrder = ['semplici', 'speciali'];
+  const allCategoriesWithProducts = Object.keys(filteredProducts).filter(slug =>
+    filteredProducts[slug] &&
+    filteredProducts[slug].length > 0 &&
+    slug !== 'extra' // Exclude extras from main menu display
+  );
 
   // Sort categories: preferred order first, then any others alphabetically
   const sortedCategories = [
