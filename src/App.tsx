@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import ClientTrackingTest from "./pages/ClientTrackingTest";
+import DebugClientTracking from "./pages/DebugClientTracking";
 // DatabaseSetup component removed to prevent accidental initialization
 import SimpleStripeTest from "./components/SimpleStripeTest";
 import OrderStatusWidget from "./components/OrderStatusWidget";
@@ -99,6 +100,11 @@ const App = () => (
               <Route path="/client-test" element={
                 <ErrorBoundary componentName="ClientTrackingTest">
                   <ClientTrackingTest />
+                </ErrorBoundary>
+              } />
+              <Route path="/debug-tracking" element={
+                <ErrorBoundary componentName="DebugClientTracking">
+                  <DebugClientTracking />
                 </ErrorBoundary>
               } />
               <Route path="*" element={<NotFound />} />

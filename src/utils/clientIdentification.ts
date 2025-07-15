@@ -75,6 +75,8 @@ const generateWebGLFingerprint = (): string => {
 // Get client IP address
 const getClientIPAddress = async (): Promise<string> => {
   try {
+    console.log('🌐 Starting IP detection...');
+
     // Try multiple IP detection services for reliability
     const ipServices = [
       'https://api.ipify.org?format=json',
@@ -84,26 +86,58 @@ const getClientIPAddress = async (): Promise<string> => {
 
     for (const service of ipServices) {
       try {
-        const response = await fetch(service);
+        console.log(`🔍 Trying IP service: ${service}`);
+        const response = await fetch(service, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          // Add timeout to prevent hanging
+          signal: AbortSignal.timeout(5000)
+        });
+
+        if (!response.ok) {
+          console.log(`⚠️ IP service ${service} returned status: ${response.status}`);
+          continue;
+        }
+
         const data = await response.json();
+        console.log(`📡 IP service ${service} response:`, data);
 
         // Different services return IP in different formats
         const ip = data.ip || data.origin || data.query;
         if (ip && typeof ip === 'string') {
-          console.log('🌐 Client IP detected:', ip.slice(0, 8) + '...');
+          console.log('✅ Client IP detected:', ip.slice(0, 8) + '...');
+          // Store IP in localStorage for consistency
+          localStorage.setItem('pizzeria_client_ip', ip);
           return ip;
         }
       } catch (e) {
-        console.log('⚠️ IP service failed:', service);
+        console.log(`❌ IP service ${service} failed:`, e.message);
         continue;
       }
     }
 
-    // Fallback to a unique identifier based on timestamp
-    return `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Try to get stored IP first
+    const storedIP = localStorage.getItem('pizzeria_client_ip');
+    if (storedIP) {
+      console.log('🔄 Using stored IP:', storedIP.slice(0, 8) + '...');
+      return storedIP;
+    }
+
+    // Fallback to a consistent identifier based on browser characteristics
+    const browserFingerprint = btoa(`${navigator.userAgent}_${screen.width}x${screen.height}_${navigator.language}_${Intl.DateTimeFormat().resolvedOptions().timeZone}`).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+    const fallbackId = `local_${browserFingerprint}`;
+    console.log('🔧 Using fallback IP identifier:', fallbackId.slice(0, 15) + '...');
+    localStorage.setItem('pizzeria_client_ip', fallbackId);
+    return fallbackId;
   } catch (error) {
     console.error('❌ Failed to get IP address:', error);
-    return `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Use a consistent fallback based on browser characteristics
+    const browserFingerprint = btoa(`${navigator.userAgent}_${screen.width}x${screen.height}_${navigator.language}`).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+    const fallbackId = `fallback_${browserFingerprint}`;
+    localStorage.setItem('pizzeria_client_ip', fallbackId);
+    return fallbackId;
   }
 };
 
@@ -192,13 +226,19 @@ export const getOrCreateClientIdentity = async (): Promise<ClientIdentity> => {
     // Try to get from localStorage first
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const identity = JSON.parse(stored);
-      // Update last seen
-      identity.lastSeen = new Date().toISOString();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
-      setCookie(COOKIE_KEY, identity.clientId, 30);
-      console.log('🔄 Existing client identity:', identity.clientId.slice(-12));
-      return identity;
+      try {
+        const identity = JSON.parse(stored);
+        console.log('🔄 Found existing client identity:', identity.clientId.slice(-12));
+        // Update last seen
+        identity.lastSeen = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
+        setCookie(COOKIE_KEY, identity.clientId, 30);
+        console.log('✅ Using existing client identity:', identity.clientId.slice(-12));
+        return identity;
+      } catch (e) {
+        console.log('⚠️ Corrupted stored identity, creating new one');
+        localStorage.removeItem(STORAGE_KEY);
+      }
     }
 
     // Try to get from cookie and regenerate identity
@@ -254,8 +294,15 @@ export const getOrCreateClientIdentity = async (): Promise<ClientIdentity> => {
 // Clear client identity
 export const clearClientIdentity = () => {
   localStorage.removeItem('pizzeria_client_identity');
+  localStorage.removeItem('pizzeria_client_ip');
   document.cookie = 'pizzeria_client_id=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;';
-  console.log('🗑️ Client identity cleared');
+  console.log('🗑️ Client identity and IP cleared');
+};
+
+// Force regenerate client identity (for testing)
+export const regenerateClientIdentity = async (): Promise<ClientIdentity> => {
+  clearClientIdentity();
+  return await getOrCreateClientIdentity();
 };
 
 // Check if two fingerprints are similar (for device recognition)
