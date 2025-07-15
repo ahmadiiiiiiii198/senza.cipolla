@@ -11,6 +11,7 @@ import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
+import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 
 interface SimpleCheckoutModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
   const { toast } = useToast();
   const { validateOrderTime, isOpen: businessIsOpen, message: businessMessage } = useBusinessHours();
   const { clearCart } = useSimpleCart();
+  const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValidatingAddress, setIsValidatingAddress] = useState(false);
   const [addressValidation, setAddressValidation] = useState<any>(null);
@@ -219,7 +221,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
       const clientIdentity = await getOrCreateClientIdentity();
       console.log('🆔 Creating Simple Stripe order with client ID:', clientIdentity.clientId.slice(-12));
 
-      // Create order in database with client identification
+      // Create order in database with client identification and user authentication
       const orderData = {
         order_number: generateOrderNumber(),
         customer_name: customerData.customerName,
@@ -232,12 +234,14 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         status: 'pending',
         payment_status: 'pending',
         payment_method: 'stripe',
+        user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
         metadata: {
           // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
           clientId: clientIdentity.clientId,
           deviceFingerprint: clientIdentity.deviceFingerprint,
           sessionId: clientIdentity.sessionId,
-          orderCreatedAt: new Date().toISOString()
+          orderCreatedAt: new Date().toISOString(),
+          isAuthenticatedOrder: isAuthenticated
         }
       };
 
@@ -436,7 +440,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
       const clientIdentity = await getOrCreateClientIdentity();
       console.log('🆔 Creating Simple PayLater order with client ID:', clientIdentity.clientId.slice(-12));
 
-      // Create order in database with client identification
+      // Create order in database with client identification and user authentication
       const orderData = {
         order_number: generateOrderNumber(),
         customer_name: customerData.customerName,
@@ -449,12 +453,14 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         status: 'confirmed',
         payment_status: 'pending',
         payment_method: 'cash_on_delivery',
+        user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
         metadata: {
           // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
           clientId: clientIdentity.clientId,
           deviceFingerprint: clientIdentity.deviceFingerprint,
           sessionId: clientIdentity.sessionId,
-          orderCreatedAt: new Date().toISOString()
+          orderCreatedAt: new Date().toISOString(),
+          isAuthenticatedOrder: isAuthenticated
         }
       };
 

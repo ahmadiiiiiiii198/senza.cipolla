@@ -14,6 +14,7 @@ import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
+import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 
 interface OrderFormData {
   customerName: string;
@@ -39,6 +40,7 @@ interface AddressValidationResult {
 const EnhancedOrderForm = () => {
   const { toast } = useToast();
   const { validateOrderTime } = useBusinessHours();
+  const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1: Form, 2: Address Validation, 3: Payment
   const [addressValidation, setAddressValidation] = useState<AddressValidationResult | null>(null);
@@ -125,7 +127,7 @@ const EnhancedOrderForm = () => {
     const orderNumber = generateOrderNumber();
     const totalAmount = calculateEstimatedPrice();
 
-    // Create order with client identification
+    // Create order with client identification and user authentication
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -136,6 +138,7 @@ const EnhancedOrderForm = () => {
         customer_address: addressValidation.formattedAddress, // Use customer_address column
         total_amount: totalAmount,
         status: 'confirmed',
+        user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
         metadata: {
           coordinates: addressValidation.coordinates,
           deliveryFee: addressValidation.deliveryFee,
@@ -143,7 +146,8 @@ const EnhancedOrderForm = () => {
           clientId: clientIdentity.clientId,
           deviceFingerprint: clientIdentity.deviceFingerprint,
           sessionId: clientIdentity.sessionId,
-          orderCreatedAt: new Date().toISOString()
+          orderCreatedAt: new Date().toISOString(),
+          isAuthenticatedOrder: isAuthenticated
         },
         notes: `Category: ${formData.category}\nProduct: ${formData.productDescription}\nQuantity: ${formData.quantity}\nSpecial Requests: ${formData.specialRequests}`
       })

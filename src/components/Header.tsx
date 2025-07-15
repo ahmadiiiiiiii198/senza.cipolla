@@ -8,6 +8,7 @@ import SimpleCart from './SimpleCart';
 import ProductSearch from './ProductSearch';
 import MobileSearchModal from './MobileSearchModal';
 import { useLanguage } from '@/hooks/use-language';
+import CustomerAccountWidget from './customer/CustomerAccountWidget';
 import logoImage from '@/assets/logo.png';
 
 
@@ -103,6 +104,9 @@ const Header = () => {
                 <Search size={20} />
               </button>
 
+              <div className="animate-scale-in animate-stagger-1">
+                <CustomerAccountWidget />
+              </div>
               <div className="animate-scale-in animate-stagger-1">
                 <LanguageSelector />
               </div>

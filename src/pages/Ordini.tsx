@@ -1,11 +1,15 @@
 import React, { Suspense } from 'react';
-import { Pizza, Loader2, ArrowLeft } from 'lucide-react';
+import { Pizza, Loader2, ArrowLeft, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import OrdersAdmin from '@/components/admin/OrdersAdmin';
 import OrderNotificationSystem from '@/components/OrderNotificationSystem';
 import OrdiniHeader from '@/components/OrdiniHeader';
+import AuthenticatedAdminWrapper from '@/components/admin/AuthenticatedAdminWrapper';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const Ordini = () => {
+  const { handleLogout } = useAdminAuth();
+
   const handleBackToAdmin = () => {
     window.location.href = '/admin';
   };
@@ -15,6 +19,7 @@ const Ordini = () => {
   };
 
   return (
+    <AuthenticatedAdminWrapper title="Gestione Ordini - Pizzeria Regina 2000" showLogout={false}>
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
       {/* Mobile-Optimized Header */}
       <div className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-40">
@@ -35,6 +40,14 @@ const Ordini = () => {
               <div id="header-notification-controls" className="flex items-center space-x-1">
                 {/* This will be populated by OrderNotificationSystem */}
               </div>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                size="sm"
+                className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100 px-2 py-1 rounded-md text-xs"
+              >
+                <LogOut className="w-3 h-3" />
+              </Button>
               <Button
                 onClick={handleBackToAdmin}
                 variant="outline"
@@ -74,6 +87,14 @@ const Ordini = () => {
                 {/* This will be populated by OrderNotificationSystem */}
               </div>
 
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="flex items-center gap-2 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
               <Button
                 onClick={handleBackToAdmin}
                 variant="outline"
@@ -142,6 +163,7 @@ const Ordini = () => {
         <OrderNotificationSystem />
       </Suspense>
     </div>
+    </AuthenticatedAdminWrapper>
   );
 };
 

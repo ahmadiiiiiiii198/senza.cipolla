@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/hooks/use-language";
 import { SimpleCartProvider } from "@/hooks/use-simple-cart";
+import { CustomerAuthProvider } from "@/hooks/useCustomerAuth";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 // import DiagnosticInfo from "./components/DiagnosticInfo"; // Removed diagnostic button
@@ -28,6 +29,9 @@ import DebugClientTracking from "./pages/DebugClientTracking";
 // DatabaseSetup component removed to prevent accidental initialization
 import SimpleStripeTest from "./components/SimpleStripeTest";
 import OrderStatusWidget from "./components/OrderStatusWidget";
+import AuthTest from "./components/AuthTest";
+import AuthTestHelper from "./components/AuthTestHelper";
+import MyOrders from "./pages/MyOrders";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +40,8 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LanguageProvider>
-          <SimpleCartProvider>
+          <CustomerAuthProvider>
+            <SimpleCartProvider>
             <BackgroundInitializer />
             {/* OrderNotificationSystem now only loads in admin panel */}
             {/* ButtonDebugger removed - no more debug overlays */}
@@ -107,11 +112,27 @@ const App = () => (
                   <DebugClientTracking />
                 </ErrorBoundary>
               } />
+              <Route path="/auth-test" element={
+                <ErrorBoundary componentName="AuthTest">
+                  <AuthTest />
+                </ErrorBoundary>
+              } />
+              <Route path="/auth-helper" element={
+                <ErrorBoundary componentName="AuthTestHelper">
+                  <AuthTestHelper />
+                </ErrorBoundary>
+              } />
+              <Route path="/my-orders" element={
+                <ErrorBoundary componentName="MyOrders">
+                  <MyOrders />
+                </ErrorBoundary>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
           {/* <DiagnosticInfo /> */}
-          </SimpleCartProvider>
+            </SimpleCartProvider>
+          </CustomerAuthProvider>
         </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>

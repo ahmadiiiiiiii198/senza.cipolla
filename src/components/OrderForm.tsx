@@ -12,6 +12,7 @@ import { useBusinessHours } from '@/hooks/useBusinessHours';
 import BusinessHoursStatus from './BusinessHoursStatus';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
+import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 
 interface OrderFormData {
   customerName: string;
@@ -40,6 +41,7 @@ interface OrderFormData {
 const OrderForm = () => {
   const { toast } = useToast();
   const { validateOrderTime } = useBusinessHours(true, 'order-form');
+  const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<OrderFormData>({
     customerName: '',
@@ -152,7 +154,7 @@ const OrderForm = () => {
         ? formData.billingAddress
         : formData.shippingAddress;
 
-      // Create order with client identification
+      // Create order with client identification and user authentication
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -165,13 +167,15 @@ const OrderForm = () => {
           status: 'confirmed', // Orders are automatically confirmed
           payment_status: 'pending',
           payment_method: 'stripe',
+          user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
           metadata: {
             billing_address: billingAddress,
             // 🎯 CLIENT IDENTIFICATION FOR ORDER TRACKING
             clientId: clientIdentity.clientId,
             deviceFingerprint: clientIdentity.deviceFingerprint,
             sessionId: clientIdentity.sessionId,
-            orderCreatedAt: new Date().toISOString()
+            orderCreatedAt: new Date().toISOString(),
+            isAuthenticatedOrder: isAuthenticated
           },
           notes: `Category: ${formData.category}\nProduct: ${formData.productDescription}\nQuantity: ${formData.quantity}\nSpecial Requests: ${formData.specialRequests}\nDelivery Date: ${formData.deliveryDate}`
         })

@@ -16,6 +16,7 @@ import { businessHoursService } from '@/services/businessHoursService';
 import { saveOrderForTracking } from '@/utils/orderTracking';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
+import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 
 // Direct payment button component - no abstractions
 interface DirectPaymentButtonProps {
@@ -56,7 +57,7 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
       const totalAmount = (product.price || 0) * (orderData.quantity || 1);
       console.log('💰 ProductOrder - price:', product.price, 'quantity:', orderData.quantity, 'totalAmount:', totalAmount);
 
-      // Create order with client identification
+      // Create order with client identification and user authentication
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -70,6 +71,7 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
           status: 'confirmed',
           payment_status: 'pending',
           payment_method: 'stripe',
+          user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
           special_instructions: `Product Order - ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`,
           metadata: {
             product_id: product.id,
@@ -81,7 +83,8 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
             clientId: clientIdentity.clientId,
             deviceFingerprint: clientIdentity.deviceFingerprint,
             sessionId: clientIdentity.sessionId,
-            orderCreatedAt: new Date().toISOString()
+            orderCreatedAt: new Date().toISOString(),
+            isAuthenticatedOrder: isAuthenticated
           }
         })
         .select()
@@ -278,6 +281,7 @@ interface OrderData {
 const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, onClose }) => {
   const { toast } = useToast();
   const { validateOrderTime } = useBusinessHours(true, 'product-order-modal');
+  const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValidatingAddress, setIsValidatingAddress] = useState(false);
   const [addressValidation, setAddressValidation] = useState<any>(null);
@@ -425,7 +429,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
     const totalAmount = subtotal + deliveryFee;
     console.log('💰 ProductOrder PayLater - price:', product.price, 'quantity:', orderData.quantity, 'subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'totalAmount:', totalAmount);
 
-    // Create order with client identification
+    // Create order with client identification and user authentication
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -440,6 +444,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
         status: 'confirmed', // Orders are automatically confirmed
         payment_status: 'pending',
         payment_method: 'cash_on_delivery',
+        user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
         metadata: {
           deliveryFee: addressValidation.deliveryFee,
           estimatedTime: addressValidation.estimatedTime,
@@ -449,7 +454,8 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
           clientId: clientIdentity.clientId,
           deviceFingerprint: clientIdentity.deviceFingerprint,
           sessionId: clientIdentity.sessionId,
-          orderCreatedAt: new Date().toISOString()
+          orderCreatedAt: new Date().toISOString(),
+          isAuthenticatedOrder: isAuthenticated
         },
         special_instructions: `Pay Later Order - Product: ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`
       })

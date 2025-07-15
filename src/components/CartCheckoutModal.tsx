@@ -12,6 +12,7 @@ import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHours } from '@/hooks/useBusinessHours';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
+import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 
 interface CartCheckoutModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
 }) => {
   const { toast } = useToast();
   const { validateOrderTime } = useBusinessHours();
+  const { user, isAuthenticated } = useCustomerAuth();
   const { clearCart } = useSimpleCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValidatingAddress, setIsValidatingAddress] = useState(false);
@@ -114,7 +116,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
     const finalTotal = subtotal + deliveryFee;
     console.log('💰 CartCheckout - subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'finalTotal:', finalTotal);
 
-    // Create order with client identification
+    // Create order with client identification and user authentication
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -129,6 +131,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         status: 'confirmed',
         payment_status: 'pending',
         payment_method: 'stripe',
+        user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
         metadata: {
           deliveryFee,
           estimatedTime: addressValidation.estimatedTime,
@@ -145,7 +148,8 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
           clientId: clientIdentity.clientId,
           deviceFingerprint: clientIdentity.deviceFingerprint,
           sessionId: clientIdentity.sessionId,
-          orderCreatedAt: new Date().toISOString()
+          orderCreatedAt: new Date().toISOString(),
+          isAuthenticatedOrder: isAuthenticated
         },
         special_instructions: `Cart Order - ${cartItems.length} items\n${cartItems.map(item =>
           `${item.product.name} x${item.quantity}${item.specialRequests ? ` (${item.specialRequests})` : ''}`
@@ -327,7 +331,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
     const finalTotal = subtotal + deliveryFee;
     console.log('💰 CartCheckout PayLater - subtotal:', subtotal, 'deliveryFee:', deliveryFee, 'finalTotal:', finalTotal);
 
-    // Create order with client identification
+    // Create order with client identification and user authentication
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -342,6 +346,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         status: 'confirmed',
         payment_status: 'pending',
         payment_method: 'cash_on_delivery',
+        user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
         metadata: {
           deliveryFee,
           estimatedTime: addressValidation.estimatedTime,
@@ -358,7 +363,8 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
           clientId: clientIdentity.clientId,
           deviceFingerprint: clientIdentity.deviceFingerprint,
           sessionId: clientIdentity.sessionId,
-          orderCreatedAt: new Date().toISOString()
+          orderCreatedAt: new Date().toISOString(),
+          isAuthenticatedOrder: isAuthenticated
         },
         special_instructions: `Pay Later Cart Order - ${cartItems.length} items\n${cartItems.map(item =>
           `${item.product.name} x${item.quantity}${item.specialRequests ? ` (${item.specialRequests})` : ''}`
