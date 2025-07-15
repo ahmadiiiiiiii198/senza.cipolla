@@ -32,27 +32,11 @@ async function ensureSettingsTable(): Promise<boolean> {
 // Initialize content_sections table structure
 async function ensureContentSectionsTable(): Promise<boolean> {
   try {
-    console.log('[InitDB] Ensuring content_sections table exists...');
-
-    // Try to query the content_sections table to see if it exists
-    const { error } = await supabase
-      .from('content_sections')
-      .select('id')
-      .limit(1);
-
-    if (error && error.code === 'PGRST116') {
-      console.log('[InitDB] Content sections table does not exist, but we cannot create it via client');
-      console.log('[InitDB] Please ensure the content_sections table exists in your Supabase database');
-    } else if (error) {
-      console.log('[InitDB] Content sections table check error:', error.message);
-    } else {
-      console.log('[InitDB] Content sections table exists and is accessible');
-    }
-
+    console.log('[InitDB] Skipping content_sections initialization (not needed for pizzeria)');
     return true;
   } catch (error) {
     console.error('[InitDB] Error ensuring content_sections table:', error);
-    return true; // Continue anyway, table might already exist
+    return true; // Continue anyway
   }
 }
 
@@ -82,117 +66,8 @@ export async function initializeDatabase(): Promise<boolean> {
     console.log('[InitDB] Step 2: Skipping product initialization to prevent recreation after deletion');
     console.log('[InitDB] Products initialization skipped successfully');
 
-    // Step 3: Initialize content sections
-    console.log('[InitDB] Step 3: Initializing content sections...');
-
-    // Define the content sections for categories and hero
-    const categoryContentSections = [
-      // Hero content section
-      {
-        section_key: 'hero_main_content',
-        section_name: 'Hero Section - Main Content',
-        content_type: 'json',
-        content_value: JSON.stringify({
-          heading: "Francesco Fiori & Piante",
-          subheading: "Scopri l'eleganza floreale firmata Francesco: fiori, piante e creazioni per ogni occasione. 🌸🌿",
-          backgroundImage: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80"
-        }),
-        metadata: { section: 'hero' },
-        is_active: true
-      },
-      // Category content sections
-      {
-        section_key: 'category_matrimoni_images',
-        section_name: 'Category Images: Matrimoni',
-        content_type: 'json',
-        content_value: JSON.stringify([]), // Empty array to prevent default images
-        metadata: { section: 'categories' },
-        is_active: true
-      },
-      {
-        section_key: 'category_matrimoni_features',
-        section_name: 'Matrimoni - Features',
-        content_type: 'json',
-        content_value: JSON.stringify([
-          "Consulenza personalizzata",
-          "Bouquet sposa e damigelle",
-          "Allestimenti chiesa e location",
-          "Centrotavola e decorazioni",
-          "Addobbi floreali completi",
-          "Servizio completo per matrimoni"
-        ]),
-        metadata: { section: 'categories' },
-        is_active: true
-      },
-      {
-        section_key: 'category_matrimoni_explanation',
-        section_name: 'Matrimoni - Explanation',
-        content_type: 'textarea',
-        content_value: "Rendiamo unico il giorno più importante della tua vita con allestimenti floreali personalizzati per matrimoni. Bouquet da sposa, centrotavola, archi floreali e decorazioni per chiesa e location: tutto viene progettato su misura per raccontare la vostra storia d'amore con i fiori.",
-        metadata: { section: 'categories' },
-        is_active: true
-      },
-      {
-        section_key: 'category_fiori_piante_images',
-        section_name: 'Category Images: Fiori & Piante',
-        content_type: 'json',
-        content_value: JSON.stringify([]), // Empty array to prevent default images
-        metadata: { section: 'categories' },
-        is_active: true
-      },
-      {
-        section_key: 'category_fiori_finti_images',
-        section_name: 'Category Images: Fiori Finti',
-        content_type: 'json',
-        content_value: JSON.stringify([]), // Empty array to prevent default images
-        metadata: { section: 'categories' },
-        is_active: true
-      },
-      {
-        section_key: 'category_funerali_images',
-        section_name: 'Category Images: Funerali',
-        content_type: 'json',
-        content_value: JSON.stringify([]), // Empty array to prevent default images
-        metadata: { section: 'categories' },
-        is_active: true
-      }
-    ];
-
-    // Check if content sections already exist
-    const { data: existingSections, error: fetchError } = await supabase
-      .from('content_sections')
-      .select('section_key')
-      .in('section_key', categoryContentSections.map(s => s.section_key));
-
-    if (fetchError) {
-      console.error('[InitDB] Error checking existing sections:', fetchError);
-      return false;
-    }
-
-    const existingKeys = existingSections?.map(s => s.section_key) || [];
-    const sectionsToInsert = categoryContentSections.filter(
-      section => !existingKeys.includes(section.section_key)
-    );
-
-    if (sectionsToInsert.length === 0) {
-      console.log('[InitDB] All category content sections already exist');
-      return true;
-    }
-
-    console.log(`[InitDB] Inserting ${sectionsToInsert.length} new content sections...`);
-
-    // Insert new content sections
-    const { data: insertedData, error: insertError } = await supabase
-      .from('content_sections')
-      .insert(sectionsToInsert)
-      .select();
-
-    if (insertError) {
-      console.error('[InitDB] Error inserting content sections:', insertError);
-      return false;
-    }
-
-    console.log('[InitDB] Successfully inserted content sections:', insertedData);
+    // Step 3: Skip content sections initialization (not needed for pizzeria)
+    console.log('[InitDB] Step 3: Content sections initialization skipped successfully');
 
     // Step 4: Initialize default settings
     console.log('[InitDB] Step 4: Initializing default settings...');
@@ -205,6 +80,11 @@ export async function initializeDatabase(): Promise<boolean> {
   }
 }
 
+// Skip the old content sections logic and go directly to settings
+async function skipOldContentSections(): Promise<boolean> {
+  return true;
+}
+
 // Initialize default settings in the settings table
 async function initializeDefaultSettings(): Promise<boolean> {
   try {
@@ -214,102 +94,36 @@ async function initializeDefaultSettings(): Promise<boolean> {
       {
         key: 'heroContent',
         value: {
-          heading: "🍕 PIZZERIA Regina 2000",
-          subheading: "Autentica pizza napoletana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino",
-          backgroundImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+          heading: "Pizzeria Regina 2000",
+          subheading: "Autentica pizza italiana nel cuore di Torino",
+          backgroundImage: "/hero-pizza-bg.jpg"
         }
       },
       {
-        key: 'logoSettings',
+        key: 'weOfferContent',
         value: {
-          logoUrl: "/pizzeria-regina-logo.png",
-          altText: "Pizzeria Regina 2000 Torino Logo"
-        }
-      },
-      {
-        key: 'aboutContent',
-        value: {
-          heading: "Chi Siamo",
-          subheading: "Passione per la bellezza naturale e l'arte floreale",
-          backgroundImage: "",
-          backgroundColor: "#FEF7CD",
-          paragraphs: [
-            "Francesco Fiori & Piante offre composizioni floreali per ogni occasione, dai funerali ai matrimoni. Troverai fiori freschi, piante da interno ed esterno, fiori finti di alta qualità e servizi su misura. Situati all'interno del Mercato di Porta Palazzo a Torino, portiamo esperienza artigianale e passione per la bellezza naturale."
-          ]
-        }
-      },
-      {
-        key: 'restaurantSettings',
-        value: {
-          totalSeats: 50,
-          reservationDuration: 120,
-          openingTime: "11:30",
-          closingTime: "22:00",
-          languages: ["it", "en", "ar", "fa"],
-          defaultLanguage: "it"
-        }
-      },
-      {
-        key: 'contactContent',
-        value: {
-          address: "Corso Regina Margherita, 53, 10152 Torino TO",
-          phone: "0110769211",
-          email: "anilamyzyri@gmail.com",
-          mapUrl: "https://maps.google.com",
-          hours: "Lun-Dom: 08:00 - 19:00"
-        }
-      },
-      {
-        key: 'businessHours',
-        value: {
-          monday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
-          tuesday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
-          wednesday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
-          thursday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
-          friday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
-          saturday: { isOpen: true, openTime: '18:30', closeTime: '22:30' },
-          sunday: { isOpen: true, openTime: '18:30', closeTime: '22:30' }
+          title: "Le Nostre Specialità",
+          description: "Scopri le nostre pizze tradizionali preparate con ingredienti freschi e di qualità"
         }
       }
     ];
 
-    // Check which settings already exist
-    const { data: existingSettings, error: fetchError } = await supabase
-      .from('settings')
-      .select('key')
-      .in('key', defaultSettings.map(s => s.key));
+    // Insert or update settings
+    for (const setting of defaultSettings) {
+      const { error } = await supabase
+        .from('settings')
+        .upsert(setting, { onConflict: 'key' });
 
-    if (fetchError) {
-      console.error('[InitDB] Error checking existing settings:', fetchError);
-      return false;
+      if (error) {
+        console.error(`[InitDB] Error upserting setting ${setting.key}:`, error);
+      } else {
+        console.log(`[InitDB] Setting ${setting.key} initialized successfully`);
+      }
     }
 
-    const existingKeys = existingSettings?.map(s => s.key) || [];
-    const settingsToInsert = defaultSettings.filter(
-      setting => !existingKeys.includes(setting.key)
-    );
-
-    if (settingsToInsert.length === 0) {
-      console.log('[InitDB] All default settings already exist');
-      return true;
-    }
-
-    console.log(`[InitDB] Inserting ${settingsToInsert.length} new settings...`);
-
-    // Insert new settings
-    const { error: insertError } = await supabase
-      .from('settings')
-      .insert(settingsToInsert);
-
-    if (insertError) {
-      console.error('[InitDB] Error inserting settings:', insertError);
-      return false;
-    }
-
-    console.log('[InitDB] Successfully inserted default settings');
     return true;
   } catch (error) {
-    console.error('[InitDB] Error in initializeDefaultSettings:', error);
+    console.error('[InitDB] Error initializing default settings:', error);
     return false;
   }
 }
@@ -318,14 +132,13 @@ async function initializeDefaultSettings(): Promise<boolean> {
 export async function testDatabaseConnection(): Promise<boolean> {
   try {
     console.log('[InitDB] Testing database connection...');
-    
     const { data, error } = await supabase
-      .from('content_sections')
-      .select('count')
+      .from('categories')
+      .select('id')
       .limit(1);
 
     if (error) {
-      console.error('[InitDB] Database connection failed:', error);
+      console.error('[InitDB] Database connection error:', error);
       return false;
     }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { businessHoursService } from '@/services/businessHoursService';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -37,6 +37,7 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
   const [nextOpenTime, setNextOpenTime] = useState<string | undefined>();
   const [todayHours, setTodayHours] = useState<DayHours | undefined>();
   const [formattedHours, setFormattedHours] = useState<string>('');
+  const subscriptionRef = useRef<any>(null);
 
   /**
    * Check current business status
@@ -105,6 +106,13 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
   useEffect(() => {
     if (!autoRefresh) return;
 
+    // Clean up existing subscription first
+    if (subscriptionRef.current) {
+      console.log('🔌 Cleaning up existing business hours subscription');
+      supabase.removeChannel(subscriptionRef.current);
+      subscriptionRef.current = null;
+    }
+
     // Set up real-time subscription for immediate updates
     const channel = supabase
       .channel('business-hours-updates')
@@ -124,6 +132,9 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
       })
       .subscribe();
 
+    // Store the subscription reference
+    subscriptionRef.current = channel;
+
     // Auto-refresh every 5 minutes as backup (reduced frequency since we have real-time updates)
     const interval = setInterval(async () => {
       if (process.env.NODE_ENV === 'development') {
@@ -138,7 +149,10 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
     }, 300000); // 5 minutes (300,000ms)
 
     return () => {
-      supabase.removeChannel(channel);
+      if (subscriptionRef.current) {
+        supabase.removeChannel(subscriptionRef.current);
+        subscriptionRef.current = null;
+      }
       clearInterval(interval);
     };
   }, [autoRefresh, checkBusinessStatus]);
