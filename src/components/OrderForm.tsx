@@ -39,7 +39,7 @@ interface OrderFormData {
 
 const OrderForm = () => {
   const { toast } = useToast();
-  const { validateOrderTime } = useBusinessHours();
+  const { validateOrderTime } = useBusinessHours(true, 'order-form');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<OrderFormData>({
     customerName: '',

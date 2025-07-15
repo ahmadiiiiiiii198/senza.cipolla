@@ -30,7 +30,7 @@ interface UseBusinessHoursReturn {
 /**
  * Hook for managing business hours and checking if the business is open
  */
-export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursReturn => {
+export const useBusinessHours = (autoRefresh: boolean = true, componentId?: string): UseBusinessHoursReturn => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string>('Caricamento orari...');
@@ -113,9 +113,10 @@ export const useBusinessHours = (autoRefresh: boolean = true): UseBusinessHoursR
       subscriptionRef.current = null;
     }
 
-    // Set up real-time subscription for immediate updates
+    // Set up real-time subscription for immediate updates with unique channel name
+    const channelName = `business-hours-updates-${componentId || Math.random().toString(36).substr(2, 9)}`;
     const channel = supabase
-      .channel('business-hours-updates')
+      .channel(channelName)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',

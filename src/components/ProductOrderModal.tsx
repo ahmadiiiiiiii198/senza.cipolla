@@ -277,7 +277,7 @@ interface OrderData {
 
 const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, onClose }) => {
   const { toast } = useToast();
-  const { validateOrderTime } = useBusinessHours();
+  const { validateOrderTime } = useBusinessHours(true, 'product-order-modal');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValidatingAddress, setIsValidatingAddress] = useState(false);
   const [addressValidation, setAddressValidation] = useState<any>(null);

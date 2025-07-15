@@ -22,7 +22,7 @@ const BusinessHoursStatus: React.FC<BusinessHoursStatusProps> = ({
     nextOpenTime,
     todayHours,
     formattedHours
-  } = useBusinessHours();
+  } = useBusinessHours(true, 'business-hours-status');
 
   if (isLoading) {
     return (

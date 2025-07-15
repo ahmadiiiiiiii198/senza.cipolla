@@ -6,7 +6,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { supabase } from '@/integrations/supabase/client';
 
 const Footer = () => {
-  const { formattedHours } = useBusinessHours();
+  const { formattedHours } = useBusinessHours(true, 'footer');
   const { t } = useLanguage();
   const [contactHours, setContactHours] = useState<string>('');
 

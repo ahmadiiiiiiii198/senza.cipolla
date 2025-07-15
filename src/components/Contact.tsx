@@ -22,7 +22,7 @@ interface ContactContent {
 
 const Contact = () => {
   const { toast } = useToast();
-  const { formattedHours } = useBusinessHours();
+  const { formattedHours } = useBusinessHours(true, 'contact');
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
