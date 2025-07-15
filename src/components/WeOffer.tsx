@@ -7,29 +7,29 @@ const WeOffer = () => {
 
   // Dynamic content based on translations
   const getOfferContent = () => ({
-    heading: t('weOffer'),
-    subheading: t('weOfferSubtitle'),
+    heading: t('weOffer') || 'Le Nostre Specialità',
+    subheading: t('weOfferSubtitle') || 'Scopri le nostre pizze tradizionali preparate con ingredienti freschi e di qualità',
     offers: [
       {
         id: 1,
-        title: t('pizzaMetroTitle'),
-        description: t('pizzaMetroDesc'),
-        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: t('specialtyBadge')
+        title: t('pizzaMetroTitle') || 'Pizza al Metro',
+        description: t('pizzaMetroDesc') || 'Pizza al metro per 4-5 persone, perfetta per condividere',
+        image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        badge: t('specialtyBadge') || 'Specialità'
       },
       {
         id: 2,
-        title: t('flourQualityTitle'),
-        description: t('flourQualityDesc'),
+        title: t('flourQualityTitle') || 'Ingredienti Freschi',
+        description: t('flourQualityDesc') || 'Solo ingredienti freschi e di qualità per le nostre pizze',
         image: "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: t('qualityBadge')
+        badge: t('qualityBadge') || 'Qualità'
       },
       {
         id: 3,
-        title: t('italianPizzaTitle'),
-        description: t('italianPizzaDesc'),
+        title: t('italianPizzaTitle') || 'Pizza Italiana',
+        description: t('italianPizzaDesc') || 'Autentica pizza italiana preparata con forno a legna',
         image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: t('authenticBadge')
+        badge: t('authenticBadge') || 'Autentica'
       }
     ]
   });
@@ -105,7 +105,7 @@ const WeOffer = () => {
 
         {/* Offers Grid */}
         <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {offerContent.offers.map((offer, index) => (
+          {(offerContent.offers || []).map((offer, index) => (
             <div 
               key={offer.id}
               className={`group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover-lift animate-fade-in-up`}
