@@ -7,48 +7,19 @@ async function ensureSettingsTable(): Promise<boolean> {
   try {
     console.log('[InitDB] Ensuring settings table exists...');
 
-    // Try to create the settings table if it doesn't exist
-    const { error } = await supabase.rpc('exec_sql', {
-      sql: `
-        CREATE TABLE IF NOT EXISTS settings (
-          key TEXT PRIMARY KEY,
-          value JSONB,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-        );
+    // Try to query the settings table to see if it exists
+    const { error } = await supabase
+      .from('settings')
+      .select('key')
+      .limit(1);
 
-        CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
-        CREATE INDEX IF NOT EXISTS idx_settings_updated_at ON settings(updated_at);
-
-        -- Enable RLS
-        ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
-
-        -- Create RLS policies
-        DROP POLICY IF EXISTS "Allow public read access to settings" ON settings;
-        CREATE POLICY "Allow public read access to settings"
-          ON settings
-          FOR SELECT
-          USING (true);
-
-        DROP POLICY IF EXISTS "Allow authenticated users to update settings" ON settings;
-        CREATE POLICY "Allow authenticated users to update settings"
-          ON settings
-          FOR UPDATE
-          USING (auth.role() = 'authenticated')
-          WITH CHECK (auth.role() = 'authenticated');
-
-        DROP POLICY IF EXISTS "Allow authenticated users to insert settings" ON settings;
-        CREATE POLICY "Allow authenticated users to insert settings"
-          ON settings
-          FOR INSERT
-          WITH CHECK (auth.role() = 'authenticated');
-      `
-    });
-
-    if (error) {
-      console.log('[InitDB] Settings table creation via RPC failed, table might already exist:', error.message);
+    if (error && error.code === 'PGRST116') {
+      console.log('[InitDB] Settings table does not exist, but we cannot create it via client');
+      console.log('[InitDB] Please ensure the settings table exists in your Supabase database');
+    } else if (error) {
+      console.log('[InitDB] Settings table check error:', error.message);
     } else {
-      console.log('[InitDB] Settings table ensured');
+      console.log('[InitDB] Settings table exists and is accessible');
     }
 
     return true;
@@ -63,31 +34,19 @@ async function ensureContentSectionsTable(): Promise<boolean> {
   try {
     console.log('[InitDB] Ensuring content_sections table exists...');
 
-    // Try to create the table if it doesn't exist
-    const { error } = await supabase.rpc('exec_sql', {
-      sql: `
-        CREATE TABLE IF NOT EXISTS content_sections (
-          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-          section_key TEXT NOT NULL UNIQUE,
-          section_name TEXT NOT NULL,
-          content_type TEXT NOT NULL,
-          content_value TEXT,
-          metadata JSONB,
-          is_active BOOLEAN DEFAULT true,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-        );
+    // Try to query the content_sections table to see if it exists
+    const { error } = await supabase
+      .from('content_sections')
+      .select('id')
+      .limit(1);
 
-        CREATE INDEX IF NOT EXISTS idx_content_sections_section_key ON content_sections(section_key);
-        CREATE INDEX IF NOT EXISTS idx_content_sections_active ON content_sections(is_active);
-        CREATE INDEX IF NOT EXISTS idx_content_sections_metadata ON content_sections USING GIN(metadata);
-      `
-    });
-
-    if (error) {
-      console.log('[InitDB] Table creation via RPC failed, table might already exist:', error.message);
+    if (error && error.code === 'PGRST116') {
+      console.log('[InitDB] Content sections table does not exist, but we cannot create it via client');
+      console.log('[InitDB] Please ensure the content_sections table exists in your Supabase database');
+    } else if (error) {
+      console.log('[InitDB] Content sections table check error:', error.message);
     } else {
-      console.log('[InitDB] Content sections table ensured');
+      console.log('[InitDB] Content sections table exists and is accessible');
     }
 
     return true;

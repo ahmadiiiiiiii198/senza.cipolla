@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +34,7 @@ const SimpleOrderTracker: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isRealTimeActive, setIsRealTimeActive] = useState(false);
   const { toast } = useToast();
+  const subscriptionRef = useRef<any>(null);
 
   // CLIENT-SPECIFIC ORDER DETECTION WITH SMART FALLBACK
   useEffect(() => {
@@ -76,6 +77,13 @@ const SimpleOrderTracker: React.FC = () => {
     if (!order) {
       console.log('❌ No order found, skipping real-time setup');
       return;
+    }
+
+    // Clean up existing subscription first
+    if (subscriptionRef.current) {
+      console.log('🔌 Cleaning up existing subscription before creating new one');
+      supabase.removeChannel(subscriptionRef.current);
+      subscriptionRef.current = null;
     }
 
     console.log('📡 BULLETPROOF: Setting up real-time subscription for order:', order.id);
@@ -151,9 +159,15 @@ const SimpleOrderTracker: React.FC = () => {
         }
       });
 
+    // Store the subscription reference
+    subscriptionRef.current = channel;
+
     return () => {
       console.log('🔌 Cleaning up real-time subscription for channel:', channelName);
-      supabase.removeChannel(channel);
+      if (subscriptionRef.current) {
+        supabase.removeChannel(subscriptionRef.current);
+        subscriptionRef.current = null;
+      }
       setIsRealTimeActive(false);
     };
   }, [order?.id, toast]); // Only depend on order.id to avoid unnecessary re-subscriptions
