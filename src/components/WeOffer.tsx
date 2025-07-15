@@ -52,14 +52,20 @@ const WeOffer = () => {
   useEffect(() => {
     const loadContent = async () => {
       try {
+        console.log('🔄 [WeOffer] Starting content load...');
         // Initialize We Offer content in database if it doesn't exist
         const { initializeWeOfferContent } = await import('@/utils/initializeWeOfferContent');
         const loadedContent = await initializeWeOfferContent();
 
-        setOfferContent(loadedContent);
-        console.log('✅ [WeOffer] Content loaded successfully');
+        if (loadedContent && loadedContent.offers && Array.isArray(loadedContent.offers)) {
+          setOfferContent(loadedContent);
+          console.log('✅ [WeOffer] Content loaded successfully:', loadedContent);
+        } else {
+          console.warn('⚠️ [WeOffer] Invalid content structure, using defaults');
+          // Keep default content
+        }
       } catch (error) {
-        console.warn('⚠️ [WeOffer] Failed to load content, using defaults:', error);
+        console.error('❌ [WeOffer] Failed to load content, using defaults:', error);
         // Fallback to default content if database fails
       }
     };

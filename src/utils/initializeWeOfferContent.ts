@@ -45,7 +45,7 @@ export const initializeWeOfferContent = async () => {
     };
     
     // Save to database
-    await settingsService.setSetting('weOfferContent', defaultWeOfferContent);
+    await settingsService.updateSetting('weOfferContent', defaultWeOfferContent);
     
     console.log('✅ [WeOffer] We Offer content successfully initialized in database');
     return defaultWeOfferContent;
