@@ -49,11 +49,35 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache when offline
 self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests and chrome-extension requests
+  if (event.request.method !== 'GET' || event.request.url.startsWith('chrome-extension://')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
+        // Return cached version if available
+        if (response) {
+          return response;
+        }
+
+        // Try to fetch from network
+        return fetch(event.request).catch((error) => {
+          console.log('🌐 Network fetch failed for:', event.request.url, error.message);
+
+          // Return a basic response for favicon requests to prevent errors
+          if (event.request.url.includes('favicon.ico')) {
+            return new Response('', { status: 404, statusText: 'Not Found' });
+          }
+
+          // For other requests, throw the error
+          throw error;
+        });
+      })
+      .catch((error) => {
+        console.log('🔄 Cache and network both failed for:', event.request.url);
+        return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
       })
   );
 });
@@ -239,7 +263,13 @@ self.addEventListener('error', (event) => {
 });
 
 self.addEventListener('unhandledrejection', (event) => {
-  console.error('❌ Service Worker unhandled rejection:', event.reason);
+  // Prevent the default unhandled rejection behavior
+  event.preventDefault();
+
+  // Only log non-fetch related errors to reduce noise
+  if (!event.reason?.message?.includes('Failed to fetch')) {
+    console.error('❌ Service Worker unhandled rejection:', event.reason);
+  }
 });
 
 console.log('🚀 Service Worker loaded and ready for order notifications!');
