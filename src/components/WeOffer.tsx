@@ -5,6 +5,8 @@ import { useLanguage } from '@/hooks/use-language';
 const WeOffer = () => {
   const { t } = useLanguage();
 
+  console.log('🍕 [WeOffer] Component rendering...');
+
   // Dynamic content based on translations
   const getOfferContent = () => ({
     heading: t('weOffer') || 'Le Nostre Specialità',
@@ -69,6 +71,8 @@ const WeOffer = () => {
     setImagesLoaded(prev => ({ ...prev, [offerId]: true }));
   };
 
+  console.log('🍕 [WeOffer] Rendering with content:', offerContent);
+
   return (
     <section className="py-20 bg-gradient-to-br from-pizza-cream via-white to-pizza-orange/10 relative overflow-hidden">
       {/* Pizza-themed background decorations */}
@@ -91,10 +95,12 @@ const WeOffer = () => {
         <div className="text-center mb-16 animate-fade-in-up">
           <div className="flex items-center justify-center space-x-4 mb-6">
             <Pizza className="text-pizza-red animate-pizza-spin" size={48} />
+            <Star className="text-pizza-orange animate-pulse" size={32} />
             <Utensils className="text-pizza-orange animate-tomato-bounce" size={48} />
+            <Star className="text-pizza-green animate-pulse animation-delay-1000" size={32} />
             <Pizza className="text-pizza-green animate-pizza-spin animation-delay-2000" size={48} />
           </div>
-          
+
           <h2 className="text-4xl md:text-5xl font-bold text-pizza-dark mb-6 font-fredoka">
             🍕 {offerContent.heading}
           </h2>

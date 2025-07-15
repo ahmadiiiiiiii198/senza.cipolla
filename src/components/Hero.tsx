@@ -13,7 +13,7 @@ const Hero = () => {
   });
 
   const [logoSettings, setLogoSettings] = useState({
-    logoUrl: "/pizzeria-regina-logo.png",
+    logoUrl: "/logo.png",
     altText: "Pizzeria Regina 2000 Torino Logo",
   });
 

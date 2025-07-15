@@ -9,7 +9,7 @@ const TwoImageSection = () => {
       description: "Da oltre 20 anni serviamo la migliore pizza italiana nel cuore di Torino. La nostra passione per la tradizione culinaria italiana si riflette in ogni pizza che prepariamo con ingredienti freschi e di qualità."
     },
     rightImage: {
-      url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       title: "Ingredienti Freschi",
       description: "Utilizziamo solo ingredienti freschi e di prima qualità. La nostra mozzarella viene preparata quotidianamente, i pomodori sono selezionati dalle migliori coltivazioni italiane e l'impasto viene lavorato a mano ogni giorno."
     }

@@ -13,7 +13,7 @@ const YouTubeSection = () => {
     title: "Guarda Come Prepariamo le Nostre Pizze",
     description: "Scopri i segreti della nostra cucina e la passione che mettiamo nella preparazione di ogni pizza. Dal nostro forno a legna alla tua tavola.",
     youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    thumbnailUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+    thumbnailUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
   };
 
   useEffect(() => {

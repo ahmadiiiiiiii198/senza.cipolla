@@ -100,15 +100,23 @@ class ContinuousAudioNotifier {
         .eq('is_active', true)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading active sound:', error);
+      if (error) {
+        if (error.code === 'PGRST116') {
+          console.log('🎵 No active sound found, using default');
+        } else if (error.code === 'PGRST301') {
+          console.log('🎵 Permission denied for notification_sounds, using default');
+        } else {
+          console.error('🎵 Error loading active sound:', error);
+        }
+        this.activeSound = { name: 'Default', sound_type: 'built-in' };
         return;
       }
 
       this.activeSound = data;
       console.log('🎵 Active sound loaded:', data?.name || 'Default');
     } catch (error) {
-      console.error('Error loading active sound:', error);
+      console.error('🎵 Error loading active sound:', error);
+      this.activeSound = { name: 'Default', sound_type: 'built-in' };
     }
   }
 

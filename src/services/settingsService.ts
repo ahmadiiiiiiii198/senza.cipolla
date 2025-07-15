@@ -134,7 +134,7 @@ class SettingsService {
               id: 1,
               title: "Pizza Metro Finchi 5 Gusti",
               description: "Experience our signature meter-long pizza with up to 5 different flavors in one amazing creation. Perfect for sharing with family and friends.",
-              image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+              image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
               badge: "Specialty"
             },
             {
