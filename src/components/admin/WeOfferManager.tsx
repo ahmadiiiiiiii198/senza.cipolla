@@ -79,11 +79,18 @@ const WeOfferManager = () => {
       const { initializeWeOfferContent } = await import('@/utils/initializeWeOfferContent');
       const loadedContent = await initializeWeOfferContent();
 
-      setContent(loadedContent);
-      console.log('✅ [WeOfferManager] Content loaded successfully');
+      // Ensure loaded content has proper structure
+      if (loadedContent && loadedContent.offers && Array.isArray(loadedContent.offers)) {
+        setContent(loadedContent);
+        console.log('✅ [WeOfferManager] Content loaded successfully');
+      } else {
+        console.warn('⚠️ [WeOfferManager] Loaded content has invalid structure, using default');
+        // Keep the default content if loaded content is invalid
+      }
     } catch (error) {
       console.error('❌ [WeOfferManager] Failed to load content:', error);
       toast.error('Failed to load We Offer content');
+      // Keep the default content on error
     } finally {
       setLoading(false);
     }
@@ -127,7 +134,7 @@ const WeOfferManager = () => {
   const updateOffer = (offerId: number, field: keyof OfferItem, value: string) => {
     setContent(prev => ({
       ...prev,
-      offers: prev.offers.map(offer => 
+      offers: (prev.offers || []).map(offer =>
         offer.id === offerId ? { ...offer, [field]: value } : offer
       )
     }));
@@ -302,7 +309,7 @@ const WeOfferManager = () => {
         </TabsContent>
 
         {/* Individual Offer Tabs */}
-        {content.offers.map((offer, index) => (
+        {(content.offers || []).map((offer, index) => (
           <TabsContent key={offer.id} value={`offer${offer.id}`}>
             <Card>
               <CardHeader>
