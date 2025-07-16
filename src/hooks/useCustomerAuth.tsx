@@ -19,7 +19,7 @@ interface CustomerAuthContextType {
   profile: UserProfile | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string }>;
+  signUp: (email: string, password: string, profileData: { fullName: string; phone?: string; address?: string }) => Promise<{ success: boolean; error?: string }>;
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>;
@@ -112,16 +112,18 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   // Sign up function
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, profileData: { fullName: string; phone?: string; address?: string }) => {
     try {
       setLoading(true);
-      
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            full_name: fullName,
+            full_name: profileData.fullName,
+            phone: profileData.phone,
+            default_address: profileData.address,
           },
         },
       });

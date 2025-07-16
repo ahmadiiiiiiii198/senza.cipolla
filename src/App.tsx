@@ -31,6 +31,7 @@ import SimpleStripeTest from "./components/SimpleStripeTest";
 import OrderStatusWidget from "./components/OrderStatusWidget";
 import AuthTest from "./components/AuthTest";
 import AuthTestHelper from "./components/AuthTestHelper";
+import AuthSeparationTest from "./components/AuthSeparationTest";
 import MyOrders from "./pages/MyOrders";
 
 const queryClient = new QueryClient();
@@ -120,6 +121,11 @@ const App = () => (
               <Route path="/auth-helper" element={
                 <ErrorBoundary componentName="AuthTestHelper">
                   <AuthTestHelper />
+                </ErrorBoundary>
+              } />
+              <Route path="/auth-separation-test" element={
+                <ErrorBoundary componentName="AuthSeparationTest">
+                  <AuthSeparationTest />
                 </ErrorBoundary>
               } />
               <Route path="/my-orders" element={

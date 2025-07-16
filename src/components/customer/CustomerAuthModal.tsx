@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, User, Mail, Lock, Phone, MapPin, Eye, EyeOff, LogIn, UserPlus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +17,7 @@ interface CustomerAuthModalProps {
 const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({ 
   isOpen, 
   onClose, 
-  defaultTab = 'login' 
+  defaultTab = 'register' 
 }) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [showPassword, setShowPassword] = useState(false);
@@ -25,13 +25,35 @@ const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
   const { signIn, signUp } = useCustomerAuth();
   const { toast } = useToast();
 
+  // Handle body scroll locking and keyboard events
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+
+      document.addEventListener('keydown', handleEscape);
+
+      return () => {
+        document.body.style.overflow = 'unset';
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isOpen, onClose]);
+
   // Login form state
   const [loginData, setLoginData] = useState({
     email: '',
-    password: '',
+    password: ''
   });
 
-  // Register form state
+  // Registration form state
   const [registerData, setRegisterData] = useState({
     fullName: '',
     email: '',
@@ -93,14 +115,18 @@ const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
     setLoading(true);
 
     try {
-      const result = await signUp(registerData.email, registerData.password, registerData.fullName);
-      
+      const result = await signUp(registerData.email, registerData.password, {
+        fullName: registerData.fullName,
+        phone: registerData.phone,
+        address: registerData.address,
+      });
+
       if (result.success) {
         toast({
-          title: 'Registrazione completata',
+          title: 'Registrazione completata!',
           description: 'Controlla la tua email per confermare l\'account',
         });
-        setActiveTab('login');
+        onClose();
         setRegisterData({
           fullName: '',
           email: '',
@@ -129,233 +155,365 @@ const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <Card className="w-full max-w-md bg-white shadow-2xl border-0 rounded-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-        <CardHeader className="relative bg-gradient-to-r from-red-600 to-orange-500 text-white pb-8">
+  const modalContent = (
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300"
+      style={{
+        zIndex: 9999,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflowY: 'auto',
+        padding: '1rem'
+      }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <Card
+        className="w-full max-w-md max-h-[85vh] bg-white shadow-2xl border-0 rounded-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300 my-4 flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <CardHeader className="relative bg-gradient-to-br from-red-600 to-red-700 text-white p-6">
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={onClose}
-            className="absolute right-3 top-3 h-8 w-8 p-0 text-white hover:bg-white/20 rounded-full"
+            className="absolute right-3 top-3 h-8 w-8 p-0 text-white hover:bg-white/20 rounded-full transition-all duration-200"
           >
             <X className="h-4 w-4" />
           </Button>
-          <div className="text-center pt-4">
-            <div className="bg-white/20 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-              <User className="h-8 w-8 text-white" />
+          <div className="text-center">
+            <div className="bg-white/20 p-3 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+              <User className="h-6 w-6 text-white" />
             </div>
-            <CardTitle className="text-2xl font-bold text-white">Account Cliente</CardTitle>
-            <CardDescription className="text-white/90 mt-2">
-              Accedi o registrati per gestire i tuoi ordini
+            <CardTitle id="modal-title" className="text-xl font-bold text-white mb-2">
+              Pizzeria Regina 2000
+            </CardTitle>
+            <CardDescription className="text-red-100 text-sm">
+              {activeTab === 'login' ? 'Accedi al tuo account' : 'Crea il tuo account'}
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="p-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-xl mb-6">
-              <TabsTrigger
-                value="login"
-                className="rounded-lg data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
-              >
-                <LogIn className="h-4 w-4 mr-2" />
-                Accedi
-              </TabsTrigger>
-              <TabsTrigger
-                value="register"
-                className="rounded-lg data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Registrati
-              </TabsTrigger>
-            </TabsList>
 
-            {/* Login Tab */}
-            <TabsContent value="login" className="space-y-6 mt-6">
-              <form onSubmit={handleLogin} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email" className="text-sm font-medium text-gray-700">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        <div className="flex flex-col flex-1 min-h-0">
+          <div className="p-6 pb-4 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          {/* Toggle Buttons */}
+          <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+            <Button
+              type="button"
+              onClick={() => setActiveTab('login')}
+              className={`flex-1 rounded-md py-2 px-4 text-sm font-medium transition-all duration-200 ${
+                activeTab === 'login'
+                  ? "bg-red-600 text-white shadow-sm hover:bg-red-700"
+                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-200 bg-transparent"
+              }`}
+            >
+              <LogIn className="h-4 w-4 mr-2" />
+              Accedi
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setActiveTab('register')}
+              className={`flex-1 rounded-md py-2 px-4 text-sm font-medium transition-all duration-200 ${
+                activeTab === 'register'
+                  ? "bg-red-600 text-white shadow-sm hover:bg-red-700"
+                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-200 bg-transparent"
+              }`}
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Registrati
+            </Button>
+          </div>
+
+          {/* Login Form */}
+          {activeTab === 'login' && (
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Accedi al tuo account</h3>
+                <p className="text-sm text-gray-600">Inserisci le tue credenziali</p>
+              </div>
+
+              <form id="login-form" onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="login-email" className="text-sm font-medium text-gray-700 flex items-center">
+                      <Mail className="h-4 w-4 mr-1 text-red-600" />
+                      Email
+                    </Label>
                     <Input
                       id="login-email"
                       type="email"
                       placeholder="la-tua-email@esempio.com"
                       value={loginData.email}
                       onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                      className="pl-10 h-12 border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
+                      className="h-10 text-sm border border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
                       required
                     />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="login-password" className="text-sm font-medium text-gray-700">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="login-password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="La tua password"
-                      value={loginData.password}
-                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                      className="pl-10 pr-10 h-12 border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-1 top-1 h-10 w-10 p-0 hover:bg-gray-100 rounded-lg"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="login-password" className="text-sm font-medium text-gray-700 flex items-center">
+                      <Lock className="h-4 w-4 mr-1 text-red-600" />
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="login-password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="La tua password"
+                        value={loginData.password}
+                        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                        className="h-10 text-sm border border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg pr-10"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-1 top-1 h-8 w-8 p-0 hover:bg-gray-200 rounded-md"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4 text-gray-600" /> : <Eye className="h-4 w-4 text-gray-600" />}
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Accesso in corso...
-                    </>
-                  ) : (
-                    <>
-                      <LogIn className="h-4 w-4 mr-2" />
-                      Accedi
-                    </>
-                  )}
-                </Button>
+
               </form>
-            </TabsContent>
+            </div>
+          )}
 
-            {/* Register Tab */}
-            <TabsContent value="register" className="space-y-6 mt-6">
-              <form onSubmit={handleRegister} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="register-name" className="text-sm font-medium text-gray-700">Nome Completo</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="register-name"
-                      type="text"
-                      placeholder="Il tuo nome completo"
-                      value={registerData.fullName}
-                      onChange={(e) => setRegisterData({ ...registerData, fullName: e.target.value })}
-                      className="pl-10 h-12 border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
-                      required
-                    />
-                  </div>
+          {/* Registration Form */}
+          {activeTab === 'register' && (
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Crea il tuo account</h3>
+                <p className="text-sm text-gray-600 mb-3">Registrati per gestire i tuoi ordini</p>
+
+                {/* Benefits */}
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-left">
+                  <h4 className="text-sm font-semibold text-red-800 mb-2 flex items-center justify-center">
+                    <UserPlus className="h-4 w-4 mr-1" />
+                    Vantaggi dell'account
+                  </h4>
+                  <ul className="text-xs text-red-700 space-y-1">
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                      Tracciamento ordini in tempo reale
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                      Storico completo degli ordini
+                    </li>
+                  </ul>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="register-email" className="text-sm font-medium text-gray-700">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="register-email"
-                      type="email"
-                      placeholder="la-tua-email@esempio.com"
-                      value={registerData.email}
-                      onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                      className="pl-10 h-12 border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
-                      required
-                    />
-                  </div>
-                </div>
+              <form id="register-form" onSubmit={handleRegister} className="space-y-4">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="register-name" className="text-sm font-medium text-gray-700 flex items-center">
+                        <User className="h-4 w-4 mr-1 text-red-600" />
+                        Nome Completo
+                      </Label>
+                      <Input
+                        id="register-name"
+                        type="text"
+                        placeholder="Il tuo nome completo"
+                        value={registerData.fullName}
+                        onChange={(e) => setRegisterData({ ...registerData, fullName: e.target.value })}
+                        className="h-10 text-sm border border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
+                        required
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="register-password" className="text-sm font-medium text-gray-700">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="register-password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Almeno 6 caratteri"
-                      value={registerData.password}
-                      onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                      className="pl-10 pr-10 h-12 border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
-                      required
-                      minLength={6}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-1 top-1 h-10 w-10 p-0 hover:bg-gray-100 rounded-lg"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="register-email" className="text-sm font-medium text-gray-700 flex items-center">
+                        <Mail className="h-4 w-4 mr-1 text-red-600" />
+                        Email
+                      </Label>
+                      <Input
+                        id="register-email"
+                        type="email"
+                        placeholder="la-tua-email@esempio.com"
+                        value={registerData.email}
+                        onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                        className="h-10 text-sm border border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
+                        required
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="register-confirm-password" className="text-sm font-medium text-gray-700">Conferma Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="register-confirm-password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Ripeti la password"
-                      value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                      className={`pl-10 h-12 border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg ${
-                        registerData.confirmPassword && registerData.password !== registerData.confirmPassword
-                          ? 'border-red-300 bg-red-50'
-                          : registerData.confirmPassword && registerData.password === registerData.confirmPassword
-                          ? 'border-green-300 bg-green-50'
-                          : ''
-                      }`}
-                      required
-                    />
-                  </div>
-                  {registerData.confirmPassword && (
-                    <div className="flex items-center space-x-2 mt-1">
-                      {registerData.password === registerData.confirmPassword ? (
-                        <div className="flex items-center text-green-600 text-xs">
-                          <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                          Le password corrispondono
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-red-600 text-xs">
-                          <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
-                          Le password non corrispondono
+                    <div className="space-y-2">
+                      <Label htmlFor="register-password" className="text-sm font-medium text-gray-700 flex items-center">
+                        <Lock className="h-4 w-4 mr-1 text-red-600" />
+                        Password
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="register-password"
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Almeno 6 caratteri"
+                          value={registerData.password}
+                          onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                          className="h-10 text-sm border border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg pr-10"
+                          required
+                          minLength={6}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-1 top-1 h-8 w-8 p-0 hover:bg-gray-200 rounded-md"
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4 text-gray-600" /> : <Eye className="h-4 w-4 text-gray-600" />}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="register-confirm-password" className="text-sm font-medium text-gray-700 flex items-center">
+                        <Lock className="h-4 w-4 mr-1 text-red-600" />
+                        Conferma Password
+                      </Label>
+                      <Input
+                        id="register-confirm-password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Ripeti la password"
+                        value={registerData.confirmPassword}
+                        onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
+                        className={`h-10 text-sm border focus:ring-red-500 rounded-lg transition-all duration-200 ${
+                          registerData.confirmPassword && registerData.password !== registerData.confirmPassword
+                            ? 'border-red-400 bg-red-50 focus:border-red-500'
+                            : registerData.confirmPassword && registerData.password === registerData.confirmPassword
+                            ? 'border-green-400 bg-green-50 focus:border-green-500'
+                            : 'border-gray-300 focus:border-red-500'
+                        }`}
+                        required
+                      />
+                      {registerData.confirmPassword && (
+                        <div className="flex items-center space-x-2 mt-1">
+                          {registerData.password === registerData.confirmPassword ? (
+                            <div className="flex items-center text-green-600 text-xs font-medium">
+                              <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                              Le password corrispondono
+                            </div>
+                          ) : (
+                            <div className="flex items-center text-red-600 text-xs font-medium">
+                              <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
+                              Le password non corrispondono
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="register-phone" className="text-sm font-medium text-gray-700 flex items-center">
+                        <Phone className="h-4 w-4 mr-1 text-red-600" />
+                        Telefono
+                      </Label>
+                      <Input
+                        id="register-phone"
+                        type="tel"
+                        placeholder="+39 123 456 7890"
+                        value={registerData.phone}
+                        onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
+                        className="h-10 text-sm border border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="register-address" className="text-sm font-medium text-gray-700 flex items-center">
+                        <MapPin className="h-4 w-4 mr-1 text-red-600" />
+                        Indirizzo
+                      </Label>
+                      <Input
+                        id="register-address"
+                        type="text"
+                        placeholder="Via, Numero, Città"
+                        value={registerData.address}
+                        onChange={(e) => setRegisterData({ ...registerData, address: e.target.value })}
+                        className="h-10 text-sm border border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-lg"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Registrazione in corso...
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Registrati
-                    </>
-                  )}
-                </Button>
+
               </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
+            </div>
+          )}
+          </div>
+
+          {/* Fixed Button Area */}
+          <div className="p-6 pt-4 border-t border-gray-100 bg-white flex-shrink-0">
+            {activeTab === 'login' ? (
+              <Button
+                type="submit"
+                form="login-form"
+                className="w-full h-10 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-sm font-semibold rounded-lg transition-all duration-200"
+                disabled={loading || !loginData.email || !loginData.password}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Accesso in corso...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Accedi
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                form="register-form"
+                className="w-full h-10 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-sm font-semibold rounded-lg transition-all duration-200"
+                disabled={
+                  loading ||
+                  !registerData.fullName ||
+                  !registerData.email ||
+                  !registerData.password ||
+                  !registerData.confirmPassword ||
+                  !registerData.phone ||
+                  !registerData.address ||
+                  (registerData.password && registerData.confirmPassword && registerData.password !== registerData.confirmPassword)
+                }
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Registrazione...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Crea Account
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
       </Card>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default CustomerAuthModal;

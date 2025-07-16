@@ -157,25 +157,22 @@ export const useAdminAuth = () => {
 
   const handleLogout = async () => {
     try {
-      // Sign out from Supabase if needed
-      try {
-        await supabase.auth.signOut();
-      } catch (e) {
-        console.warn("Error signing out from Supabase:", e);
-      }
-      
-      // Remove auth state from localStorage
+      // Admin authentication is completely separate from client authentication
+      // We only clear admin-specific localStorage data, NOT Supabase sessions
+      // This ensures client authentication remains unaffected
+
+      // Remove admin auth state from localStorage
       localStorage.removeItem('adminAuthenticated');
-      
+
       setIsAuthenticated(false);
       navigate("/admin");
-      
+
       toast({
         title: "Logged out",
-        description: "You've been successfully logged out."
+        description: "You've been successfully logged out from admin panel."
       });
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Admin logout error:", error);
     }
   };
 
