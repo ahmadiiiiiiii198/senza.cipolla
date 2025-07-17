@@ -49,7 +49,7 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
   const checkBusinessStatus = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       if (process.env.NODE_ENV === 'development') {
         console.log('🕒 [BusinessHoursProvider] Checking business hours status...');
       }
@@ -71,7 +71,12 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
       }
     } catch (error) {
       console.error('❌ [BusinessHoursProvider] Error checking business status:', error);
-      setMessage('Errore nel caricamento degli orari');
+      // Set safe defaults on error
+      setIsOpen(true); // Default to open to allow orders
+      setMessage('Orari non disponibili');
+      setNextOpenTime(undefined);
+      setTodayHours(undefined);
+      setFormattedHours('Orari non disponibili');
     } finally {
       setIsLoading(false);
     }
@@ -85,9 +90,10 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
       return await businessHoursService.validateOrderTime(orderTime);
     } catch (error) {
       console.error('❌ [BusinessHoursProvider] Error validating order time:', error);
+      // Default to allowing orders on validation error
       return {
-        valid: false,
-        message: 'Errore nella validazione degli orari'
+        valid: true,
+        message: 'Validazione orari non disponibile - ordine consentito'
       };
     }
   }, []);
