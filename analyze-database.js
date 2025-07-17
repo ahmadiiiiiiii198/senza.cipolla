@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Use the same configuration as the project
-const supabaseUrl = 'https://yytnyqsfofivcxbsexvs.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5dG55cXNmb2ZpdmN4YnNleHZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5NTI4NzQsImV4cCI6MjA1MjUyODg3NH0.Ej5Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8';
+// Correct Supabase configuration for Pizzeria Regina 2000
+const supabaseUrl = 'https://sixnfemtvmighstbgrbd.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 

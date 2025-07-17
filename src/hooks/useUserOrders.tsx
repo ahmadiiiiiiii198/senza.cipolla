@@ -45,6 +45,93 @@ export const useUserOrders = (): UseUserOrdersReturn => {
 
   // Load user orders from database
   const loadUserOrders = useCallback(async () => {
+    console.log('📋 [USER-ORDERS] Starting loadUserOrders...');
+    console.log('📋 [USER-ORDERS] Auth state:', { isAuthenticated, userId: user?.id });
+
+    if (!isAuthenticated || !user) {
+      console.log('📋 [USER-ORDERS] Not authenticated or no user, clearing orders');
+      setOrders([]);
+      return;
+    }
+
+    console.log('📋 [USER-ORDERS] Setting loading to true');
+    const startTime = Date.now();
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('📋 [USER-ORDERS] Executing user orders query...');
+
+      // Add timeout protection
+      const queryPromise = supabase
+        .from('orders')
+        .select(`
+          id,
+          order_number,
+          customer_name,
+          customer_email,
+          customer_phone,
+          customer_address,
+          total_amount,
+          status,
+          order_status,
+          payment_status,
+          created_at,
+          updated_at,
+          order_items (
+            id,
+            product_name,
+            quantity,
+            product_price,
+            subtotal,
+            special_requests,
+            toppings
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('User orders query timeout')), 5000)
+      );
+
+      const { data, error: fetchError } = await Promise.race([queryPromise, timeoutPromise]) as any;
+
+      const queryTime = Date.now() - startTime;
+      console.log(`📋 [USER-ORDERS] Query completed in ${queryTime}ms`);
+      console.log('📋 [USER-ORDERS] Query result:', {
+        ordersCount: data?.length || 0,
+        hasError: !!fetchError,
+        errorMessage: fetchError?.message
+      });
+
+      if (fetchError) {
+        console.error('📋 [USER-ORDERS] Error loading user orders:', fetchError);
+
+        // Handle specific error cases
+        if (fetchError.message?.includes('user_id')) {
+          console.warn('📋 [USER-ORDERS] User ID related error, user may not be fully authenticated yet');
+          setError('Caricamento ordini in corso...');
+        } else {
+          setError('Errore durante il caricamento degli ordini');
+        }
+        return;
+      }
+
+      console.log('📋 [USER-ORDERS] Setting orders state with', data?.length || 0, 'orders');
+      setOrders(data || []);
+    } catch (error) {
+      console.error('📋 [USER-ORDERS] Exception in loadUserOrders:', error);
+      setError('Si è verificato un errore durante il caricamento degli ordini');
+    } finally {
+      const totalTime = Date.now() - startTime;
+      console.log(`📋 [USER-ORDERS] loadUserOrders completed in ${totalTime}ms, setting loading to false`);
+      setLoading(false);
+    }
+  }, [isAuthenticated, user]);
+
+  // Refresh orders - FIXED to avoid circular dependency
+  const refreshOrders = useCallback(async () => {
     if (!isAuthenticated || !user) {
       setOrders([]);
       return;
@@ -83,24 +170,17 @@ export const useUserOrders = (): UseUserOrdersReturn => {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
-        console.error('Error loading user orders:', fetchError);
         setError('Errore durante il caricamento degli ordini');
         return;
       }
 
       setOrders(data || []);
     } catch (error) {
-      console.error('Error loading user orders:', error);
       setError('Si è verificato un errore durante il caricamento degli ordini');
     } finally {
       setLoading(false);
     }
   }, [isAuthenticated, user]);
-
-  // Refresh orders
-  const refreshOrders = useCallback(async () => {
-    await loadUserOrders();
-  }, [loadUserOrders]);
 
   // Get the most recent active order (not delivered or cancelled)
   const getActiveOrder = useCallback((): Order | null => {
@@ -112,39 +192,118 @@ export const useUserOrders = (): UseUserOrdersReturn => {
     return activeOrder || null;
   }, [orders]);
 
-  // Check if user has any active orders
-  const hasActiveOrders = useCallback((): boolean => {
-    return getActiveOrder() !== null;
-  }, [getActiveOrder]);
+  // Check if user has any active orders - memoized to prevent recalculation
+  const hasActiveOrders = useMemo((): boolean => {
+    const activeStatuses = ['confirmed', 'preparing', 'ready', 'arrived'];
+    return orders.some(order => {
+      const currentStatus = order.order_status || order.status;
+      return activeStatuses.includes(currentStatus);
+    });
+  }, [orders]);
 
-  // Load orders when user authentication changes
+  // Load orders when user authentication changes - FIXED infinite loop by inlining
   useEffect(() => {
+    console.log('📋 [USER-ORDERS-EFFECT] Auth state changed, checking if should load orders...');
+    console.log('📋 [USER-ORDERS-EFFECT] State:', { isAuthenticated, hasUser: !!user });
+
     if (isAuthenticated && user) {
-      loadUserOrders();
+      console.log('📋 [USER-ORDERS-EFFECT] User authenticated, loading orders...');
+
+      // INLINE the loadUserOrders logic to avoid dependency issues
+      const loadOrdersInline = async () => {
+        console.log('📋 [USER-ORDERS] Starting loadUserOrders...');
+        console.log('📋 [USER-ORDERS] Auth state:', { isAuthenticated, userId: user?.id });
+
+        const startTime = Date.now();
+        setLoading(true);
+        setError(null);
+
+        try {
+          console.log('📋 [USER-ORDERS] Executing user orders query...');
+
+          const { data, error: fetchError } = await supabase
+            .from('orders')
+            .select(`
+              id,
+              order_number,
+              customer_name,
+              customer_email,
+              customer_phone,
+              customer_address,
+              total_amount,
+              status,
+              order_status,
+              payment_status,
+              created_at,
+              updated_at,
+              order_items (
+                id,
+                product_name,
+                quantity,
+                product_price,
+                subtotal,
+                special_requests,
+                toppings
+              )
+            `)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+          const queryTime = Date.now() - startTime;
+          console.log(`📋 [USER-ORDERS] Query completed in ${queryTime}ms`);
+
+          if (fetchError) {
+            console.error('📋 [USER-ORDERS] Error loading user orders:', fetchError);
+            setError('Errore durante il caricamento degli ordini');
+            return;
+          }
+
+          console.log('📋 [USER-ORDERS] Setting orders state with', data?.length || 0, 'orders');
+          setOrders(data || []);
+        } catch (error) {
+          console.error('📋 [USER-ORDERS] Exception in loadUserOrders:', error);
+          setError('Si è verificato un errore durante il caricamento degli ordini');
+        } finally {
+          const totalTime = Date.now() - startTime;
+          console.log(`📋 [USER-ORDERS] loadUserOrders completed in ${totalTime}ms, setting loading to false`);
+          setLoading(false);
+        }
+      };
+
+      // Add delay to allow profile to load first
+      const loadTimer = setTimeout(() => {
+        loadOrdersInline();
+      }, 100);
+
+      return () => clearTimeout(loadTimer);
     } else {
+      console.log('📋 [USER-ORDERS-EFFECT] User not authenticated, clearing orders');
       setOrders([]);
       setError(null);
     }
-  }, [isAuthenticated, user, loadUserOrders]);
+  }, [isAuthenticated, user]); // REMOVED loadUserOrders dependency
 
-  // Set up real-time subscription for user orders
+  // Set up real-time subscription for user orders - FIXED to prevent infinite loop
   useEffect(() => {
     if (!isAuthenticated || !user) return;
 
+    console.log('📋 [USER-ORDERS-SUB] Setting up subscription for user:', user.id);
+
+    const channelName = `user-orders-hook-${user.id}`;
     const channel = supabase
-      .channel(`user-orders-${user.id}`)
+      .channel(channelName)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'orders',
         filter: `user_id=eq.${user.id}`
       }, (payload) => {
-        console.log('User order updated:', payload);
-        
+        console.log('📋 [USER-ORDERS-SUB] Order updated:', payload);
+
         // Update the specific order in the list
-        setOrders(prevOrders => 
-          prevOrders.map(order => 
-            order.id === payload.new.id 
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
+            order.id === payload.new.id
               ? { ...order, ...payload.new }
               : order
           )
@@ -162,22 +321,70 @@ export const useUserOrders = (): UseUserOrdersReturn => {
         table: 'orders',
         filter: `user_id=eq.${user.id}`
       }, (payload) => {
-        console.log('New user order created:', payload);
-        
-        // Refresh orders to get the complete order with items
-        refreshOrders();
+        console.log('📋 [USER-ORDERS-SUB] New order created:', payload);
+
+        // INLINE the loadUserOrders logic to avoid dependency issues
+        const loadNewOrder = async () => {
+          if (!user) return;
+
+          setLoading(true);
+          setError(null);
+
+          try {
+            const { data, error: fetchError } = await supabase
+              .from('orders')
+              .select(`
+                id,
+                order_number,
+                customer_name,
+                customer_email,
+                customer_phone,
+                customer_address,
+                total_amount,
+                status,
+                order_status,
+                payment_status,
+                created_at,
+                updated_at,
+                order_items (
+                  id,
+                  product_name,
+                  quantity,
+                  product_price,
+                  subtotal,
+                  special_requests,
+                  toppings
+                )
+              `)
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false });
+
+            if (!fetchError) {
+              setOrders(data || []);
+            }
+          } catch (error) {
+            console.error('Error reloading orders after insert:', error);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        loadNewOrder();
 
         toast({
           title: 'Nuovo ordine creato!',
           description: 'Il tuo ordine è stato registrato con successo',
         });
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📋 [USER-ORDERS-SUB] Subscription status:', status);
+      });
 
     return () => {
+      console.log('📋 [USER-ORDERS-SUB] Cleaning up subscription for:', channelName);
       supabase.removeChannel(channel);
     };
-  }, [isAuthenticated, user, toast, refreshOrders]);
+  }, [isAuthenticated, user, toast]); // REMOVED loadUserOrders dependency
 
   return {
     orders,
@@ -185,7 +392,7 @@ export const useUserOrders = (): UseUserOrdersReturn => {
     error,
     refreshOrders,
     getActiveOrder,
-    hasActiveOrders: hasActiveOrders(),
+    hasActiveOrders,
   };
 };
 

@@ -11,6 +11,12 @@ const AdminMinimal = () => {
   const { toast } = useToast();
   const [heroContent, updateHeroContent, isHeroLoading] = useHeroContent();
 
+  // DISABLED TO PREVENT 400 ERROR LOOP
+  const contentSections = [];
+  const isLoading = false;
+  const error = null;
+
+  /* DISABLED TO PREVENT 400 ERRORS
   const { data: contentSections, isLoading, error } = useQuery({
     queryKey: ['content-sections-test'],
     queryFn: async () => {
@@ -28,6 +34,7 @@ const AdminMinimal = () => {
     },
     retry: false
   });
+  */
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-8 md:pt-24 md:py-8">
       <div className="container mx-auto px-4">

@@ -33,8 +33,20 @@ import AuthTest from "./components/AuthTest";
 import AuthTestHelper from "./components/AuthTestHelper";
 import AuthSeparationTest from "./components/AuthSeparationTest";
 import MyOrders from "./pages/MyOrders";
+import ComponentLoadingTest from "./tests/ComponentLoadingTest";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1, // Only retry once instead of 3 times
+      retryDelay: 1000, // Wait 1 second before retry
+      staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+      cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+      refetchOnWindowFocus: false, // Don't refetch on window focus
+      refetchOnMount: false, // Don't refetch on component mount if data exists
+    },
+  },
+});
 
 const App = () => (
   <ErrorBoundary componentName="App">
@@ -131,6 +143,11 @@ const App = () => (
               <Route path="/my-orders" element={
                 <ErrorBoundary componentName="MyOrders">
                   <MyOrders />
+                </ErrorBoundary>
+              } />
+              <Route path="/test-components" element={
+                <ErrorBoundary componentName="ComponentLoadingTest">
+                  <ComponentLoadingTest />
                 </ErrorBoundary>
               } />
               <Route path="*" element={<NotFound />} />

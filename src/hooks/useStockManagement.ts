@@ -14,16 +14,44 @@ export const useStockManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadSettings = async () => {
+    console.log('📦 [STOCK] Starting loadSettings...');
+    const startTime = Date.now();
+
     try {
+      console.log('📦 [STOCK] Setting isLoading to true');
       setIsLoading(true);
-      
-      const { data: settingsData, error } = await supabase
+
+      // Add timeout to prevent hanging
+      console.log('📦 [STOCK] Creating 8s timeout promise...');
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Stock settings loading timeout')), 8000)
+      );
+
+      console.log('📦 [STOCK] Creating settings query promise...');
+      const settingsPromise = supabase
         .from('settings')
         .select('key, value')
         .in('key', ['stock_management_enabled', 'default_stock_quantity']);
 
+      console.log('📦 [STOCK] Executing Promise.race with timeout...');
+      const { data: settingsData, error } = await Promise.race([settingsPromise, timeoutPromise]) as any;
+
+      const queryTime = Date.now() - startTime;
+      console.log(`📦 [STOCK] Query completed in ${queryTime}ms`);
+      console.log('📦 [STOCK] Query result:', {
+        settingsCount: settingsData?.length || 0,
+        hasError: !!error,
+        errorMessage: error?.message
+      });
+
       if (error) {
-        console.error('Error loading stock management settings:', error);
+        console.error('📦 [STOCK] Error loading stock management settings:', error);
+        console.log('📦 [STOCK] Using default settings due to error');
+        // Use defaults on error
+        setSettings({
+          enabled: false,
+          defaultQuantity: 100
+        });
         return;
       }
 
@@ -52,12 +80,19 @@ export const useStockManagement = () => {
         }
       });
 
+      console.log('📦 [STOCK] Processed settings:', newSettings);
       setSettings(newSettings);
-      console.log('📦 Stock management settings loaded:', newSettings);
 
     } catch (error) {
-      console.error('Error loading stock management settings:', error);
+      console.error('📦 [STOCK] Exception in loadSettings:', error);
+      console.log('📦 [STOCK] Using default settings due to exception');
+      setSettings({
+        enabled: false,
+        defaultQuantity: 100
+      });
     } finally {
+      const totalTime = Date.now() - startTime;
+      console.log(`📦 [STOCK] loadSettings completed in ${totalTime}ms, setting isLoading to false`);
       setIsLoading(false);
     }
   };

@@ -1,9 +1,9 @@
 // Debug script to test frontend loading mechanism
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase configuration (same as frontend)
-const SUPABASE_URL = 'https://despodpgvkszyexvcbft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlc3BvZHBndmtzenlleHZjYmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzNTcyMTAsImV4cCI6MjA2MzkzMzIxMH0.zyjFQA-Kr317M5l_6qjV_a-6ED2iU4wraRuYaa0iGEg';
+// Correct Supabase configuration for Pizzeria Regina 2000 (same as frontend)
+const SUPABASE_URL = 'https://sixnfemtvmighstbgrbd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 

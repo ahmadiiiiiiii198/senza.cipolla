@@ -47,13 +47,13 @@ CREATE TRIGGER update_content_sections_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_content_sections_updated_at();
 
--- Insert some default hero content sections
+-- Insert pizzeria content sections
 INSERT INTO content_sections (section_key, section_name, content_type, content_value, metadata, is_active) VALUES
   (
     'hero_main_content',
     'Hero Section - Main Content',
     'json',
-    '{"heading": "Francesco Fiori & Piante", "subheading": "Scopri l\'eleganza floreale firmata Francesco: fiori, piante e creazioni per ogni occasione. 🌸🌿", "backgroundImage": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80"}',
+    '{"heading": "Pizzeria Regina 2000", "subheading": "Autentica pizza italiana nel cuore di Torino", "backgroundImage": "/hero-pizza-bg.jpg"}',
     '{"section": "hero"}',
     true
   ),
@@ -61,7 +61,7 @@ INSERT INTO content_sections (section_key, section_name, content_type, content_v
     'about_main_content',
     'About Section - Main Content',
     'json',
-    '{"heading": "Chi Siamo", "content": "Francesco Fiori & Piante offre composizioni floreali per ogni occasione, dai funerali ai matrimoni. Troverai fiori freschi, piante da interno ed esterno, fiori finti di alta qualità e servizi su misura. Situati all\'interno del Mercato di Porta Palazzo a Torino, portiamo esperienza artigianale e passione per la bellezza naturale."}',
+    '{"heading": "La Nostra Storia", "content": "Dal 2000 portiamo a Torino la vera tradizione della pizza napoletana. La nostra famiglia ha tramandato di generazione in generazione i segreti di un impasto perfetto e di ingredienti selezionati. Utilizziamo solo ingredienti freschi e di prima qualità: mozzarella di bufala DOP, pomodori San Marzano, olio extravergine di oliva e farina tipo 00."}',
     '{"section": "about"}',
     true
   ),
@@ -69,8 +69,16 @@ INSERT INTO content_sections (section_key, section_name, content_type, content_v
     'categories_main_content',
     'Categories Section - Main Content',
     'json',
-    '{"heading": "Le Nostre Categorie", "subheading": "Scopri la nostra ampia gamma di prodotti e servizi"}',
+    '{"heading": "Le Nostre Pizze", "subheading": "Scopri la nostra ampia gamma di pizze tradizionali e speciali"}',
     '{"section": "categories"}',
+    true
+  ),
+  (
+    'menu_main_content',
+    'Menu Section - Main Content',
+    'json',
+    '{"heading": "Il Nostro Menu", "subheading": "Pizze preparate con ingredienti freschi e di qualità"}',
+    '{"section": "menu"}',
     true
   )
 ON CONFLICT (section_key) DO NOTHING;

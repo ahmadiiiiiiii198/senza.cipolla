@@ -23,7 +23,15 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(`ErrorBoundary caught an error in ${this.props.componentName || 'component'}:`, error, errorInfo);
+    console.error(`🚨 [ERROR-BOUNDARY] Error caught in ${this.props.componentName || 'component'}:`, error);
+    console.error('🚨 [ERROR-BOUNDARY] Component stack:', errorInfo.componentStack);
+    console.error('🚨 [ERROR-BOUNDARY] Error stack:', error.stack);
+
+    // Check if it's a subscription error (safely check for message)
+    const errorMessage = error?.message || '';
+    if (errorMessage.includes('subscribe multiple times') || errorMessage.includes('subscription')) {
+      console.error('🚨 [ERROR-BOUNDARY] Subscription error detected - this may cause component recreation');
+    }
   }
 
   private handleRetry = () => {
@@ -51,7 +59,7 @@ class ErrorBoundary extends Component<Props, State> {
                 Show Error Details
               </summary>
               <pre className="mt-2 p-3 bg-red-100 rounded text-xs text-red-800 overflow-auto max-h-40">
-                {this.state.error.stack}
+                {this.state.error?.stack || 'No stack trace available'}
               </pre>
             </details>
           )}

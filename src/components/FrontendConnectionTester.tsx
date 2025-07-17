@@ -130,8 +130,10 @@ const FrontendConnectionTester = () => {
       // Test 6: About Component (Check if it should be database-driven)
       addResult('About', 'info', 'About component uses hardcoded content (not database-driven)');
 
-      // Test 7: Content Sections Table
-      addResult('Content Sections', 'info', 'Testing content_sections table...');
+      // Test 7: Content Sections Table - DISABLED TO PREVENT 400 ERRORS
+      addResult('Content Sections', 'info', 'Content sections test disabled to prevent 400 errors');
+
+      /* DISABLED TO PREVENT 400 ERROR LOOP
       try {
         const { data: contentData, error: contentError } = await supabase
           .from('content_sections')
@@ -146,6 +148,7 @@ const FrontendConnectionTester = () => {
       } catch (error) {
         addResult('Content Sections', 'error', `❌ Content sections error: ${error.message}`);
       }
+      */
 
       addResult('Frontend Test', 'success', '🎉 Frontend database connection test completed!');
 

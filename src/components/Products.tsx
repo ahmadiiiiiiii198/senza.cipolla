@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Pizza, Sparkles, ChefHat, Users, ShoppingBag, Search, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import ProductCard from './ProductCard';
 import OrderOptionsModal from './OrderOptionsModal';
 
@@ -8,29 +9,110 @@ import { Product, ProductsByCategory } from '@/types/category';
 import { useStockManagement } from '@/hooks/useStockManagement';
 
 const Products = () => {
-  const [products, setProducts] = useState<ProductsByCategory>({});
-  const [filteredProducts, setFilteredProducts] = useState<ProductsByCategory>({});
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
-  const [isLoading, setIsLoading] = useState(true);
-  const [heading, setHeading] = useState("Le Nostre Pizze");
-  const [subheading, setSubheading] = useState("Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale");
   const [searchTerm, setSearchTerm] = useState("");
   const { isProductAvailable } = useStockManagement();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
-  useEffect(() => {
-    loadProducts();
-    loadContent();
-  }, []);
+  // Use React Query for products loading with caching
+  const { data: products = {}, isLoading, error: productsError } = useQuery({
+    queryKey: ['products'],
+    queryFn: async (): Promise<ProductsByCategory> => {
+      console.log('🍕 [PRODUCTS-QUERY] Loading products with React Query...');
+      const startTime = Date.now();
 
-  // Filter products based on search term
+      const { data: productsData, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          categories (
+            name,
+            slug
+          )
+        `)
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+
+      if (error) {
+        console.error('🍕 [PRODUCTS-QUERY] Error:', error);
+        throw error;
+      }
+
+      // Group products by category slug
+      const groupedProducts: ProductsByCategory = {};
+
+      productsData?.forEach((product) => {
+        const categorySlug = product.categories?.slug || 'uncategorized';
+        if (!groupedProducts[categorySlug]) {
+          groupedProducts[categorySlug] = [];
+        }
+
+        // Transform database product to frontend format
+        const transformedProduct: Product = {
+          ...product,
+          category: product.categories?.name || 'Uncategorized',
+          category_slug: categorySlug,
+          is_available: product.is_active && isProductAvailable(product.stock_quantity),
+          images: product.gallery ? (Array.isArray(product.gallery) ? product.gallery : [product.image_url].filter(Boolean)) : [product.image_url].filter(Boolean)
+        };
+
+        groupedProducts[categorySlug].push(transformedProduct);
+      });
+
+      const queryTime = Date.now() - startTime;
+      console.log(`🍕 [PRODUCTS-QUERY] Completed in ${queryTime}ms, found ${Object.values(groupedProducts).flat().length} products`);
+
+      return groupedProducts;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  // Use React Query for content sections
+  const { data: contentData } = useQuery({
+    queryKey: ['content-sections', 'products'],
+    queryFn: async () => {
+      console.log('🍕 [CONTENT-QUERY] Loading content sections...');
+
+      const { data, error } = await supabase
+        .from('content_sections')
+        .select('section_key, content_value')
+        .in('section_key', ['products_heading', 'products_subheading'])
+        .eq('is_active', true);
+
+      if (error) {
+        console.warn('🍕 [CONTENT-QUERY] Error loading content, using defaults:', error);
+        return null;
+      }
+
+      return data;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    cacheTime: 30 * 60 * 1000, // 30 minutes
+  });
+
+  // Set heading and subheading from content data
+  const heading = useMemo(() => {
+    const headingData = contentData?.find(item => item.section_key === 'products_heading');
+    return headingData?.content_value || "Le Nostre Pizze";
+  }, [contentData]);
+
+  const subheading = useMemo(() => {
+    const subheadingData = contentData?.find(item => item.section_key === 'products_subheading');
+    return subheadingData?.content_value || "Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale";
+  }, [contentData]);
+
+  // Update search active state when search term changes
   useEffect(() => {
+    setIsSearchActive(!!searchTerm.trim());
+  }, [searchTerm]);
+
+  // Memoized filtered products to prevent unnecessary re-calculations
+  const filteredProducts = useMemo(() => {
     if (!searchTerm.trim()) {
-      setFilteredProducts(products);
-      setIsSearchActive(false);
+      return products;
     } else {
-      setIsSearchActive(true);
       const filtered: ProductsByCategory = {};
 
       Object.entries(products).forEach(([categorySlug, categoryProducts]) => {
@@ -45,87 +127,14 @@ const Products = () => {
         }
       });
 
-      setFilteredProducts(filtered);
+      return filtered;
     }
   }, [searchTerm, products]);
 
-  const loadProducts = async () => {
-    try {
-      // Fetch products with their categories
-      const { data: productsData, error: productsError } = await supabase
-        .from('products')
-        .select(`
-          *,
-          categories (
-            name,
-            slug
-          )
-        `)
-        .eq('is_active', true)
-        .order('name', { ascending: true });
+  // Remove old loading functions - now using React Query
 
-      console.log('🍕 Products query result:', { productsData: productsData?.length, productsError });
-
-      if (!productsError && productsData) {
-        // Group products by category slug
-        const groupedProducts: ProductsByCategory = {};
-
-        productsData.forEach((product) => {
-          const categorySlug = product.categories?.slug || 'uncategorized';
-          if (!groupedProducts[categorySlug]) {
-            groupedProducts[categorySlug] = [];
-          }
-
-          // Transform database product to frontend format
-          const transformedProduct: Product = {
-            ...product,
-            category: product.categories?.name || 'Uncategorized',
-            category_slug: categorySlug,
-            is_available: product.is_active && isProductAvailable(product.stock_quantity),
-            images: product.gallery ? (Array.isArray(product.gallery) ? product.gallery : [product.image_url].filter(Boolean)) : [product.image_url].filter(Boolean)
-          };
-
-          groupedProducts[categorySlug].push(transformedProduct);
-        });
-
-        console.log('🍕 Grouped products:', groupedProducts);
-        setProducts(groupedProducts);
-        setFilteredProducts(groupedProducts);
-      } else if (productsError) {
-        console.error('[Products] Error loading products:', productsError);
-      }
-    } catch (error) {
-      console.error('[Products] Could not load products:', error);
-      // Fail silently - component will show empty state
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadContent = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('content_sections')
-        .select('section_key, content_value')
-        .in('section_key', ['products_heading', 'products_subheading']);
-
-      if (!error && data) {
-        data.forEach((item) => {
-          if (item.section_key === 'products_heading' && item.content_value) {
-            setHeading(item.content_value);
-          }
-          if (item.section_key === 'products_subheading' && item.content_value) {
-            setSubheading(item.content_value);
-          }
-        });
-      }
-    } catch (error) {
-      console.log('Could not load content:', error);
-      // Fail silently - use default content
-    }
-  };
-
-  const toggleCategoryExpansion = (categorySlug: string) => {
+  // Memoized event handlers to prevent unnecessary re-renders
+  const toggleCategoryExpansion = useCallback((categorySlug: string) => {
     console.log(`🔄 Toggling category expansion for: ${categorySlug}`);
     setExpandedCategories(prev => {
       const newSet = new Set(prev);
@@ -138,21 +147,21 @@ const Products = () => {
       }
       return newSet;
     });
-  };
+  }, []);
 
-  const clearSearch = () => {
+  const clearSearch = useCallback(() => {
     setSearchTerm("");
     setIsSearchActive(false);
-  };
+  }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-  };
+  }, []);
 
 
 
-  // Icon mapping for categories
-  const getIconForCategory = (categorySlug: string) => {
+  // Memoized utility functions to prevent recreation on every render
+  const getIconForCategory = useCallback((categorySlug: string) => {
     switch (categorySlug) {
       case 'semplici':
         return <Pizza className="text-pizza-orange" size={28} />;
@@ -163,10 +172,9 @@ const Products = () => {
       default:
         return <Pizza className="text-pizza-orange" size={28} />;
     }
-  };
+  }, []);
 
-  // Color mapping for categories
-  const getColorForCategory = (categorySlug: string) => {
+  const getColorForCategory = useCallback((categorySlug: string) => {
     switch (categorySlug) {
       case 'semplici':
         return 'from-pizza-orange to-pizza-red';
@@ -177,7 +185,7 @@ const Products = () => {
       default:
         return 'from-pizza-orange to-pizza-red';
     }
-  };
+  }, []);
 
   // Category display names
   const getCategoryDisplayName = (categorySlug: string) => {
@@ -205,7 +213,37 @@ const Products = () => {
     }
   };
 
+  console.log('🍕 [PRODUCTS-RENDER] Render state:', {
+    isLoading,
+    productsCount: Object.values(products).flat().length,
+    filteredProductsCount: Object.values(filteredProducts).flat().length,
+    searchTerm,
+    isSearchActive
+  });
+
+  // Show error state
+  if (productsError) {
+    console.log('🍕 [PRODUCTS-RENDER] Showing error state:', productsError);
+    return (
+      <section id="products" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Oops! Qualcosa è andato storto</h2>
+            <p className="text-lg text-gray-600 mb-8">Non riusciamo a caricare i nostri prodotti al momento. Riprova tra poco.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Ricarica la pagina
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (isLoading) {
+    console.log('🍕 [PRODUCTS-RENDER] Showing loading state');
     return (
       <section id="products" className="py-20 bg-white">
         <div className="container mx-auto px-4">

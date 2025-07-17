@@ -157,7 +157,7 @@ const MyOrders: React.FC = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel(`user-orders-${user.id}`)
+      .channel(`user-orders-page-${user.id}`)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',

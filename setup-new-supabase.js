@@ -8,22 +8,19 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// New Supabase project configuration
-const SUPABASE_URL = 'https://ijhuoolcnxbdvpqmqofo.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE'; // Get this from: https://supabase.com/dashboard/project/ijhuoolcnxbdvpqmqofo/settings/api
+// Correct Supabase project configuration - PIZZERIA REGINA 2000
+const SUPABASE_URL = 'https://sixnfemtvmighstbgrbd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I';
 
 console.log('🚀 Automated Supabase Project Setup');
 console.log('=====================================');
 console.log('📍 Project URL:', SUPABASE_URL);
-console.log('🎯 This will set up your complete flower shop database');
+console.log('🎯 This will set up your complete pizzeria database');
 console.log('');
 
 async function setupDatabase() {
-  if (SUPABASE_ANON_KEY === 'YOUR_ANON_KEY_HERE') {
-    console.log('❌ Please update the SUPABASE_ANON_KEY in this script first!');
-    console.log('📝 Get your anon key from: https://supabase.com/dashboard/project/ijhuoolcnxbdvpqmqofo/settings/api');
-    return false;
-  }
+  // Using the correct pizzeria database key - no need to update
+  console.log('✅ Using correct pizzeria database configuration');
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 

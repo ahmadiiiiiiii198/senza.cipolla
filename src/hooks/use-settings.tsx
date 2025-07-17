@@ -2,11 +2,97 @@ import { useState, useEffect, useCallback } from 'react';
 import { settingsService } from '@/services/settingsService';
 import { supabase } from '@/integrations/supabase/client';
 
+// Global subscription manager to prevent multiple subscriptions
+class SettingsSubscriptionManager {
+  private static instance: SettingsSubscriptionManager;
+  private subscriptions = new Map<string, any>();
+  private subscribers = new Map<string, Set<(value: any) => void>>();
+
+  static getInstance(): SettingsSubscriptionManager {
+    if (!SettingsSubscriptionManager.instance) {
+      SettingsSubscriptionManager.instance = new SettingsSubscriptionManager();
+    }
+    return SettingsSubscriptionManager.instance;
+  }
+
+  subscribe(key: string, callback: (value: any) => void) {
+    // Add callback to subscribers
+    if (!this.subscribers.has(key)) {
+      this.subscribers.set(key, new Set());
+    }
+    this.subscribers.get(key)!.add(callback);
+
+    // Create subscription if it doesn't exist
+    if (!this.subscriptions.has(key)) {
+      console.log(`[SettingsManager] Creating subscription for ${key}`);
+      const channel = supabase
+        .channel(`settings-${key}`)
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'settings',
+          filter: `key=eq.${key}`
+        }, (payload) => {
+          console.log(`[SettingsManager] Received update for ${key}:`, payload);
+          if (payload.new && (payload.new as any)?.value !== undefined) {
+            const newValue = (payload.new as any).value;
+            // Notify all subscribers
+            this.subscribers.get(key)?.forEach(cb => cb(newValue));
+          }
+        })
+        .subscribe();
+
+      this.subscriptions.set(key, channel);
+    }
+
+    // Return unsubscribe function
+    return () => {
+      const keySubscribers = this.subscribers.get(key);
+      if (keySubscribers) {
+        keySubscribers.delete(callback);
+
+        // If no more subscribers, clean up subscription
+        if (keySubscribers.size === 0) {
+          console.log(`[SettingsManager] Cleaning up subscription for ${key}`);
+          const channel = this.subscriptions.get(key);
+          if (channel) {
+            supabase.removeChannel(channel);
+            this.subscriptions.delete(key);
+          }
+          this.subscribers.delete(key);
+        }
+      }
+    };
+  }
+}
+
+const subscriptionManager = SettingsSubscriptionManager.getInstance();
+
 // Generic hook to use any setting with type safety
 export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => Promise<boolean>, boolean] {
   const [value, setValue] = useState<T>(defaultValue);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+
+  // Update setting function
+  const updateSetting = useCallback(async (newValue: T): Promise<boolean> => {
+    try {
+      console.log(`[useSetting] Updating ${key} to:`, newValue);
+      const success = await settingsService.updateSetting(key, newValue);
+      if (success) {
+        setValue(newValue);
+        console.log(`[useSetting] Successfully updated ${key}`);
+      } else {
+        console.error(`[useSetting] Failed to update ${key}`);
+      }
+      return success;
+    } catch (error) {
+      console.error(`[useSetting] Error updating ${key}:`, error);
+      return false;
+    }
+  }, [key]);
+
+
 
   // Monitor online status
   useEffect(() => {
@@ -24,43 +110,20 @@ export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => P
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [loadSetting]); // Fixed dependency array
   
-  // Set up a Supabase realtime subscription for this setting
+  // Set up subscription using the global manager to prevent duplicates
   useEffect(() => {
-    // Subscribe to settings table changes for this key
-    const channel = supabase
-      .channel(`public:settings:${key}`)
-      .on(
-        'postgres_changes',
-        { 
-          event: 'UPDATE', 
-          schema: 'public', 
-          table: 'settings',
-          filter: `key=eq.${key}`
-        },
-        (payload) => {
-          console.log(`Settings: Received realtime update for ${key}:`, payload);
-          if (payload.new && (payload.new as any)?.value !== undefined) {
-            try {
-              const newValue = (payload.new as any).value;
-              setValue(newValue as T);
-              console.log(`Settings: Updated ${key} via Supabase realtime`);
-              
-              // Update localStorage to keep in sync
-              localStorage.setItem(key, JSON.stringify(newValue));
-            } catch (e) {
-              console.warn(`Settings: Error processing realtime update for ${key}:`, e);
-            }
-          }
-        }
-      )
-      .subscribe();
-    
-    // Cleanup subscription on unmount
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    console.log(`[useSetting] Setting up subscription for ${key}`);
+
+    const unsubscribe = subscriptionManager.subscribe(key, (newValue: T) => {
+      console.log(`[useSetting] Received update for ${key}:`, newValue);
+      setValue(newValue);
+      // Update localStorage to keep in sync
+      localStorage.setItem(key, JSON.stringify(newValue));
+    });
+
+    return unsubscribe;
   }, [key]);
 
   // Load setting function that can be called to refresh data

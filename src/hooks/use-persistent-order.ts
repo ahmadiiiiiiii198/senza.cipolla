@@ -143,55 +143,156 @@ export const usePersistentOrder = (): UsePersistentOrderReturn => {
     }
   }, [saveOrderInfo]);
 
-  // Refresh current order
+  // Refresh current order - FIXED to prevent infinite loop by inlining the search logic
   const refreshOrder = useCallback(async () => {
     if (!storedOrderInfo) return;
-    
-    await searchOrder(storedOrderInfo.orderNumber, storedOrderInfo.customerEmail);
-  }, [storedOrderInfo, searchOrder]);
 
-  // Auto-load stored order on hook initialization
+    // Inline the search logic to avoid dependency chain
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: searchError } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (
+            id,
+            product_name,
+            quantity,
+            unit_price,
+            subtotal,
+            special_requests,
+            toppings
+          )
+        `)
+        .eq('order_number', storedOrderInfo.orderNumber.trim())
+        .eq('customer_email', storedOrderInfo.customerEmail.trim().toLowerCase())
+        .single();
+
+      if (searchError) {
+        if (searchError.code === 'PGRST116') {
+          setError('Ordine non trovato. Verifica il numero ordine e l\'email.');
+        } else {
+          setError('Errore durante la ricerca dell\'ordine.');
+        }
+        return;
+      }
+
+      setOrder(data);
+
+      // Save as last successful order
+      localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(data));
+
+    } catch (err) {
+      console.error('Refresh error:', err);
+      setError('Errore durante la ricerca dell\'ordine.');
+    } finally {
+      setLoading(false);
+    }
+  }, [storedOrderInfo?.orderNumber, storedOrderInfo?.customerEmail]);
+
+  // Auto-load stored order on hook initialization - FIXED to break dependency chain
   useEffect(() => {
-    const stored = loadStoredOrderInfo();
-    if (stored) {
-      // Try to load from last order cache first
+    let isMounted = true;
+
+    const initializeOrder = async () => {
       try {
-        const lastOrder = localStorage.getItem(LAST_ORDER_KEY);
-        if (lastOrder) {
-          const parsedOrder = JSON.parse(lastOrder);
-          setOrder(parsedOrder);
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored || !isMounted) return;
+
+        const parsedStored = JSON.parse(stored);
+        setStoredOrderInfo(parsedStored);
+
+        // Try to load from last order cache first
+        try {
+          const lastOrder = localStorage.getItem(LAST_ORDER_KEY);
+          if (lastOrder && isMounted) {
+            const parsedOrder = JSON.parse(lastOrder);
+            setOrder(parsedOrder);
+          }
+        } catch (error) {
+          console.error('Error loading cached order:', error);
+        }
+
+        // Then refresh from database - INLINE to avoid dependency chain
+        if (isMounted && parsedStored.orderNumber && parsedStored.customerEmail) {
+          setLoading(true);
+          setError(null);
+
+          try {
+            const { data, error: searchError } = await supabase
+              .from('orders')
+              .select(`
+                *,
+                order_items (
+                  id,
+                  product_name,
+                  quantity,
+                  unit_price,
+                  subtotal,
+                  special_requests,
+                  toppings
+                )
+              `)
+              .eq('order_number', parsedStored.orderNumber.trim())
+              .eq('customer_email', parsedStored.customerEmail.trim().toLowerCase())
+              .single();
+
+            if (!searchError && isMounted) {
+              setOrder(data);
+              localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(data));
+            } else if (searchError && isMounted) {
+              console.warn('Order not found during initialization:', searchError);
+            }
+          } catch (err) {
+            console.error('Error refreshing order during initialization:', err);
+          } finally {
+            if (isMounted) {
+              setLoading(false);
+            }
+          }
         }
       } catch (error) {
-        console.error('Error loading cached order:', error);
+        console.error('Error initializing order:', error);
       }
-      
-      // Then refresh from database
-      searchOrder(stored.orderNumber, stored.customerEmail);
-    }
-  }, [loadStoredOrderInfo, searchOrder]);
+    };
+
+    initializeOrder();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array - only run on mount
 
   // Set up real-time subscription for order updates
   useEffect(() => {
     if (!order) return;
 
+    console.log('📋 [PERSISTENT-ORDER-SUB] Setting up subscription for order:', order.id);
+
+    const channelName = `persistent-order-${order.id}`;
     const channel = supabase
-      .channel(`persistent-order-${order.id}`)
+      .channel(channelName)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'orders',
         filter: `id=eq.${order.id}`
       }, (payload) => {
-        console.log('Persistent order updated:', payload);
+        console.log('📋 [PERSISTENT-ORDER-SUB] Order updated:', payload);
         const updatedOrder = { ...order, ...payload.new };
         setOrder(updatedOrder);
-        
+
         // Update localStorage cache
         localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(updatedOrder));
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📋 [PERSISTENT-ORDER-SUB] Subscription status:', status);
+      });
 
     return () => {
+      console.log('📋 [PERSISTENT-ORDER-SUB] Cleaning up subscription for:', channelName);
       supabase.removeChannel(channel);
     };
   }, [order]);

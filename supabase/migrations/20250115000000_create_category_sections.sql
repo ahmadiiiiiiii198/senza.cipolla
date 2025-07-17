@@ -48,14 +48,18 @@ CREATE TRIGGER update_category_sections_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_category_sections_updated_at();
 
--- Insert some default sections
+-- Insert pizzeria category sections
 INSERT INTO category_sections (name, slug, description, section_type, sort_order) VALUES
-  ('Wedding Services', 'wedding-services', 'Beautiful arrangements for your special day', 'categories', 1),
-  ('Corporate Events', 'corporate-events', 'Professional floral arrangements for business events', 'categories', 2),
-  ('Special Occasions', 'special-occasions', 'Flowers for birthdays, anniversaries, and celebrations', 'categories', 3),
-  ('Seasonal Collections', 'seasonal-collections', 'Seasonal flower arrangements and bouquets', 'categories', 4),
-  ('Featured Products', 'featured-products', 'Our most popular and recommended products', 'products', 1),
-  ('New Arrivals', 'new-arrivals', 'Latest additions to our product collection', 'products', 2),
-  ('Best Sellers', 'best-sellers', 'Customer favorite products', 'products', 3),
-  ('Seasonal Specials', 'seasonal-specials', 'Limited time seasonal product offerings', 'products', 4)
+  ('SEMPLICI', 'semplici', 'Classic Pizzas & Focacce - Le nostre pizze tradizionali e focacce', 'categories', 1),
+  ('SPECIALI', 'speciali', 'Signature & Gourmet - Creazioni speciali della casa', 'categories', 2),
+  ('Pizze al metro per 4-5 persone', 'pizze-al-metro-per-4-5-persone', 'Pizze al metro ideali per gruppi di 4-5 persone', 'categories', 3),
+  ('BEVANDE', 'bevande', 'Bevande e bibite', 'categories', 4),
+  ('DOLCI', 'dolci', 'Dolci e dessert', 'categories', 6),
+  ('FARINATE', 'farinate', 'Farinate', 'categories', 7),
+  ('SCHIACCIATE', 'schiacciate', 'Schiacciate', 'categories', 8),
+  ('EXTRA', 'extra', 'Aggiunte per pizze e altri prodotti', 'categories', 8),
+  ('Featured Pizzas', 'featured-pizzas', 'Le nostre pizze più popolari e consigliate', 'products', 1),
+  ('New Pizzas', 'new-pizzas', 'Ultime aggiunte al nostro menu', 'products', 2),
+  ('Best Sellers', 'best-sellers', 'Pizze preferite dai clienti', 'products', 3),
+  ('Seasonal Specials', 'seasonal-specials', 'Offerte stagionali a tempo limitato', 'products', 4)
 ON CONFLICT (slug) DO NOTHING;

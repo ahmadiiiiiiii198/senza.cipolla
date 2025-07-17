@@ -53,19 +53,19 @@ CREATE TRIGGER update_settings_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_settings_updated_at();
 
--- Insert default hero content and other essential settings
+-- Insert default pizzeria content and essential settings
 INSERT INTO settings (key, value) VALUES
   (
     'heroContent',
-    '{"heading": "Francesco Fiori & Piante", "subheading": "Scopri l\'eleganza floreale firmata Francesco: fiori, piante e creazioni per ogni occasione. 🌸🌿", "backgroundImage": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80"}'
+    '{"heading": "Pizzeria Regina 2000", "subheading": "Autentica pizza italiana nel cuore di Torino", "backgroundImage": "/hero-pizza-bg.jpg"}'
   ),
   (
     'logoSettings',
-    '{"logoUrl": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80", "altText": "Francesco Fiori & Piante Logo"}'
+    '{"logoUrl": "/pizzeria-regina-logo.png", "altText": "Pizzeria Regina 2000 Torino Logo"}'
   ),
   (
-    'aboutContent',
-    '{"heading": "Chi Siamo", "subheading": "Passione per la bellezza naturale e l\'arte floreale", "backgroundImage": "", "backgroundColor": "#FEF7CD", "paragraphs": ["Francesco Fiori & Piante offre composizioni floreali per ogni occasione, dai funerali ai matrimoni. Troverai fiori freschi, piante da interno ed esterno, fiori finti di alta qualità e servizi su misura. Situati all\'interno del Mercato di Porta Palazzo a Torino, portiamo esperienza artigianale e passione per la bellezza naturale."]}'
+    'aboutSections',
+    '{"section1": {"image": "/images/storia.jpg", "title": "La Nostra Storia", "description": "Dal 2000 portiamo a Torino la vera tradizione della pizza napoletana. La nostra famiglia ha tramandato di generazione in generazione i segreti di un impasto perfetto e di ingredienti selezionati."}, "section2": {"image": "/images/ingredienti.jpg", "title": "Ingredienti di Qualità", "description": "Utilizziamo solo ingredienti freschi e di prima qualità: mozzarella di bufala DOP, pomodori San Marzano, olio extravergine di oliva e farina tipo 00. Ogni pizza è un capolavoro di sapore."}}'
   ),
   (
     'restaurantSettings',
@@ -73,15 +73,15 @@ INSERT INTO settings (key, value) VALUES
   ),
   (
     'contactContent',
-    '{"address": "Corso Regina Margherita, 53, 10152 Torino TO", "phone": "0110769211", "email": "anilamyzyri@gmail.com", "mapUrl": "https://maps.google.com", "hours": "Lun-Dom: 08:00 - 19:00"}'
+    '{"address": "Corso Regina Margherita, 53, 10152 Torino TO", "phone": "0110769211", "email": "anilamyzyri@gmail.com", "mapUrl": "https://maps.google.com", "hours": "Lun-Dom: 18:30 - 22:30"}'
   ),
   (
     'businessHours',
-    '{"monday": {"isOpen": true, "openTime": "08:00", "closeTime": "19:00"}, "tuesday": {"isOpen": true, "openTime": "08:00", "closeTime": "19:00"}, "wednesday": {"isOpen": true, "openTime": "08:00", "closeTime": "19:00"}, "thursday": {"isOpen": true, "openTime": "08:00", "closeTime": "19:00"}, "friday": {"isOpen": true, "openTime": "08:00", "closeTime": "19:00"}, "saturday": {"isOpen": true, "openTime": "08:00", "closeTime": "19:00"}, "sunday": {"isOpen": true, "openTime": "08:00", "closeTime": "19:00"}}'
+    '{"monday": {"isOpen": true, "openTime": "14:30", "closeTime": "22:30"}, "tuesday": {"isOpen": true, "openTime": "14:30", "closeTime": "22:30"}, "wednesday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}, "thursday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}, "friday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}, "saturday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}, "sunday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}}'
   ),
   (
     'galleryContent',
-    '{"heading": "La Nostra Galleria", "subheading": "Scopri le nostre creazioni floreali"}'
+    '{"heading": "La Nostra Galleria", "subheading": "Scorci delle nostre creazioni e dell\'atmosfera della pizzeria"}'
   ),
   (
     'galleryImages',

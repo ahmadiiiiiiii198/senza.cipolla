@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Bell, X, Check, AlertCircle, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import iosAudioFix from '@/utils/iosAudioFix';
@@ -124,8 +124,8 @@ const OrderNotificationSystem = () => {
     };
   }, []);
 
-  // Fetch notifications safely
-  const fetchNotifications = async () => {
+  // Memoized fetch notifications function to prevent recreation
+  const fetchNotifications = useCallback(async () => {
     try {
       console.log('📡 [OrderNotification] Fetching notifications...');
 
@@ -219,7 +219,7 @@ const OrderNotificationSystem = () => {
       // Continue with empty notifications instead of crashing
       setNotifications([]);
     }
-  };
+  }, []); // Empty dependency array since this function doesn't depend on any state
 
   // Start continuous notification sound
   const startNotificationSound = async () => {
@@ -314,8 +314,8 @@ const OrderNotificationSystem = () => {
     }
   };
 
-  // Stop notification sound
-  const stopNotificationSound = () => {
+  // Memoized stop notification sound function
+  const stopNotificationSound = useCallback(() => {
     try {
       console.log('🔊 [OrderNotification] Stopping notification sound...');
 
@@ -350,7 +350,7 @@ const OrderNotificationSystem = () => {
       // Force state update even if there's an error
       setIsPlaying(false);
     }
-  };
+  }, []);
 
   // Manual sound trigger for mobile (requires user interaction)
   const triggerSoundWithUserGesture = () => {
@@ -369,8 +369,8 @@ const OrderNotificationSystem = () => {
     }
   };
 
-  // Force stop all sounds (for stop button) - CONNECT TO REAL AUDIO SYSTEM
-  const forceStopSound = () => {
+  // Memoized force stop all sounds function
+  const forceStopSound = useCallback(() => {
     console.log('🔇 [OrderNotification] ===== FORCE STOPPING ALL AUDIO SYSTEMS =====');
 
     try {
@@ -437,7 +437,7 @@ const OrderNotificationSystem = () => {
       console.error('🔇 [OrderNotification] ❌ Error during force stop:', error);
       setIsPlaying(false);
     }
-  };
+  }, []);
 
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {

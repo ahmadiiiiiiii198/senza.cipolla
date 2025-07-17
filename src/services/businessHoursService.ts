@@ -49,12 +49,19 @@ class BusinessHoursService {
 
     try {
       console.log('🕒 Fetching business hours from database...');
-      
-      const { data, error } = await supabase
+
+      // Add timeout protection
+      const queryPromise = supabase
         .from('settings')
         .select('value')
         .eq('key', 'businessHours')
         .single();
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Business hours query timeout')), 5000)
+      );
+
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
 
       if (error) {
         console.error('❌ Error fetching business hours:', error);
