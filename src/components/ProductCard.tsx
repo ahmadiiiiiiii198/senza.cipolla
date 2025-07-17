@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import PizzaCustomizationModal from './PizzaCustomizationModal';
 import { formatPrice } from '@/utils/priceUtils';
 import { useStockManagement } from '@/hooks/useStockManagement';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
 
 interface ProductCardProps {
   product?: Product;
@@ -20,6 +19,10 @@ interface ProductCardProps {
   description?: string;
   onOrder?: (product: Product) => void;
   onViewDetails?: (product: Product) => void;
+  // Business hours props to avoid multiple subscriptions
+  businessIsOpen?: boolean;
+  businessMessage?: string;
+  validateOrderTime?: () => Promise<{ valid: boolean; message: string }>;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -29,12 +32,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
   image,
   description,
   onOrder,
-  onViewDetails
+  onViewDetails,
+  businessIsOpen = true, // Default to true if not provided
+  businessMessage = '',
+  validateOrderTime
 }) => {
   const { toast } = useToast();
   const { addItem } = useSimpleCart();
   const { isProductAvailable, getStockStatus, getStockMessage, isStockManagementEnabled } = useStockManagement();
-  const { isOpen: businessIsOpen, message: businessMessage, validateOrderTime } = useBusinessHours(true, 'product-card');
   const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
 
   // Use product data if available, otherwise fall back to legacy props
@@ -69,25 +74,27 @@ const ProductCard: React.FC<ProductCardProps> = ({
       return;
     }
 
-    // Validate order time for extra security
-    try {
-      const timeValidation = await validateOrderTime();
-      if (!timeValidation.valid) {
+    // Validate order time for extra security if function is provided
+    if (validateOrderTime) {
+      try {
+        const timeValidation = await validateOrderTime();
+        if (!timeValidation.valid) {
+          toast({
+            title: 'Ordini non disponibili 🕒',
+            description: timeValidation.message,
+            variant: 'destructive'
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('❌ Error validating order time:', error);
         toast({
-          title: 'Ordini non disponibili 🕒',
-          description: timeValidation.message,
+          title: 'Errore di validazione',
+          description: 'Impossibile verificare gli orari di apertura. Riprova.',
           variant: 'destructive'
         });
         return;
       }
-    } catch (error) {
-      console.error('❌ Error validating order time:', error);
-      toast({
-        title: 'Errore di validazione',
-        description: 'Impossibile verificare gli orari di apertura. Riprova.',
-        variant: 'destructive'
-      });
-      return;
     }
 
     if (product && isAvailable) {
@@ -142,17 +149,30 @@ const ProductCard: React.FC<ProductCardProps> = ({
       return;
     }
 
-    try {
-      const timeValidation = await validateOrderTime();
-      if (!timeValidation.valid) {
+    // Validate order time if function is provided
+    if (validateOrderTime) {
+      try {
+        const timeValidation = await validateOrderTime();
+        if (!timeValidation.valid) {
+          toast({
+            title: 'Ordini non disponibili 🕒',
+            description: timeValidation.message,
+            variant: 'destructive'
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('❌ Error validating order time:', error);
         toast({
-          title: 'Ordini non disponibili 🕒',
-          description: timeValidation.message,
+          title: 'Errore di validazione',
+          description: 'Impossibile verificare gli orari di apertura. Riprova.',
           variant: 'destructive'
         });
         return;
       }
+    }
 
+    try {
       addItem(pizza, quantity, extras, specialRequests);
       console.log('✅ Customized pizza added to cart successfully');
       toast({

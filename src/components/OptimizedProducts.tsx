@@ -11,20 +11,24 @@ import OrderOptionsModal from './OrderOptionsModal';
 
 import { Product, ProductsByCategory } from '@/types/category';
 import { useStockManagement } from '@/hooks/useStockManagement';
+import { useBusinessHours } from '@/hooks/useBusinessHours';
 
 // Memoized ProductCard to prevent unnecessary re-renders
 const MemoizedProductCard = memo(ProductCard);
 
 // Memoized category section to prevent re-renders
-const CategorySection = memo(({ 
-  categorySlug, 
-  categoryProducts, 
-  isExpanded, 
+const CategorySection = memo(({
+  categorySlug,
+  categoryProducts,
+  isExpanded,
   onToggleExpansion,
   getIconForCategory,
   getColorForCategory,
   getCategoryDisplayName,
-  getCategoryPricingInfo
+  getCategoryPricingInfo,
+  businessIsOpen,
+  businessMessage,
+  validateOrderTime
 }: {
   categorySlug: string;
   categoryProducts: Product[];
@@ -34,6 +38,9 @@ const CategorySection = memo(({
   getColorForCategory: (slug: string) => string;
   getCategoryDisplayName: (slug: string) => string;
   getCategoryPricingInfo: (slug: string) => string;
+  businessIsOpen: boolean;
+  businessMessage: string;
+  validateOrderTime: () => Promise<{ valid: boolean; message: string }>;
 }) => {
   const handleToggle = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -68,7 +75,12 @@ const CategorySection = memo(({
             key={product.id}
             className={`animate-scale-in animate-stagger-${Math.min(productIndex + 1, 5)} hover-lift`}
           >
-            <MemoizedProductCard product={product} />
+            <MemoizedProductCard
+              product={product}
+              businessIsOpen={businessIsOpen}
+              businessMessage={businessMessage}
+              validateOrderTime={validateOrderTime}
+            />
           </div>
         ))}
       </div>
@@ -109,6 +121,9 @@ const OptimizedProducts = () => {
   const { isProductAvailable } = useStockManagement();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+
+  // Get business hours for all product cards
+  const { isOpen: businessIsOpen, message: businessMessage, validateOrderTime } = useBusinessHours(true, 'optimized-products');
 
   // Memoized load functions to prevent recreation
   const loadProducts = useCallback(async () => {
@@ -390,6 +405,9 @@ const OptimizedProducts = () => {
               getColorForCategory={getColorForCategory}
               getCategoryDisplayName={getCategoryDisplayName}
               getCategoryPricingInfo={getCategoryPricingInfo}
+              businessIsOpen={businessIsOpen}
+              businessMessage={businessMessage}
+              validateOrderTime={validateOrderTime}
             />
           ))
         ) : (

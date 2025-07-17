@@ -7,6 +7,7 @@ import OrderOptionsModal from './OrderOptionsModal';
 
 import { Product, ProductsByCategory } from '@/types/category';
 import { useStockManagement } from '@/hooks/useStockManagement';
+import { useBusinessHours } from '@/hooks/useBusinessHours';
 
 const Products = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
@@ -14,6 +15,9 @@ const Products = () => {
   const { isProductAvailable } = useStockManagement();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+
+  // Get business hours for all product cards
+  const { isOpen: businessIsOpen, message: businessMessage, validateOrderTime } = useBusinessHours(true, 'products-section');
 
   // Use React Query for products loading with caching
   const { data: products = {}, isLoading, error: productsError } = useQuery({
@@ -391,6 +395,9 @@ const Products = () => {
                       >
                         <ProductCard
                           product={product}
+                          businessIsOpen={businessIsOpen}
+                          businessMessage={businessMessage}
+                          validateOrderTime={validateOrderTime}
                         />
                       </div>
                     ))}
