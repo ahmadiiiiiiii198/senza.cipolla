@@ -186,7 +186,8 @@ export const useUserOrders = (): UseUserOrdersReturn => {
   const getActiveOrder = useCallback((): Order | null => {
     const activeStatuses = ['confirmed', 'preparing', 'ready', 'arrived'];
     const activeOrder = orders.find(order => {
-      const currentStatus = order.order_status || order.status;
+      // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
+      const currentStatus = order.status || order.order_status;
       return activeStatuses.includes(currentStatus);
     });
     return activeOrder || null;
@@ -196,7 +197,8 @@ export const useUserOrders = (): UseUserOrdersReturn => {
   const hasActiveOrders = useMemo((): boolean => {
     const activeStatuses = ['confirmed', 'preparing', 'ready', 'arrived'];
     return orders.some(order => {
-      const currentStatus = order.order_status || order.status;
+      // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
+      const currentStatus = order.status || order.order_status;
       return activeStatuses.includes(currentStatus);
     });
   }, [orders]);

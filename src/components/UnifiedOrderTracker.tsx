@@ -35,7 +35,8 @@ const UnifiedOrderTracker: React.FC = () => {
     if (isAuthenticated && userOrders) {
       const activeStatuses = ['confirmed', 'preparing', 'ready', 'arrived'];
       activeOrder = userOrders.find(order => {
-        const currentStatus = order.order_status || order.status;
+        // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
+        const currentStatus = order.status || order.order_status;
         return activeStatuses.includes(currentStatus);
       }) || null;
     } else {
@@ -74,7 +75,8 @@ const UnifiedOrderTracker: React.FC = () => {
     return null;
   }
 
-  const currentStatus = activeOrderData.activeOrder.order_status || activeOrderData.activeOrder.status || 'pending';
+  // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
+  const currentStatus = activeOrderData.activeOrder.status || activeOrderData.activeOrder.order_status || 'pending';
 
   let statusInfo;
   try {
