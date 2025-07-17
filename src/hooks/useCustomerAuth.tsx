@@ -43,14 +43,16 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Load user profile - OPTIMIZED with better error handling
+  // Load user profile - ENHANCED with better error handling and fallbacks
   const loadUserProfile = useCallback(async (userId: string) => {
-    try {
-      console.log('🔐 [Auth] Loading user profile for:', userId);
+    const profileStartTime = Date.now();
 
-      // Reduced timeout to prevent blocking
+    try {
+      console.log('🔐 [PROFILE] Loading user profile for:', userId);
+
+      // Increased timeout but with better error handling
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Profile loading timeout')), 3000)
+        setTimeout(() => reject(new Error('Profile loading timeout after 5 seconds')), 5000)
       );
 
       const profilePromise = supabase
@@ -60,12 +62,15 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         .single();
 
       const { data, error } = await Promise.race([profilePromise, timeoutPromise]) as any;
+      const profileTime = Date.now() - profileStartTime;
 
       if (error) {
+        console.log(`🔐 [PROFILE] Profile query completed in ${profileTime}ms with error:`, error.code);
+
         // Check if it's a missing table error
         if (error.message?.includes('relation "user_profiles" does not exist')) {
-          console.warn('🔐 [Auth] user_profiles table does not exist - creating profile in memory');
-          // Return a basic profile structure
+          console.warn('🔐 [PROFILE] user_profiles table does not exist - creating fallback profile');
+          // Return a basic profile structure as fallback
           return {
             id: userId,
             email: '',
@@ -78,31 +83,47 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
           };
         }
 
-        console.warn('🔐 [Auth] Profile loading failed, continuing without profile:', error);
+        // Check if it's a "no rows returned" error (user profile doesn't exist yet)
+        if (error.code === 'PGRST116') {
+          console.log('🔐 [PROFILE] User profile not found - this is normal for new users');
+          return null;
+        }
+
+        // Check for connection/timeout errors
+        if (error.message?.includes('timeout') || error.message?.includes('network')) {
+          console.warn('🔐 [PROFILE] Network/timeout error loading profile - will retry later');
+          throw new Error('Network timeout - profile loading failed');
+        }
+
+        console.warn('🔐 [PROFILE] Profile loading failed with unknown error:', error);
         return null;
       }
 
-      console.log('✅ [Auth] User profile loaded successfully');
+      console.log(`✅ [PROFILE] User profile loaded successfully in ${profileTime}ms`);
       return data;
     } catch (error) {
-      console.warn('🔐 [Auth] Profile loading exception, continuing without profile:', error);
+      const profileTime = Date.now() - profileStartTime;
+      console.warn(`🔐 [PROFILE] Profile loading exception after ${profileTime}ms:`, error);
+
+      // For timeout errors, we should throw to let the caller handle it
+      if (error.message?.includes('timeout')) {
+        throw error;
+      }
+
       return null;
     }
   }, []);
 
-  // Initialize auth state - OPTIMIZED to not block app loading
+  // Initialize auth state - FIXED loading sequence to prevent race conditions
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log('🔐 [AUTH-INIT] Starting OPTIMIZED authentication initialization...');
+      console.log('🔐 [AUTH-INIT] Starting authentication initialization...');
       const startTime = Date.now();
 
       try {
-        // Set loading to false immediately to not block app
-        setLoading(false);
-
         console.log('🔐 [AUTH-INIT] Calling supabase.auth.getSession()...');
 
-        // Get initial session with timeout
+        // Get initial session with timeout - but keep loading true until complete
         const sessionPromise = supabase.auth.getSession();
         const sessionTimeout = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Session timeout')), 5000)
@@ -118,38 +139,45 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         if (error) {
           console.error('🔐 [AUTH-INIT] Error getting session:', error);
-          // Continue without auth - don't block app
+          // Set loading to false only after session check is complete
+          setLoading(false);
         } else if (initialSession) {
           console.log('🔐 [AUTH-INIT] Initial session found, user:', initialSession.user?.email);
           setSession(initialSession);
           setUser(initialSession.user);
 
-          // Load user profile in background - don't block app
-          console.log('🔐 [AUTH-INIT] Loading user profile in background...');
-          loadUserProfile(initialSession.user.id).then(userProfile => {
+          // Load user profile - wait for it to complete before setting loading to false
+          console.log('🔐 [AUTH-INIT] Loading user profile...');
+          try {
+            const userProfile = await loadUserProfile(initialSession.user.id);
             const profileTime = Date.now() - startTime;
             console.log(`🔐 [AUTH-INIT] Profile loaded in ${profileTime}ms:`, userProfile ? 'SUCCESS' : 'FAILED');
             setProfile(userProfile);
-          }).catch(error => {
+          } catch (error) {
             console.warn('🔐 [AUTH-INIT] Profile loading failed, continuing without profile:', error);
             setProfile(null);
-          });
+          } finally {
+            // Set loading to false only after profile loading is complete
+            setLoading(false);
+          }
         } else {
           console.log('🔐 [AUTH-INIT] No initial session found');
+          // Set loading to false when no session is found
+          setLoading(false);
         }
       } catch (error) {
         console.error('🔐 [AUTH-INIT] Error initializing auth:', error);
-        // Don't block app on auth errors
+        // Set loading to false on any error to prevent infinite loading
+        setLoading(false);
       } finally {
         const totalTime = Date.now() - startTime;
         console.log(`🔐 [AUTH-INIT] Authentication initialization completed in ${totalTime}ms`);
-        // Loading already set to false above
       }
     };
 
     initializeAuth();
 
-    // Listen for auth changes - OPTIMIZED to not block
+    // Listen for auth changes - FIXED to handle loading states properly
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log(`🔐 [AUTH-CHANGE] Event: ${event}, User: ${session?.user?.email || 'none'}`);
       const changeStartTime = Date.now();
@@ -160,27 +188,30 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          console.log('🔐 [AUTH-CHANGE] User session found, loading profile in background...');
+          console.log('🔐 [AUTH-CHANGE] User session found, loading profile...');
 
-          // Load profile in background - don't block auth state change
-          loadUserProfile(session.user.id).then(userProfile => {
+          // For auth state changes, we can load profile in background
+          // but we should handle errors gracefully
+          try {
+            const userProfile = await loadUserProfile(session.user.id);
             const profileTime = Date.now() - changeStartTime;
             console.log(`🔐 [AUTH-CHANGE] Profile loaded in ${profileTime}ms:`, userProfile ? 'SUCCESS' : 'FAILED');
             setProfile(userProfile);
-          }).catch(error => {
+          } catch (error) {
             console.warn('🔐 [AUTH-CHANGE] Profile loading failed:', error);
             setProfile(null);
-          });
+          }
         } else {
           console.log('🔐 [AUTH-CHANGE] No user session, clearing profile');
           setProfile(null);
         }
       } catch (error) {
         console.error('🔐 [AUTH-CHANGE] Error in auth state change:', error);
+        // Ensure we don't get stuck in loading state
+        setProfile(null);
       } finally {
         const totalTime = Date.now() - changeStartTime;
         console.log(`🔐 [AUTH-CHANGE] Auth state change completed in ${totalTime}ms`);
-        // Don't set loading to false here - it's already false from initialization
       }
     });
 
