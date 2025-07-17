@@ -51,7 +51,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const isPizza = product?.category_slug === 'semplici' || product?.category_slug === 'speciali';
   const isExtra = product?.category_slug === 'extra';
 
-  const handleOrderClick = (e?: React.MouseEvent) => {
+  const handleOrderClick = async (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
 
@@ -66,12 +66,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       // For non-pizza items (like extras), add directly to cart
       try {
-        addItem(product, 1);
-        toast({
-          title: 'Prodotto aggiunto al carrello! 🛒',
-          description: `${product.name} è stato aggiunto al tuo carrello.`,
-        });
-        console.log('✅ Product added to cart successfully');
+        const result = await addItem(product, 1);
+        if (result !== null) {
+          toast({
+            title: 'Prodotto aggiunto al carrello! 🛒',
+            description: `${product.name} è stato aggiunto al tuo carrello.`,
+          });
+          console.log('✅ Product added to cart successfully');
+        }
+        // If result is null, business hours validation failed and user was already notified
       } catch (error) {
         console.error('❌ Error adding product to cart:', error);
         toast({
@@ -98,10 +101,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
 
-  const handlePizzaCustomization = (pizza: Product, quantity: number, extras: PizzaExtra[], specialRequests?: string) => {
+  const handlePizzaCustomization = async (pizza: Product, quantity: number, extras: PizzaExtra[], specialRequests?: string) => {
     try {
-      addItem(pizza, quantity, extras, specialRequests);
-      console.log('✅ Customized pizza added to cart successfully');
+      const result = await addItem(pizza, quantity, extras, specialRequests);
+      if (result !== null) {
+        console.log('✅ Customized pizza added to cart successfully');
+        toast({
+          title: 'Pizza personalizzata aggiunta! 🍕',
+          description: `${pizza.name} personalizzata è stata aggiunta al tuo carrello.`,
+        });
+      }
+      // If result is null, business hours validation failed and user was already notified
     } catch (error) {
       console.error('❌ Error adding customized pizza to cart:', error);
       toast({

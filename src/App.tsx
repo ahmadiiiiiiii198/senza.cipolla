@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/hooks/use-language";
 import { SimpleCartProvider } from "@/hooks/use-simple-cart";
 import { CustomerAuthProvider } from "@/hooks/useCustomerAuth";
+import { BusinessHoursProvider } from "@/contexts/BusinessHoursContext";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 // import DiagnosticInfo from "./components/DiagnosticInfo"; // Removed diagnostic button
@@ -54,8 +55,9 @@ const App = () => (
       <TooltipProvider>
         <LanguageProvider>
           <CustomerAuthProvider>
-            <SimpleCartProvider>
-            <BackgroundInitializer />
+            <BusinessHoursProvider>
+              <SimpleCartProvider>
+              <BackgroundInitializer />
             {/* OrderNotificationSystem now only loads in admin panel */}
             {/* ButtonDebugger removed - no more debug overlays */}
             <Toaster />
@@ -154,7 +156,8 @@ const App = () => (
             </Routes>
           </BrowserRouter>
           {/* <DiagnosticInfo /> */}
-            </SimpleCartProvider>
+              </SimpleCartProvider>
+            </BusinessHoursProvider>
           </CustomerAuthProvider>
         </LanguageProvider>
       </TooltipProvider>

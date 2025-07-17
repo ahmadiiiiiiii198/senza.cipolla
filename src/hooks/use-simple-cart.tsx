@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { Product } from '@/types/category';
+import { useBusinessHoursValidation } from '@/hooks/useBusinessHoursValidation';
 
 export interface PizzaExtra {
   id: string;
@@ -47,8 +48,10 @@ interface SimpleCartProviderProps {
 export const SimpleCartProvider: React.FC<SimpleCartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const { withBusinessHoursValidation } = useBusinessHoursValidation();
 
-  const addItem = (product: Product, quantity = 1, extras: PizzaExtra[] = [], specialRequests = '') => {
+  // Original addItem function (internal use only)
+  const addItemInternal = (product: Product, quantity = 1, extras: PizzaExtra[] = [], specialRequests = '') => {
     setItems(prev => {
       // For pizzas with extras, always create a new cart item (don't merge)
       // This allows customers to have the same pizza with different extras
@@ -86,6 +89,12 @@ export const SimpleCartProvider: React.FC<SimpleCartProviderProps> = ({ children
       }];
     });
   };
+
+  // Public addItem function with business hours validation
+  const addItem = withBusinessHoursValidation(
+    addItemInternal,
+    'Aggiunta al carrello'
+  );
 
   const removeItem = (itemId: string) => {
     setItems(prev => prev.filter(item => item.id !== itemId));

@@ -11,6 +11,7 @@ import UnifiedOrderTracker from '../components/UnifiedOrderTracker';
 import About from '../components/About';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
+import BusinessHoursBanner from '../components/BusinessHoursBanner';
 // Pizzeria Regina 2000 Torino - Complete transformation
 
 
@@ -18,6 +19,7 @@ const Index = () => {
   return (
     <div className="min-h-screen font-inter overflow-x-hidden">
       <Header />
+      <BusinessHoursBanner />
       <ErrorBoundary componentName="Hero">
         <div className="animate-fade-in-up">
           <Hero />
