@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ShoppingCart, Eye, Tag, Clock } from 'lucide-react';
+import { ShoppingCart, Eye, Tag } from 'lucide-react';
 import { Product } from '@/types/category';
 
 import { useToast } from '@/hooks/use-toast';
@@ -19,10 +19,6 @@ interface ProductCardProps {
   description?: string;
   onOrder?: (product: Product) => void;
   onViewDetails?: (product: Product) => void;
-  // Business hours props to avoid multiple subscriptions
-  businessIsOpen?: boolean;
-  businessMessage?: string;
-  validateOrderTime?: () => Promise<{ valid: boolean; message: string }>;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -32,10 +28,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   image,
   description,
   onOrder,
-  onViewDetails,
-  businessIsOpen = true, // Default to true if not provided
-  businessMessage = '',
-  validateOrderTime
+  onViewDetails
 }) => {
   const { toast } = useToast();
   const { addItem } = useSimpleCart();
@@ -58,44 +51,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const isPizza = product?.category_slug === 'semplici' || product?.category_slug === 'speciali';
   const isExtra = product?.category_slug === 'extra';
 
-  const handleOrderClick = async (e?: React.MouseEvent) => {
+  const handleOrderClick = (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
 
-    console.log('🛒 Add to cart button clicked', { product, isAvailable, isPizza, businessIsOpen });
-
-    // First check if business is open
-    if (!businessIsOpen) {
-      toast({
-        title: 'Ordini non disponibili 🕒',
-        description: businessMessage || 'Siamo attualmente chiusi. Gli ordini possono essere effettuati solo durante gli orari di apertura.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    // Validate order time for extra security if function is provided
-    if (validateOrderTime) {
-      try {
-        const timeValidation = await validateOrderTime();
-        if (!timeValidation.valid) {
-          toast({
-            title: 'Ordini non disponibili 🕒',
-            description: timeValidation.message,
-            variant: 'destructive'
-          });
-          return;
-        }
-      } catch (error) {
-        console.error('❌ Error validating order time:', error);
-        toast({
-          title: 'Errore di validazione',
-          description: 'Impossibile verificare gli orari di apertura. Riprova.',
-          variant: 'destructive'
-        });
-        return;
-      }
-    }
+    console.log('🛒 Add to cart button clicked', { product, isAvailable, isPizza });
 
     if (product && isAvailable) {
       // For pizzas, open customization modal
@@ -138,47 +98,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
 
-  const handlePizzaCustomization = async (pizza: Product, quantity: number, extras: PizzaExtra[], specialRequests?: string) => {
-    // Validate business hours before adding customized pizza
-    if (!businessIsOpen) {
-      toast({
-        title: 'Ordini non disponibili 🕒',
-        description: businessMessage || 'Siamo attualmente chiusi. Gli ordini possono essere effettuati solo durante gli orari di apertura.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    // Validate order time if function is provided
-    if (validateOrderTime) {
-      try {
-        const timeValidation = await validateOrderTime();
-        if (!timeValidation.valid) {
-          toast({
-            title: 'Ordini non disponibili 🕒',
-            description: timeValidation.message,
-            variant: 'destructive'
-          });
-          return;
-        }
-      } catch (error) {
-        console.error('❌ Error validating order time:', error);
-        toast({
-          title: 'Errore di validazione',
-          description: 'Impossibile verificare gli orari di apertura. Riprova.',
-          variant: 'destructive'
-        });
-        return;
-      }
-    }
-
+  const handlePizzaCustomization = (pizza: Product, quantity: number, extras: PizzaExtra[], specialRequests?: string) => {
     try {
       addItem(pizza, quantity, extras, specialRequests);
       console.log('✅ Customized pizza added to cart successfully');
-      toast({
-        title: 'Pizza personalizzata aggiunta! 🍕',
-        description: `${pizza.name} personalizzata è stata aggiunta al tuo carrello.`,
-      });
     } catch (error) {
       console.error('❌ Error adding customized pizza to cart:', error);
       toast({
@@ -264,14 +187,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <h3 className="text-xl font-semibold text-gray-800 mb-2 font-playfair">{productName}</h3>
         <p className="text-gray-600 mb-4 text-sm font-inter line-clamp-2">{productDescription}</p>
 
-        {/* Business Hours Status Indicator */}
-        {!businessIsOpen && (
-          <div className="mb-3 flex items-center gap-2 text-orange-600 bg-orange-50 px-3 py-2 rounded-lg border border-orange-200">
-            <Clock size={14} className="animate-pulse" />
-            <span className="text-xs font-medium">Siamo chiusi - Ordini non disponibili</span>
-          </div>
-        )}
-
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-coral-600 font-playfair">
             {productPrice}
@@ -281,34 +196,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <button
               type="button"
               onClick={handleOrderClick}
-              disabled={!isAvailable || !businessIsOpen}
+              disabled={!isAvailable}
               className={`p-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 group/btn focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
-                isAvailable && businessIsOpen
+                isAvailable
                   ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 cursor-pointer'
-                  : !businessIsOpen
-                  ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-white cursor-not-allowed'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
-              title={
-                !businessIsOpen
-                  ? 'Siamo chiusi - Ordini non disponibili'
-                  : isAvailable
-                  ? (isPizza ? 'Personalizza pizza' : 'Aggiungi al carrello')
-                  : 'Non disponibile'
-              }
-              aria-label={
-                !businessIsOpen
-                  ? 'Siamo chiusi - Ordini non disponibili'
-                  : isAvailable
-                  ? (isPizza ? `Personalizza ${product.name}` : `Aggiungi ${product.name} al carrello`)
-                  : 'Prodotto non disponibile'
-              }
+              title={isAvailable ? (isPizza ? 'Personalizza pizza' : 'Aggiungi al carrello') : 'Non disponibile'}
+              aria-label={isAvailable ? (isPizza ? `Personalizza ${product.name}` : `Aggiungi ${product.name} al carrello`) : 'Prodotto non disponibile'}
             >
-              {!businessIsOpen ? (
-                <Clock size={20} className="animate-pulse" />
-              ) : (
-                <ShoppingCart size={20} className={isAvailable ? 'group-hover/btn:animate-bounce' : ''} />
-              )}
+              <ShoppingCart size={20} className={isAvailable ? 'group-hover/btn:animate-bounce' : ''} />
             </button>
           ) : (
             <button
