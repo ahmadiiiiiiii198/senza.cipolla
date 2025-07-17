@@ -377,8 +377,11 @@ const PersistentOrderTracker: React.FC = () => {
   useEffect(() => {
     if (!order || !autoRefresh) return;
 
+    // Generate unique channel name with timestamp to prevent reuse
+    const timestamp = Date.now();
+    const channelName = `homepage-order-${order.id}-${timestamp}`;
     const channel = supabase
-      .channel(`homepage-order-${order.id}`)
+      .channel(channelName)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -400,6 +403,9 @@ const PersistentOrderTracker: React.FC = () => {
       .subscribe();
 
     return () => {
+      console.log('📋 [PERSISTENT-ORDER-TRACKER] Cleaning up subscription for:', channelName);
+      // Unsubscribe first, then remove channel
+      channel.unsubscribe();
       supabase.removeChannel(channel);
     };
   }, [order, autoRefresh]); // REMOVED toast dependency to prevent multiple subscriptions

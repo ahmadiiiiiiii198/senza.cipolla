@@ -271,7 +271,9 @@ export const usePersistentOrder = (): UsePersistentOrderReturn => {
 
     console.log('📋 [PERSISTENT-ORDER-SUB] Setting up subscription for order:', order.id);
 
-    const channelName = `persistent-order-${order.id}`;
+    // Generate unique channel name with timestamp to prevent reuse
+    const timestamp = Date.now();
+    const channelName = `persistent-order-${order.id}-${timestamp}`;
     const channel = supabase
       .channel(channelName)
       .on('postgres_changes', {
@@ -293,6 +295,8 @@ export const usePersistentOrder = (): UsePersistentOrderReturn => {
 
     return () => {
       console.log('📋 [PERSISTENT-ORDER-SUB] Cleaning up subscription for:', channelName);
+      // Unsubscribe first, then remove channel
+      channel.unsubscribe();
       supabase.removeChannel(channel);
     };
   }, [order]);

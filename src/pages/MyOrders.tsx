@@ -156,8 +156,11 @@ const MyOrders: React.FC = () => {
   useEffect(() => {
     if (!user) return;
 
+    // Generate unique channel name with timestamp to prevent reuse
+    const timestamp = Date.now();
+    const channelName = `user-orders-page-${user.id}-${timestamp}`;
     const channel = supabase
-      .channel(`user-orders-page-${user.id}`)
+      .channel(channelName)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -175,6 +178,9 @@ const MyOrders: React.FC = () => {
       .subscribe();
 
     return () => {
+      console.log('📋 [MY-ORDERS] Cleaning up subscription for:', channelName);
+      // Unsubscribe first, then remove channel
+      channel.unsubscribe();
       supabase.removeChannel(channel);
     };
   }, [user]); // REMOVED toast dependency to prevent multiple subscriptions

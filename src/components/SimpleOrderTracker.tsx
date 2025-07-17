@@ -88,8 +88,9 @@ const SimpleOrderTracker: React.FC = () => {
 
     console.log('📡 BULLETPROOF: Setting up real-time subscription for order:', order.id);
 
-    // Create unique channel name
-    const channelName = `order_updates_${order.id}`;
+    // Generate unique channel name with timestamp to prevent reuse
+    const timestamp = Date.now();
+    const channelName = `order_updates_${order.id}_${timestamp}`;
 
     const channel = supabase
       .channel(channelName)
@@ -165,6 +166,8 @@ const SimpleOrderTracker: React.FC = () => {
     return () => {
       console.log('🔌 Cleaning up real-time subscription for channel:', channelName);
       if (subscriptionRef.current) {
+        // Unsubscribe first, then remove channel
+        subscriptionRef.current.unsubscribe();
         supabase.removeChannel(subscriptionRef.current);
         subscriptionRef.current = null;
       }

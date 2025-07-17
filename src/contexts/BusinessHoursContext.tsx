@@ -118,8 +118,11 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
       console.log('📡 [BusinessHoursProvider] Setting up real-time subscription...');
     }
 
+    // Generate unique channel name with timestamp to prevent reuse
+    const timestamp = Date.now();
+    const channelName = `business-hours-global-${timestamp}`;
     const channel = supabase
-      .channel('business-hours-global')
+      .channel(channelName)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -159,15 +162,18 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
     // Cleanup function
     return () => {
       if (subscriptionRef.current) {
+        console.log('📋 [BusinessHoursProvider] Cleaning up subscription for:', channelName);
+        // Unsubscribe first, then remove channel
+        subscriptionRef.current.unsubscribe();
         supabase.removeChannel(subscriptionRef.current);
         subscriptionRef.current = null;
       }
-      
+
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current);
         refreshIntervalRef.current = null;
       }
-      
+
       if (process.env.NODE_ENV === 'development') {
         console.log('🧹 [BusinessHoursProvider] Cleanup completed');
       }

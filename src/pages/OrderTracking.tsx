@@ -189,8 +189,11 @@ const OrderTracking: React.FC = () => {
   useEffect(() => {
     if (!order) return;
 
+    // Generate unique channel name with timestamp to prevent reuse
+    const timestamp = Date.now();
+    const channelName = `order-tracking-${order.id}-${timestamp}`;
     const channel = supabase
-      .channel(`order-${order.id}`)
+      .channel(channelName)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -208,6 +211,9 @@ const OrderTracking: React.FC = () => {
       .subscribe();
 
     return () => {
+      console.log('📋 [ORDER-TRACKING] Cleaning up subscription for:', channelName);
+      // Unsubscribe first, then remove channel
+      channel.unsubscribe();
       supabase.removeChannel(channel);
     };
   }, [order]); // REMOVED toast dependency to prevent multiple subscriptions

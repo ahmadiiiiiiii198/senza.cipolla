@@ -283,13 +283,15 @@ export const useUserOrders = (): UseUserOrdersReturn => {
     }
   }, [isAuthenticated, user]); // REMOVED loadUserOrders dependency
 
-  // Set up real-time subscription for user orders - FIXED to prevent infinite loop
+  // Set up real-time subscription for user orders - FIXED to prevent multiple subscriptions
   useEffect(() => {
     if (!isAuthenticated || !user) return;
 
     console.log('📋 [USER-ORDERS-SUB] Setting up subscription for user:', user.id);
 
-    const channelName = `user-orders-hook-${user.id}`;
+    // Generate unique channel name with timestamp to prevent reuse
+    const timestamp = Date.now();
+    const channelName = `user-orders-hook-${user.id}-${timestamp}`;
     const channel = supabase
       .channel(channelName)
       .on('postgres_changes', {
@@ -382,6 +384,8 @@ export const useUserOrders = (): UseUserOrdersReturn => {
 
     return () => {
       console.log('📋 [USER-ORDERS-SUB] Cleaning up subscription for:', channelName);
+      // Unsubscribe first, then remove channel
+      channel.unsubscribe();
       supabase.removeChannel(channel);
     };
   }, [isAuthenticated, user]); // REMOVED toast dependency to prevent multiple subscriptions
