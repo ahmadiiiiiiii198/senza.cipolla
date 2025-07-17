@@ -3,11 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Minus, ShoppingCart, X } from 'lucide-react';
+import { Plus, Minus, ShoppingCart, X, Clock } from 'lucide-react';
 import { Product } from '@/types/category';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { formatPrice, calculateTotal, addPrices, roundToTwoDecimals } from '@/utils/priceUtils';
+import { useBusinessHours } from '@/hooks/useBusinessHours';
 
 interface PizzaExtra {
   id: string;
@@ -39,6 +40,7 @@ const PizzaCustomizationModal: React.FC<PizzaCustomizationModalProps> = ({
   const [specialRequests, setSpecialRequests] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { isOpen: businessIsOpen, message: businessMessage, validateOrderTime } = useBusinessHours(true, 'pizza-customization');
 
   // Load available extras when modal opens
   useEffect(() => {
@@ -136,16 +138,45 @@ const PizzaCustomizationModal: React.FC<PizzaCustomizationModalProps> = ({
     return addPrices(pizzaPrice, extrasPrice);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!pizza) return;
-    
-    onAddToCart(pizza, quantity, selectedExtras, specialRequests);
-    onClose();
-    
-    toast({
-      title: 'Pizza aggiunta al carrello! 🍕',
-      description: `${pizza.name} con ${selectedExtras.length} extra/bevande è stata aggiunta al carrello.`,
-    });
+
+    // Validate business hours before adding to cart
+    if (!businessIsOpen) {
+      toast({
+        title: 'Ordini non disponibili 🕒',
+        description: businessMessage || 'Siamo attualmente chiusi. Gli ordini possono essere effettuati solo durante gli orari di apertura.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const timeValidation = await validateOrderTime();
+      if (!timeValidation.valid) {
+        toast({
+          title: 'Ordini non disponibili 🕒',
+          description: timeValidation.message,
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      onAddToCart(pizza, quantity, selectedExtras, specialRequests);
+      onClose();
+
+      toast({
+        title: 'Pizza aggiunta al carrello! 🍕',
+        description: `${pizza.name} con ${selectedExtras.length} extra/bevande è stata aggiunta al carrello.`,
+      });
+    } catch (error) {
+      console.error('❌ Error validating order time:', error);
+      toast({
+        title: 'Errore di validazione',
+        description: 'Impossibile verificare gli orari di apertura. Riprova.',
+        variant: 'destructive'
+      });
+    }
   };
 
   if (!pizza) return null;
@@ -177,6 +208,17 @@ const PizzaCustomizationModal: React.FC<PizzaCustomizationModalProps> = ({
               <p className="text-lg font-bold text-pizza-orange mt-2">{formatPrice(pizza.price)}</p>
             </div>
           </div>
+
+          {/* Business Hours Status Indicator */}
+          {!businessIsOpen && (
+            <div className="flex items-center gap-2 text-orange-600 bg-orange-50 px-4 py-3 rounded-lg border border-orange-200">
+              <Clock size={16} className="animate-pulse" />
+              <div>
+                <p className="font-medium text-sm">Siamo attualmente chiusi</p>
+                <p className="text-xs">{businessMessage}</p>
+              </div>
+            </div>
+          )}
 
           <Separator />
 
@@ -317,9 +359,27 @@ const PizzaCustomizationModal: React.FC<PizzaCustomizationModalProps> = ({
               <Button variant="outline" onClick={onClose} className="flex-1">
                 Annulla
               </Button>
-              <Button onClick={handleAddToCart} className="flex-1 bg-pizza-orange hover:bg-pizza-red">
-                <ShoppingCart size={16} className="mr-2" />
-                Aggiungi al Carrello
+              <Button
+                onClick={handleAddToCart}
+                disabled={!businessIsOpen}
+                className={`flex-1 ${
+                  businessIsOpen
+                    ? 'bg-pizza-orange hover:bg-pizza-red'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+                title={businessIsOpen ? 'Aggiungi al carrello' : 'Siamo chiusi - Ordini non disponibili'}
+              >
+                {businessIsOpen ? (
+                  <>
+                    <ShoppingCart size={16} className="mr-2" />
+                    Aggiungi al Carrello
+                  </>
+                ) : (
+                  <>
+                    <Clock size={16} className="mr-2 animate-pulse" />
+                    Siamo Chiusi
+                  </>
+                )}
               </Button>
             </div>
           </div>
