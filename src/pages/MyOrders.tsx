@@ -177,7 +177,7 @@ const MyOrders: React.FC = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, toast]);
+  }, [user]); // REMOVED toast dependency to prevent multiple subscriptions
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('it-IT', {

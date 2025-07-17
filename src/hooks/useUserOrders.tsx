@@ -384,7 +384,7 @@ export const useUserOrders = (): UseUserOrdersReturn => {
       console.log('📋 [USER-ORDERS-SUB] Cleaning up subscription for:', channelName);
       supabase.removeChannel(channel);
     };
-  }, [isAuthenticated, user, toast]); // REMOVED loadUserOrders dependency
+  }, [isAuthenticated, user]); // REMOVED toast dependency to prevent multiple subscriptions
 
   return {
     orders,

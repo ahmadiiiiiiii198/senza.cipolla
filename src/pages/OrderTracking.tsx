@@ -210,7 +210,7 @@ const OrderTracking: React.FC = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [order, toast]);
+  }, [order]); // REMOVED toast dependency to prevent multiple subscriptions
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('it-IT', {

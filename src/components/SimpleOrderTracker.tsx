@@ -170,7 +170,7 @@ const SimpleOrderTracker: React.FC = () => {
       }
       setIsRealTimeActive(false);
     };
-  }, [order?.id, toast]); // Only depend on order.id to avoid unnecessary re-subscriptions
+  }, [order?.id]); // REMOVED toast dependency to prevent multiple subscriptions
 
   // 🔄 BACKUP AUTO-REFRESH (every 30 seconds)
   useEffect(() => {

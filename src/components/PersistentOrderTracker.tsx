@@ -402,7 +402,7 @@ const PersistentOrderTracker: React.FC = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [order, autoRefresh, toast]);
+  }, [order, autoRefresh]); // REMOVED toast dependency to prevent multiple subscriptions
 
   // Auto-refresh every 30 seconds
   useEffect(() => {

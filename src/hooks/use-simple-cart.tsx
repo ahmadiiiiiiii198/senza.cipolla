@@ -21,7 +21,7 @@ export interface CartItem {
 interface SimpleCartContextType {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (product: Product, quantity?: number, extras?: PizzaExtra[], specialRequests?: string) => void;
+  addItem: (product: Product, quantity?: number, extras?: PizzaExtra[], specialRequests?: string) => Promise<void | null>;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -91,10 +91,15 @@ export const SimpleCartProvider: React.FC<SimpleCartProviderProps> = ({ children
   };
 
   // Public addItem function with business hours validation
-  const addItem = withBusinessHoursValidation(
-    addItemInternal,
-    'Aggiunta al carrello'
-  );
+  const addItem = async (product: Product, quantity = 1, extras: PizzaExtra[] = [], specialRequests = ''): Promise<void | null> => {
+    const validatedOperation = withBusinessHoursValidation(
+      addItemInternal,
+      'Aggiunta al carrello'
+    );
+
+    const result = await validatedOperation(product, quantity, extras, specialRequests);
+    return result === null ? null : undefined; // Convert void to undefined, keep null as null
+  };
 
   const removeItem = (itemId: string) => {
     setItems(prev => prev.filter(item => item.id !== itemId));
