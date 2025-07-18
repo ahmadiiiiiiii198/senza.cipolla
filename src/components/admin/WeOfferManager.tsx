@@ -37,29 +37,29 @@ interface WeOfferContent {
 
 const WeOfferManager = () => {
   const [content, setContent] = useState<WeOfferContent>({
-    heading: "We Offer",
-    subheading: "Discover our authentic Italian specialties",
+    heading: "Offriamo",
+    subheading: "Scopri le nostre autentiche specialità italiane",
     offers: [
       {
         id: 1,
         title: "Pizza Metro Finchi 5 Gusti",
-        description: "Experience our signature meter-long pizza with up to 5 different flavors in one amazing creation. Perfect for sharing with family and friends.",
+        description: "Prova la nostra pizza metro caratteristica con fino a 5 gusti diversi in un'unica creazione straordinaria. Perfetta da condividere con famiglia e amici.",
         image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: "Specialty"
+        badge: "Specialità"
       },
       {
         id: 2,
         title: "Usiamo la Farina 5 Stagioni Gusti, Alta Qualità",
-        description: "We use premium 5 Stagioni flour, the finest quality ingredients that make our pizza dough light, digestible and incredibly flavorful.",
+        description: "Utilizziamo farina premium 5 Stagioni, ingredienti della migliore qualità che rendono il nostro impasto per pizza leggero, digeribile e incredibilmente saporito.",
         image: "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: "Quality"
+        badge: "Qualità"
       },
       {
         id: 3,
-        title: "We Make All Kinds of Italian Pizza with High Quality and Very Delicious",
-        description: "From classic Margherita to gourmet specialties, we craft every pizza with passion, using traditional techniques and the finest ingredients for an authentic Italian experience.",
+        title: "Creiamo Tutti i Tipi di Pizza Italiana di Alta Qualità",
+        description: "Dalla classica Margherita alle specialità gourmet, prepariamo ogni pizza con passione, utilizzando tecniche tradizionali e i migliori ingredienti per un'autentica esperienza italiana.",
         image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: "Authentic"
+        badge: "Autentica"
       }
     ]
   });
@@ -120,6 +120,10 @@ const WeOfferManager = () => {
       if (!success) {
         throw new Error('Failed to update setting in database');
       }
+
+      // Verify the save by reading it back
+      const savedContent = await settingsService.getSetting('weOfferContent', null);
+      console.log('🔍 [WeOfferManager] Verification - content after save:', JSON.stringify(savedContent, null, 2));
 
       toast.success('We Offer content saved successfully!');
       console.log('✅ [WeOfferManager] Content saved successfully');

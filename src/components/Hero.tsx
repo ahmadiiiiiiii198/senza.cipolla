@@ -5,7 +5,7 @@ import { usePizzeriaHours } from '@/hooks/usePizzeriaHours';
 
 const Hero = () => {
   const { t } = useLanguage();
-  const { displayText, isLoading: hoursLoading } = usePizzeriaHours();
+  const { displayText, allHours, isLoading: hoursLoading } = usePizzeriaHours();
 
   const [heroContent, setHeroContent] = useState({
     heading: "Pizzeria Regina 2000 Torino",
@@ -315,14 +315,26 @@ const Hero = () => {
           {/* Info Cards - Premium Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
             <div className="group bg-gradient-to-br from-yellow-500/25 to-orange-500/25 backdrop-blur-xl rounded-3xl p-8 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform hover:-translate-y-2">
-              <div className="text-5xl mb-4 group-hover:animate-pulse">⏰</div>
+              <div className="text-5xl mb-4 group-hover:animate-pulse text-center">⏰</div>
               <div className="text-white">
-                <div className="font-bold text-xl mb-2 tracking-wide">
-                  Aperto Oggi
+                <div className="font-bold text-xl mb-4 tracking-wide text-center text-yellow-300">
+                  Orari di Apertura
                 </div>
-                <div className="text-yellow-300 font-mono text-2xl font-bold">
-                  {hoursLoading ? '...' : displayText}
-                </div>
+                {hoursLoading ? (
+                  <div className="text-center text-yellow-200">Caricamento...</div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-1 text-center">
+                    <div className="text-yellow-200 font-mono text-sm font-medium">
+                      Lun-Gio: 12:00-14:30, 18:00-00:00
+                    </div>
+                    <div className="text-yellow-200 font-mono text-sm font-medium">
+                      Ven-Sab: 12:00-14:30, 18:30-02:00
+                    </div>
+                    <div className="text-yellow-200 font-mono text-sm font-medium">
+                      Domenica: 12:00-14:30, 18:00-00:00
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

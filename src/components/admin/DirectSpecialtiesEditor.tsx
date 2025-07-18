@@ -205,7 +205,7 @@ const DirectSpecialtiesEditor: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64 flex-col">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-persian-gold mb-2"></div>
-        <p>Loading specialties...</p>
+        <p>Caricamento specialità...</p>
       </div>
     );
   }
@@ -214,20 +214,20 @@ const DirectSpecialtiesEditor: React.FC = () => {
   if (error) {
     return (
       <div className="p-6 bg-red-50 border border-red-200 rounded-md">
-        <h2 className="text-xl font-bold text-red-700 mb-2">Database Error</h2>
+        <h2 className="text-xl font-bold text-red-700 mb-2">Errore Database</h2>
         <p className="mb-4">{error}</p>
         <div className="flex gap-4">
           <Button 
             variant="outline" 
             onClick={() => refreshData()}
           >
-            Try Again
+            Riprova
           </Button>
           <Button 
             variant="outline" 
             onClick={() => window.location.href = '/cachedebugger'}
           >
-            Open Diagnostic Page
+            Apri Pagina Diagnostica
           </Button>
         </div>
       </div>

@@ -197,19 +197,32 @@ CREATE POLICY "Allow public read access to order_items"
     ];
 
     for (const setting of defaultSettings) {
+      // Check if setting already exists
+      const { data: existingSetting } = await supabase
+        .from('settings')
+        .select('key')
+        .eq('key', setting.key)
+        .single();
+
+      if (existingSetting) {
+        console.log(`⏭️  ${setting.key} already exists, skipping to preserve user changes`);
+        continue;
+      }
+
+      // Only insert if it doesn't exist
       const { data, error } = await supabase
         .from('settings')
-        .upsert({
+        .insert({
           key: setting.key,
           value: setting.value,
           updated_at: new Date().toISOString()
         })
         .select();
-      
+
       if (error) {
         console.error(`❌ Failed to insert ${setting.key}:`, error.message);
       } else {
-        console.log(`✅ Inserted/updated ${setting.key}`);
+        console.log(`✅ Inserted ${setting.key}`);
       }
     }
 

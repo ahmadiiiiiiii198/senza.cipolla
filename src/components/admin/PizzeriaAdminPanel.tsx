@@ -62,7 +62,7 @@ const BulkStockManager = lazy(() => import('./BulkStockManager').catch(() => ({ 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-8">
     <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-    <span className="ml-2 text-gray-600">Loading...</span>
+    <span className="ml-2 text-gray-600">Caricamento...</span>
   </div>
 );
 
@@ -99,8 +99,8 @@ const PizzeriaAdminPanel = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-700">Loading Admin Panel...</h2>
-          <p className="text-gray-500 mt-2">Initializing components...</p>
+          <h2 className="text-xl font-semibold text-gray-700">Caricamento Pannello Admin...</h2>
+          <p className="text-gray-500 mt-2">Inizializzazione componenti...</p>
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ const PizzeriaAdminPanel = () => {
     // === CORE BUSINESS ===
     {
       id: 'dashboard',
-      label: 'Dashboard',
+      label: 'Cruscotto',
       icon: BarChart3,
       description: 'Panoramica generale e statistiche',
       category: 'core'

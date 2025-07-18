@@ -146,7 +146,7 @@ const translations: Record<Language, Record<string, string>> = {
     "products": "Menu",
 
     // WeOffer section
-    "weOffer": "Le Nostre Specialità",
+    "weOffer": "Offriamo",
     "weOfferSubtitle": "Scopri le nostre autentiche specialità italiane",
     "pizzaMetroTitle": "Pizza Metro Finchi 5 Gusti",
     "pizzaMetroDesc": "Prova la nostra pizza metro caratteristica con fino a 5 gusti diversi in un'unica creazione straordinaria. Perfetta da condividere con famiglia e amici.",
@@ -297,7 +297,7 @@ const translations: Record<Language, Record<string, string>> = {
     "products": "Menu",
 
     // WeOffer section
-    "weOffer": "We Offer",
+    "weOffer": "Offriamo",
     "weOfferSubtitle": "Discover our authentic Italian specialties",
     "pizzaMetroTitle": "Pizza Metro Finchi 5 Gusti",
     "pizzaMetroDesc": "Experience our signature meter-long pizza with up to 5 different flavors in one amazing creation. Perfect for sharing with family and friends.",

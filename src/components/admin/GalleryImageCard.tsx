@@ -53,7 +53,7 @@ const GalleryImageCard: React.FC<GalleryImageCardProps> = ({
         {hasImageError ? (
           <div className="w-full h-48 bg-gray-100 flex flex-col items-center justify-center">
             <Image size={32} className="text-gray-400 mb-2" />
-            <p className="text-gray-500 text-sm">Image failed to load</p>
+            <p className="text-gray-500 text-sm">Impossibile caricare l'immagine</p>
           </div>
         ) : (
           <img
@@ -89,7 +89,7 @@ const GalleryImageCard: React.FC<GalleryImageCardProps> = ({
         </div>
         {(image.is_featured || image.featured) && (
           <div className="absolute top-2 right-2 bg-persian-gold text-persian-navy text-xs px-2 py-1 rounded-full">
-            Featured
+            In Evidenza
           </div>
         )}
       </CardContent>

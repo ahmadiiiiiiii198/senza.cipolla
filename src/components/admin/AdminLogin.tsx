@@ -53,13 +53,13 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
       
       if (success) {
         toast({
-          title: "Success",
-          description: "Welcome to the admin panel!",
+          title: "Successo",
+          description: "Benvenuto nel pannello admin!",
         });
       } else {
         toast({
-          title: "Authentication failed",
-          description: "Invalid username or password.",
+          title: "Autenticazione fallita",
+          description: "Nome utente o password non validi.",
           variant: "destructive",
         });
         
@@ -72,8 +72,8 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
     } catch (error) {
       console.error("Login error:", error);
       toast({
-        title: "Error",
-        description: "An error occurred during login. Please try again.",
+        title: "Errore",
+        description: "Si è verificato un errore durante l'accesso. Riprova.",
         variant: "destructive",
       });
     } finally {
@@ -95,7 +95,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
               Pizzeria <span className="text-persian-gold">Admin</span>
             </h1>
             <p className="text-gray-300 mt-2 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              Accedi per gestire il tuo sito web del negozio di fiori
+              Accedi per gestire il tuo sito web della pizzeria
             </p>
           </div>
           
@@ -105,7 +105,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         <div className="p-8 animate-fade-in" style={{ animationDelay: "0.4s" }}>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nome utente</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-persian-gold/60" />
@@ -115,7 +115,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Default: admin"
+                  placeholder="Predefinito: admin"
                   className="pl-10 border-persian-blue/30 focus:border-persian-blue"
                   required
                 />
@@ -133,7 +133,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Default: persian123"
+                  placeholder="Predefinito: persian123"
                   className="pl-10 border-persian-blue/30 focus:border-persian-blue"
                   required
                 />
@@ -151,16 +151,16 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Signing in...
+                  Accesso in corso...
                 </span>
               ) : (
-                "Sign in"
+                "Accedi"
               )}
             </Button>
           </form>
           
           <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Default credentials: admin / persian123</p>
+            <p>Credenziali predefinite: admin / persian123</p>
           </div>
         </div>
       </Card>

@@ -9,15 +9,21 @@ export const initializeWeOfferContent = async () => {
     
     // Check if weOfferContent already exists
     const existingContent = await settingsService.getSetting('weOfferContent', null);
-    
-    if (existingContent) {
-      console.log('✅ [WeOffer] We Offer content already exists in database');
+
+    // Check if existing content has the correct structure
+    if (existingContent && existingContent.offers && Array.isArray(existingContent.offers)) {
+      console.log('✅ [WeOffer] We Offer content already exists with correct structure');
       return existingContent;
+    }
+
+    if (existingContent && (!existingContent.offers || !Array.isArray(existingContent.offers))) {
+      console.log('⚠️ [WeOffer] Existing content has old structure, updating to new structure...');
+      // Continue to create new content with correct structure
     }
     
     // Create the default We Offer content
     const defaultWeOfferContent = {
-      heading: "Le Nostre Specialità",
+      heading: "Offriamo",
       subheading: "Scopri le nostre autentiche specialità italiane",
       offers: [
         {
@@ -44,9 +50,46 @@ export const initializeWeOfferContent = async () => {
       ]
     };
     
-    // Save to database
-    await settingsService.updateSetting('weOfferContent', defaultWeOfferContent);
-    
+    // Save to database ONLY if it doesn't exist (don't overwrite existing content)
+    const { supabase } = await import('@/integrations/supabase/client');
+
+    // Check if weOfferContent already exists in database with correct structure
+    const { data: existingSetting } = await supabase
+      .from('settings')
+      .select('key, value')
+      .eq('key', 'weOfferContent')
+      .single();
+
+    if (existingSetting && existingSetting.value &&
+        existingSetting.value.offers && Array.isArray(existingSetting.value.offers)) {
+      console.log('✅ [WeOffer] We Offer content already exists with correct structure, not overwriting');
+      return existingSetting.value;
+    }
+
+    if (existingSetting && existingSetting.value &&
+        (!existingSetting.value.offers || !Array.isArray(existingSetting.value.offers))) {
+      console.log('⚠️ [WeOffer] Existing content has old structure, updating...');
+      // Delete old content and insert new
+      await supabase
+        .from('settings')
+        .delete()
+        .eq('key', 'weOfferContent');
+    }
+
+    // Only insert if it doesn't exist
+    const { error } = await supabase
+      .from('settings')
+      .insert({
+        key: 'weOfferContent',
+        value: defaultWeOfferContent,
+        updated_at: new Date().toISOString()
+      });
+
+    if (error) {
+      console.error('❌ [WeOffer] Error inserting We Offer content:', error);
+      throw error;
+    }
+
     console.log('✅ [WeOffer] We Offer content successfully initialized in database');
     return defaultWeOfferContent;
     

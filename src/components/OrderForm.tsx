@@ -138,7 +138,7 @@ const OrderForm = () => {
 
       // Validate required fields
       if (!formData.customerName || !formData.customerEmail || !formData.category) {
-        throw new Error('Please fill in all required fields');
+        throw new Error('Compila tutti i campi obbligatori');
       }
 
       const orderNumber = generateOrderNumber();

@@ -54,8 +54,8 @@ const GalleryManager: React.FC = () => {
     removeImage(id);
     setHasChanges(true);
     toast({
-      title: "Image removed",
-      description: "The image has been removed from the gallery",
+      title: "Immagine rimossa",
+      description: "L'immagine è stata rimossa dalla galleria",
     });
   };
 
@@ -64,8 +64,8 @@ const GalleryManager: React.FC = () => {
     setHasChanges(true);
     setIsDialogOpen(false);
     toast({
-      title: "Image added",
-      description: "The image has been added to the gallery",
+      title: "Immagine aggiunta",
+      description: "L'immagine è stata aggiunta alla galleria",
     });
   };
 
@@ -74,7 +74,7 @@ const GalleryManager: React.FC = () => {
       const newImage: GalleryImage = {
         id: `${Date.now()}-${index}`,
         url,
-        title: `Gallery Image ${images.length + index + 1}`,
+        title: `Immagine Galleria ${images.length + index + 1}`,
         description: '',
         order: images.length + index,
         is_featured: false,
@@ -86,8 +86,8 @@ const GalleryManager: React.FC = () => {
 
     setHasChanges(true);
     toast({
-      title: `${imageUrls.length} images added`,
-      description: `Successfully uploaded ${imageUrls.length} images to the gallery`,
+      title: `${imageUrls.length} immagini aggiunte`,
+      description: `Caricate con successo ${imageUrls.length} immagini nella galleria`,
     });
   };
 
@@ -97,13 +97,13 @@ const GalleryManager: React.FC = () => {
       await saveChanges();
       setHasChanges(false);
       toast({
-        title: "Gallery saved",
-        description: "Your gallery has been updated successfully",
+        title: "Galleria salvata",
+        description: "La tua galleria è stata aggiornata con successo",
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to save gallery changes. Please try again.",
+        title: "Errore",
+        description: "Impossibile salvare le modifiche alla galleria. Riprova.",
         variant: "destructive",
       });
     } finally {
@@ -146,7 +146,7 @@ const GalleryManager: React.FC = () => {
             className="flex items-center gap-1"
           >
             <Plus size={16} />
-            Add Image
+            Aggiungi Immagine
           </Button>
           <Button 
             onClick={handleSaveChanges} 
@@ -154,20 +154,20 @@ const GalleryManager: React.FC = () => {
             className="flex items-center gap-2"
           >
             <Save size={16} />
-            Save Changes
+            Salva Modifiche
           </Button>
         </div>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Gallery Images</CardTitle>
+          <CardTitle>Immagini Galleria</CardTitle>
         </CardHeader>
         <CardContent>
           {/* Multiple Image Upload Section */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Upload className="h-5 w-5" />
-              Multiple Image Upload
+              Caricamento Immagini Multiple
             </h3>
             <MultipleImageUploader
               onImagesSelected={(imageUrls) => {
@@ -176,7 +176,7 @@ const GalleryManager: React.FC = () => {
                   const newImage: GalleryImage = {
                     id: `${Date.now()}-${index}`,
                     url: url,
-                    title: `Gallery Image ${images.length + index + 1}`,
+                    title: `Immagine Galleria ${images.length + index + 1}`,
                     description: '',
                     order: images.length + index,
                     is_featured: false,
@@ -188,8 +188,8 @@ const GalleryManager: React.FC = () => {
 
                 setHasChanges(true);
                 toast({
-                  title: `${imageUrls.length} images added`,
-                  description: `Successfully uploaded ${imageUrls.length} images to the gallery`,
+                  title: `${imageUrls.length} immagini aggiunte`,
+                  description: `Caricate con successo ${imageUrls.length} immagini nella galleria`,
                 });
               }}
               onImagesWithLabelsSelected={(imagesWithLabels) => {
@@ -209,11 +209,11 @@ const GalleryManager: React.FC = () => {
 
                 setHasChanges(true);
                 toast({
-                  title: `${imagesWithLabels.length} images added`,
-                  description: `Successfully uploaded ${imagesWithLabels.length} images with labels to the gallery`,
+                  title: `${imagesWithLabels.length} immagini aggiunte`,
+                  description: `Caricate con successo ${imagesWithLabels.length} immagini con etichette nella galleria`,
                 });
               }}
-              buttonLabel="Upload Multiple Images with Labels"
+              buttonLabel="Carica Immagini Multiple con Etichette"
               bucketName="gallery"
               folderPath=""
               maxFiles={50}
@@ -225,7 +225,7 @@ const GalleryManager: React.FC = () => {
           {/* Divider */}
           <div className="border-t border-gray-200 my-6">
             <p className="text-center text-sm text-gray-500 -mt-3 bg-white px-4 inline-block">
-              Current Gallery Images
+              Immagini Galleria Attuali
             </p>
           </div>
 
@@ -235,7 +235,7 @@ const GalleryManager: React.FC = () => {
             </div>
           ) : images.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed rounded-lg">
-              <p className="text-gray-500">No images in the gallery yet. Add some images to get started.</p>
+              <p className="text-gray-500">Nessuna immagine nella galleria. Aggiungi alcune immagini per iniziare.</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -262,7 +262,7 @@ const GalleryManager: React.FC = () => {
         </CardContent>
         <CardFooter>
           <p className="text-sm text-gray-500">
-            Drag and drop images to reorder them. Featured images will appear first in the gallery.
+            Trascina e rilascia le immagini per riordinarle. Le immagini in evidenza appariranno per prime nella galleria.
           </p>
         </CardFooter>
       </Card>

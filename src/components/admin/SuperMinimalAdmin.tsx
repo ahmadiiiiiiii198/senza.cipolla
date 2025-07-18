@@ -5,9 +5,9 @@ const SuperMinimalAdmin = () => {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ color: 'green' }}>✅ Super Minimal Admin Panel</h1>
-      <p>If you can see this, React is working fine!</p>
-      <p>Current time: {new Date().toLocaleString()}</p>
+      <h1 style={{ color: 'green' }}>✅ Pannello Admin Super Minimale</h1>
+      <p>Se vedi questo, React funziona correttamente!</p>
+      <p>Ora attuale: {new Date().toLocaleString()}</p>
       
       <div style={{ 
         backgroundColor: '#f0f0f0', 
@@ -15,17 +15,17 @@ const SuperMinimalAdmin = () => {
         marginTop: '20px',
         borderRadius: '5px'
       }}>
-        <h3>Basic Test Results:</h3>
+        <h3>Risultati Test Base:</h3>
         <ul>
-          <li>✅ React component rendering</li>
-          <li>✅ JavaScript execution</li>
-          <li>✅ CSS styling</li>
-          <li>✅ Date/time functions</li>
+          <li>✅ Rendering componenti React</li>
+          <li>✅ Esecuzione JavaScript</li>
+          <li>✅ Styling CSS</li>
+          <li>✅ Funzioni data/ora</li>
         </ul>
       </div>
 
       <button 
-        onClick={() => alert('Button clicked! Admin panel is working.')}
+        onClick={() => alert('Pulsante cliccato! Il pannello admin funziona.')}
         style={{
           backgroundColor: '#007bff',
           color: 'white',
@@ -36,7 +36,7 @@ const SuperMinimalAdmin = () => {
           cursor: 'pointer'
         }}
       >
-        Test Button
+        Pulsante Test
       </button>
     </div>
   );

@@ -206,15 +206,15 @@ const ProductsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
       toast({
-        title: 'Success',
-        description: 'Product created successfully',
+        title: 'Successo',
+        description: 'Prodotto creato con successo',
       });
       resetForm();
     },
     onError: (error) => {
       toast({
-        title: 'Error',
-        description: `Failed to create product: ${error.message}`,
+        title: 'Errore',
+        description: `Impossibile creare il prodotto: ${error.message}`,
         variant: 'destructive',
       });
     }
@@ -236,15 +236,15 @@ const ProductsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
       toast({
-        title: 'Success',
-        description: 'Product updated successfully',
+        title: 'Successo',
+        description: 'Prodotto aggiornato con successo',
       });
       resetForm();
     },
     onError: (error) => {
       toast({
-        title: 'Error',
-        description: `Failed to update product: ${error.message}`,
+        title: 'Errore',
+        description: `Impossibile aggiornare il prodotto: ${error.message}`,
         variant: 'destructive',
       });
     }
@@ -273,15 +273,15 @@ const ProductsAdmin = () => {
       // Also invalidate the products service cache
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast({
-        title: 'Success',
-        description: 'Product deleted successfully',
+        title: 'Successo',
+        description: 'Prodotto eliminato con successo',
       });
     },
     onError: (error) => {
       console.error('[ProductsAdmin] Delete mutation error:', error);
       toast({
-        title: 'Error',
-        description: `Failed to delete product: ${error.message}`,
+        title: 'Errore',
+        description: `Impossibile eliminare il prodotto: ${error.message}`,
         variant: 'destructive',
       });
     }
@@ -359,8 +359,8 @@ const ProductsAdmin = () => {
 
     if (!formData.name || !formData.price || !formData.category_id) {
       toast({
-        title: 'Validation Error',
-        description: 'Please fill in all required fields',
+        title: 'Errore di Validazione',
+        description: 'Compila tutti i campi obbligatori',
         variant: 'destructive',
       });
       return;
@@ -397,7 +397,7 @@ const ProductsAdmin = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+    if (window.confirm('Sei sicuro di voler eliminare questo prodotto?')) {
       deleteProductMutation.mutate(id);
     }
   };
@@ -419,7 +419,7 @@ const ProductsAdmin = () => {
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">
-            {categoriesLoading ? 'Loading categories...' : 'Loading products...'}
+            {categoriesLoading ? 'Caricamento categorie...' : 'Caricamento prodotti...'}
           </p>
         </div>
       </div>
@@ -432,7 +432,7 @@ const ProductsAdmin = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <XCircle className="h-8 w-8 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600 mb-4">Failed to load categories</p>
+          <p className="text-red-600 mb-4">Impossibile caricare le categorie</p>
           <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['admin-categories'] })}>
             Retry
           </Button>
@@ -447,7 +447,7 @@ const ProductsAdmin = () => {
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="text-center md:text-left">
           <h2 className="text-lg md:text-2xl font-bold tracking-tight">Products Management</h2>
-          <p className="text-sm md:text-base text-gray-600">Manage your product catalog</p>
+          <p className="text-sm md:text-base text-gray-600">Gestisci il catalogo prodotti</p>
         </div>
         <div className="flex flex-col gap-2 md:flex-row">
           {/* Initialize Database button removed to prevent accidental recreation of default content */}
@@ -458,8 +458,8 @@ const ProductsAdmin = () => {
             size="sm"
           >
             <Plus className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
-            <span className="hidden sm:inline">Add Product</span>
-            <span className="sm:hidden">Add</span>
+            <span className="hidden sm:inline">Aggiungi Prodotto</span>
+            <span className="sm:hidden">Aggiungi</span>
           </Button>
         </div>
       </div>
@@ -469,7 +469,7 @@ const ProductsAdmin = () => {
         <Card className="mx-1 md:mx-0">
           <CardHeader className="pb-3 md:pb-6">
             <CardTitle className="flex items-center justify-between text-base md:text-lg">
-              <span>{editingProduct ? 'Edit Product' : 'Create New Product'}</span>
+              <span>{editingProduct ? 'Modifica Prodotto' : 'Crea Nuovo Prodotto'}</span>
               <Button variant="ghost" size="sm" onClick={resetForm} className="h-8 w-8 md:h-9 md:w-9">
                 <X className="h-3 w-3 md:h-4 md:w-4" />
               </Button>
@@ -639,12 +639,12 @@ const ProductsAdmin = () => {
                   {(createProductMutation.isPending || updateProductMutation.isPending) ? (
                     <>
                       <Loader2 className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 animate-spin" />
-                      {editingProduct ? 'Updating...' : 'Creating...'}
+                      {editingProduct ? 'Aggiornamento...' : 'Creazione...'}
                     </>
                   ) : (
                     <>
                       <Save className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
-                      {editingProduct ? 'Update Product' : 'Create Product'}
+                      {editingProduct ? 'Aggiorna Prodotto' : 'Crea Prodotto'}
                     </>
                   )}
                 </Button>
@@ -655,7 +655,7 @@ const ProductsAdmin = () => {
                   className="w-full md:w-auto text-sm"
                   size="sm"
                 >
-                  Cancel
+                  Annulla
                 </Button>
               </div>
             </form>
@@ -791,7 +791,7 @@ const ProductsAdmin = () => {
                 </div>
               ) : (
                 <p className="text-sm md:text-base text-gray-600">
-                  No products found. Create your first product!
+                  Nessun prodotto trovato. Crea il tuo primo prodotto!
                 </p>
               )}
             </div>

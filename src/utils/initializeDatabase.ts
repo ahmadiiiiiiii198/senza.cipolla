@@ -102,20 +102,56 @@ async function initializeDefaultSettings(): Promise<boolean> {
       {
         key: 'weOfferContent',
         value: {
-          title: "Le Nostre Specialità",
-          description: "Scopri le nostre pizze tradizionali preparate con ingredienti freschi e di qualità"
+          heading: "Offriamo",
+          subheading: "Scopri le nostre autentiche specialità italiane",
+          offers: [
+            {
+              id: 1,
+              title: "Pizza Metro Finchi 5 Gusti",
+              description: "Prova la nostra pizza metro caratteristica con fino a 5 gusti diversi in un'unica creazione straordinaria. Perfetta da condividere con famiglia e amici.",
+              image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+              badge: "Specialità"
+            },
+            {
+              id: 2,
+              title: "Usiamo la Farina 5 Stagioni Gusti, Alta Qualità",
+              description: "Utilizziamo farina premium 5 Stagioni, ingredienti della migliore qualità che rendono il nostro impasto per pizza leggero, digeribile e incredibilmente saporito.",
+              image: "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+              badge: "Qualità"
+            },
+            {
+              id: 3,
+              title: "Creiamo Tutti i Tipi di Pizza Italiana di Alta Qualità",
+              description: "Dalla classica Margherita alle specialità gourmet, prepariamo ogni pizza con passione, utilizzando tecniche tradizionali e i migliori ingredienti per un'autentica esperienza italiana.",
+              image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+              badge: "Autentica"
+            }
+          ]
         }
       }
     ];
 
-    // Insert or update settings
+    // Insert settings ONLY if they don't exist (don't overwrite existing settings)
     for (const setting of defaultSettings) {
+      // Check if setting already exists
+      const { data: existingSetting } = await supabase
+        .from('settings')
+        .select('key')
+        .eq('key', setting.key)
+        .single();
+
+      if (existingSetting) {
+        console.log(`[InitDB] Setting ${setting.key} already exists, skipping to preserve user changes`);
+        continue;
+      }
+
+      // Only insert if it doesn't exist
       const { error } = await supabase
         .from('settings')
-        .upsert(setting, { onConflict: 'key' });
+        .insert(setting);
 
       if (error) {
-        console.error(`[InitDB] Error upserting setting ${setting.key}:`, error);
+        console.error(`[InitDB] Error inserting setting ${setting.key}:`, error);
       } else {
         console.log(`[InitDB] Setting ${setting.key} initialized successfully`);
       }

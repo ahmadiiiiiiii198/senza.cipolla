@@ -60,8 +60,8 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
       for (const file of files) {
         if (file.size > 5 * 1024 * 1024) {
           toast({
-            title: "File too large",
-            description: `${file.name} exceeds the 5MB limit`,
+            title: "File troppo grande",
+            description: `${file.name} supera il limite di 5MB`,
             variant: "destructive",
           });
           continue;
@@ -84,8 +84,8 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
         if (uploadError) {
           console.error('Upload error:', uploadError);
           toast({
-            title: "Upload failed",
-            description: `Failed to upload ${file.name}: ${uploadError.message}`,
+            title: "Caricamento fallito",
+            description: `Impossibile caricare ${file.name}: ${uploadError.message}`,
             variant: "destructive",
           });
           continue;
@@ -100,7 +100,7 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
         const newImage: GalleryImage = {
           id: uuidv4(),
           src: data.publicUrl,
-          alt: file.name.split('.')[0] || "Uploaded image",
+          alt: file.name.split('.')[0] || "Immagine caricata",
           featured: false,
         };
 
@@ -114,15 +114,15 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
       // Close dialog if requested
       if (files.length > 0) {
         toast({
-          title: "Upload complete",
-          description: `${files.length} image(s) added to gallery`,
+          title: "Caricamento completato",
+          description: `${files.length} immagine/i aggiunta/e alla galleria`,
         });
       }
     } catch (error) {
       console.error("Upload error:", error);
       toast({
-        title: "Upload failed",
-        description: "There was a problem uploading your images",
+        title: "Caricamento fallito",
+        description: "C'è stato un problema nel caricare le tue immagini",
         variant: "destructive",
       });
     } finally {
@@ -153,7 +153,7 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Upload gallery images</DialogTitle>
+          <DialogTitle>Carica immagini galleria</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
         <div 
@@ -168,7 +168,7 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
           {isUploading ? (
             <div className="flex flex-col items-center justify-center py-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-persian-gold"></div>
-              <p className="text-gray-500 mt-4">Uploading {selectedFiles.length} image(s)...</p>
+              <p className="text-gray-500 mt-4">Caricamento di {selectedFiles.length} immagine/i...</p>
             </div>
           ) : selectedFiles.length > 0 ? (
             <>
@@ -184,7 +184,7 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
                   </div>
                 ))}
               </div>
-              <p className="text-center text-gray-500 mt-2">{selectedFiles.length} file(s) selected</p>
+              <p className="text-center text-gray-500 mt-2">{selectedFiles.length} file selezionato/i</p>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -192,14 +192,14 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
                 className="mt-2"
                 disabled={isUploading}
               >
-                <X size={16} className="mr-1" /> Clear selection
+                <X size={16} className="mr-1" /> Cancella selezione
               </Button>
             </>
           ) : (
             <>
               <ImageIcon size={48} className="text-gray-400" />
-              <p className="text-gray-500 text-center mb-2">Drag and drop your images here</p>
-              <p className="text-gray-400 text-center text-sm">or click to browse</p>
+              <p className="text-gray-500 text-center mb-2">Trascina e rilascia le tue immagini qui</p>
+              <p className="text-gray-400 text-center text-sm">o clicca per sfogliare</p>
               <input
                 key={fileInputKey}
                 type="file"
@@ -213,7 +213,7 @@ const GalleryUploadDialog: React.FC<GalleryUploadDialogProps> = ({
           )}
         </div>
         <p className="text-xs text-gray-500 text-center">
-          Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB per image.
+          Formati supportati: JPG, PNG, GIF, WebP. Dimensione massima: 5MB per immagine.
         </p>
         </div>
       </DialogContent>

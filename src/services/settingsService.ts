@@ -1,6 +1,28 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 
+// Helper function to safely parse JSON values
+const safeJsonParse = <T = any>(value: any): Json => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value as Json;
+    }
+  }
+
+  // For objects and arrays, ensure they're JSON-serializable
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch {
+    return null;
+  }
+};
+
 // Helper function to upsert settings
 const upsertSetting = async (key: string, value: any) => {
   const { error } = await supabase
@@ -19,19 +41,7 @@ const upsertSetting = async (key: string, value: any) => {
   }
 };
 
-// Additional helper function to safely convert to/from JSON type
-const safeJsonParse = <T>(data: any): T => {
-  try {
-    // If it's already an object, don't stringify and parse it again
-    if (typeof data === 'object' && data !== null) {
-      return data as unknown as T;
-    }
-    return JSON.parse(JSON.stringify(data)) as T;
-  } catch (e) {
-    console.error("Error parsing JSON:", e);
-    throw e;
-  }
-};
+
 
 // Class implementation for settings service
 class SettingsService {
@@ -95,85 +105,118 @@ class SettingsService {
       // Only initialize if no settings exist
       if (!existingSettings || existingSettings.length === 0) {
         console.log("No settings found, initializing defaults");
-        
-        // Initialize restaurant settings
-        const restaurantSettings = {
-          totalSeats: 50,
-          reservationDuration: 120,
-          openingTime: "11:30",
-          closingTime: "22:00",
-          languages: ["it", "en", "ar", "fa"],
-          defaultLanguage: "it"
-        };
-        
-        // Initialize contact information
-        const contactContent = {
-          address: "Corso Regina Margherita, 53, 10152 Torino TO",
-          phone: "0110769211",
-          email: "anilamyzyri@gmail.com",
-          mapUrl: "https://maps.google.com",
-          hours: "Lun-Dom: 08:00 - 19:00"
-        };
 
-        // Initialize gallery content
-        const galleryContent = {
-          heading: "La Nostra Galleria",
-          subheading: "Scorci delle nostre creazioni floreali e dell'atmosfera del negozio"
-        };
-
-        // No default gallery images to prevent automatic recreation after deletion
-        const galleryImages = [];
-        // All default gallery images removed to prevent recreation after deletion
-
-        // Initialize We Offer content
-        const weOfferContent = {
-          heading: "We Offer",
-          subheading: "Discover our authentic Italian specialties",
-          offers: [
-            {
-              id: 1,
-              title: "Pizza Metro Finchi 5 Gusti",
-              description: "Experience our signature meter-long pizza with up to 5 different flavors in one amazing creation. Perfect for sharing with family and friends.",
-              image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-              badge: "Specialty"
-            },
-            {
-              id: 2,
-              title: "Usiamo la Farina 5 Stagioni Gusti, Alta Qualità",
-              description: "We use premium 5 Stagioni flour, the finest quality ingredients that make our pizza dough light, digestible and incredibly flavorful.",
-              image: "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-              badge: "Quality"
-            },
-            {
-              id: 3,
-              title: "We Make All Kinds of Italian Pizza with High Quality and Very Delicious",
-              description: "From classic Margherita to gourmet specialties, we craft every pizza with passion, using traditional techniques and the finest ingredients for an authentic Italian experience.",
-              image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-              badge: "Authentic"
+        // Define default settings
+        const defaultSettings = [
+          {
+            key: 'restaurantSettings',
+            value: {
+              totalSeats: 50,
+              reservationDuration: 120,
+              openingTime: "11:30",
+              closingTime: "22:00",
+              languages: ["it", "en", "ar", "fa"],
+              defaultLanguage: "it"
             }
-          ]
-        };
-        
-        // Initialize logo settings
-        const logoSettings = {
-          logoUrl: "/pizzeria-regina-logo.png",
-          altText: "Pizzeria Regina 2000 Torino Logo",
-        };
-        
-        // Use Promise.allSettled to handle potential duplicate keys gracefully
-        const promises = [
-          this.updateSetting('restaurantSettings', restaurantSettings),
-          this.updateSetting('contactContent', contactContent),
-          this.updateSetting('galleryContent', galleryContent),
-          this.updateSetting('galleryImages', galleryImages),
-          this.updateSetting('logoSettings', logoSettings),
-          this.updateSetting('weOfferContent', weOfferContent),
-          this.updateSetting('popups', []),
-          this.updateSetting('reservations', [])
+          },
+          {
+            key: 'contactContent',
+            value: {
+              address: "Corso Regina Margherita, 53, 10152 Torino TO",
+              phone: "0110769211",
+              email: "anilamyzyri@gmail.com",
+              mapUrl: "https://maps.google.com",
+              hours: "Lun-Dom: 08:00 - 19:00"
+            }
+          },
+          {
+            key: 'galleryContent',
+            value: {
+              heading: "La Nostra Galleria",
+              subheading: "Scorci delle nostre creazioni floreali e dell'atmosfera del negozio"
+            }
+          },
+          {
+            key: 'galleryImages',
+            value: []
+          },
+          {
+            key: 'logoSettings',
+            value: {
+              logoUrl: "/pizzeria-regina-logo.png",
+              altText: "Pizzeria Regina 2000 Torino Logo"
+            }
+          },
+          {
+            key: 'weOfferContent',
+            value: {
+              heading: "Offriamo",
+              subheading: "Scopri le nostre autentiche specialità italiane",
+              offers: [
+                {
+                  id: 1,
+                  title: "Pizza Metro Finchi 5 Gusti",
+                  description: "Prova la nostra pizza metro caratteristica con fino a 5 gusti diversi in un'unica creazione straordinaria. Perfetta da condividere con famiglia e amici.",
+                  image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                  badge: "Specialità"
+                },
+                {
+                  id: 2,
+                  title: "Usiamo la Farina 5 Stagioni Gusti, Alta Qualità",
+                  description: "Utilizziamo farina premium 5 Stagioni, ingredienti della migliore qualità che rendono il nostro impasto per pizza leggero, digeribile e incredibilmente saporito.",
+                  image: "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                  badge: "Qualità"
+                },
+                {
+                  id: 3,
+                  title: "Creiamo Tutti i Tipi di Pizza Italiana di Alta Qualità",
+                  description: "Dalla classica Margherita alle specialità gourmet, prepariamo ogni pizza con passione, utilizzando tecniche tradizionali e i migliori ingredienti per un'autentica esperienza italiana.",
+                  image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                  badge: "Autentica"
+                }
+              ]
+            }
+          },
+          {
+            key: 'popups',
+            value: []
+          },
+          {
+            key: 'reservations',
+            value: []
+          }
         ];
-        
-        await Promise.allSettled(promises);
-        
+
+        // Insert settings ONLY if they don't exist (same pattern as initializeDatabase.ts)
+        for (const setting of defaultSettings) {
+          // Check if this specific setting already exists
+          const { data: existingSetting } = await supabase
+            .from('settings')
+            .select('key')
+            .eq('key', setting.key)
+            .single();
+
+          if (existingSetting) {
+            console.log(`[SettingsService] Setting ${setting.key} already exists, skipping to preserve user changes`);
+            continue;
+          }
+
+          // Only insert if it doesn't exist
+          const { error } = await supabase
+            .from('settings')
+            .insert({
+              key: setting.key,
+              value: safeJsonParse<Json>(setting.value),
+              updated_at: new Date().toISOString()
+            });
+
+          if (error) {
+            console.error(`[SettingsService] Error inserting setting ${setting.key}:`, error);
+          } else {
+            console.log(`[SettingsService] Setting ${setting.key} initialized successfully`);
+          }
+        }
+
         console.log("Settings initialized in database");
       } else {
         console.log("Settings already exist in database, skipping initialization");

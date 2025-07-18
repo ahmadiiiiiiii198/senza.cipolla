@@ -7,41 +7,36 @@ const WeOffer = () => {
 
   console.log('🍕 [WeOffer] Component rendering...');
 
-  // Dynamic content based on translations
-  const getOfferContent = () => ({
-    heading: t('weOffer') || 'Le Nostre Specialità',
-    subheading: t('weOfferSubtitle') || 'Scopri le nostre pizze tradizionali preparate con ingredienti freschi e di qualità',
+  // Default fallback content (only used if database fails)
+  const defaultOfferContent = {
+    heading: 'Offriamo',
+    subheading: 'Scopri le nostre autentiche specialità italiane',
     offers: [
       {
         id: 1,
-        title: t('pizzaMetroTitle') || 'Pizza al Metro',
-        description: t('pizzaMetroDesc') || 'Pizza al metro per 4-5 persone, perfetta per condividere',
+        title: 'Pizza Metro Finchi 5 Gusti',
+        description: 'Prova la nostra pizza metro caratteristica con fino a 5 gusti diversi in un\'unica creazione straordinaria. Perfetta da condividere con famiglia e amici.',
         image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: t('specialtyBadge') || 'Specialità'
+        badge: 'Specialità'
       },
       {
         id: 2,
-        title: t('flourQualityTitle') || 'Ingredienti Freschi',
-        description: t('flourQualityDesc') || 'Solo ingredienti freschi e di qualità per le nostre pizze',
+        title: 'Usiamo la Farina 5 Stagioni Gusti, Alta Qualità',
+        description: 'Utilizziamo farina premium 5 Stagioni, ingredienti della migliore qualità che rendono il nostro impasto per pizza leggero, digeribile e incredibilmente saporito.',
         image: "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: t('qualityBadge') || 'Qualità'
+        badge: 'Qualità'
       },
       {
         id: 3,
-        title: t('italianPizzaTitle') || 'Pizza Italiana',
-        description: t('italianPizzaDesc') || 'Autentica pizza italiana preparata con forno a legna',
+        title: 'Creiamo Tutti i Tipi di Pizza Italiana di Alta Qualità',
+        description: 'Dalla classica Margherita alle specialità gourmet, prepariamo ogni pizza con passione, utilizzando tecniche tradizionali e i migliori ingredienti per un\'autentica esperienza italiana.',
         image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        badge: t('authenticBadge') || 'Autentica'
+        badge: 'Autentica'
       }
     ]
-  });
+  };
 
-  const [offerContent, setOfferContent] = useState(getOfferContent());
-
-  // Update content when language changes
-  useEffect(() => {
-    setOfferContent(getOfferContent());
-  }, [t]);
+  const [offerContent, setOfferContent] = useState(defaultOfferContent);
 
   const [imagesLoaded, setImagesLoaded] = useState({
     1: false,
@@ -50,7 +45,7 @@ const WeOffer = () => {
   });
 
   useEffect(() => {
-    const loadContent = async () => {
+    const setupContentAndRealtime = async () => {
       try {
         console.log('🔄 [WeOffer] Starting content load...');
         // Initialize We Offer content in database if it doesn't exist
@@ -64,13 +59,45 @@ const WeOffer = () => {
           console.warn('⚠️ [WeOffer] Invalid content structure, using defaults');
           // Keep default content
         }
+
+        // Set up real-time listener for admin changes
+        const { supabase } = await import('@/integrations/supabase/client');
+        const timestamp = Date.now();
+        const channelName = `we-offer-updates-${timestamp}`;
+        const channel = supabase
+          .channel(channelName)
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'settings',
+            filter: 'key=eq.weOfferContent'
+          }, async (payload) => {
+            console.log('🔔 [WeOffer] Real-time update received from admin');
+            if (payload.new?.value) {
+              setOfferContent(payload.new.value);
+              console.log('✅ [WeOffer] Content updated from real-time change');
+            }
+          })
+          .subscribe();
+
+        return channel;
       } catch (error) {
         console.error('❌ [WeOffer] Failed to load content, using defaults:', error);
         // Fallback to default content if database fails
+        return null;
       }
     };
 
-    loadContent();
+    let channel: any = null;
+    setupContentAndRealtime().then((ch) => {
+      channel = ch;
+    });
+
+    return () => {
+      if (channel) {
+        channel.unsubscribe();
+      }
+    };
   }, []);
 
   const handleImageLoad = (offerId: number) => {

@@ -30,7 +30,7 @@ export type JsonCompatible<T> = {
 };
 
 // Helper function to safely convert objects to/from JSON type
-export function safeJsonParse<T>(data: any): Json {
+export function safeJsonConvert<T>(data: any): Json {
   try {
     // If it's already an object, stringify then parse to ensure compatible structure
     if (typeof data === 'object' && data !== null) {
@@ -38,7 +38,7 @@ export function safeJsonParse<T>(data: any): Json {
     }
     return data as Json;
   } catch (e) {
-    console.error("Error parsing JSON:", e);
+    console.error("Error converting to JSON:", e);
     throw e;
   }
 }

@@ -401,14 +401,30 @@ const ContactSection = () => {
               </CardContent>
             </Card>
 
-            {/* Map Placeholder */}
-            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
+            {/* Interactive Google Map */}
+            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm overflow-hidden">
               <CardContent className="p-0">
-                <div className="h-64 bg-gradient-to-br from-emerald-100 to-green-200 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="h-12 w-12 text-emerald-600 mx-auto mb-4" />
-                    <p className="text-emerald-700 font-medium">Mappa Interattiva</p>
-                    <p className="text-emerald-600 text-sm">Clicca per aprire in Google Maps</p>
+                <div className="h-64 relative">
+                  <iframe
+                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBkHCjFa0GKD7lJThAyFnSaeCXFDsBtJhs&q=Corso+Regina+Margherita+53+Torino+Italy&zoom=16&maptype=roadmap"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="rounded-lg"
+                  />
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-lg">
+                    <a
+                      href="https://www.google.com/maps/dir//Corso+Regina+Margherita+53+Torino+Italy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors text-sm font-medium"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Indicazioni
+                    </a>
                   </div>
                 </div>
               </CardContent>

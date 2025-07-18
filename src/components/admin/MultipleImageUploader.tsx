@@ -28,7 +28,7 @@ interface MultipleImageUploaderProps {
 const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
   onImagesSelected,
   onImagesWithLabelsSelected,
-  buttonLabel = "Upload Images",
+  buttonLabel = "Carica Immagini",
   className,
   bucketName = "gallery",
   folderPath,
@@ -66,8 +66,8 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
     const currentCount = enableLabels ? previewImagesWithLabels.length : previewImages.length;
     if (currentCount + filesArray.length > maxFiles) {
       toast({
-        title: "Too many files",
-        description: `Maximum ${maxFiles} images allowed. You currently have ${currentCount} images.`,
+        title: "Troppi file",
+        description: `Massimo ${maxFiles} immagini consentite. Attualmente hai ${currentCount} immagini.`,
         variant: "destructive",
       });
       return;
@@ -78,8 +78,8 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
       if (file.size > maxFileSize) {
         const maxSizeMB = Math.round(maxFileSize / (1024 * 1024));
         toast({
-          title: "File too large",
-          description: `${file.name} exceeds ${maxSizeMB}MB limit`,
+          title: "File troppo grande",
+          description: `${file.name} supera il limite di ${maxSizeMB}MB`,
           variant: "destructive",
         });
         return;
@@ -148,11 +148,11 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
 
         if (error) {
           console.error(`Upload error for file ${file.name}:`, error);
-          throw new Error(`Failed to upload ${file.name}: ${error.message}`);
+          throw new Error(`Impossibile caricare ${file.name}: ${error.message}`);
         }
 
         if (!data) {
-          throw new Error(`No data returned from upload for ${file.name}`);
+          throw new Error(`Nessun dato restituito dal caricamento per ${file.name}`);
         }
 
         // Get the public URL
@@ -188,15 +188,15 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
       }
       
       toast({
-        title: `${files.length} image${files.length > 1 ? 's' : ''} uploaded`,
-        description: `Successfully uploaded ${files.length} image${files.length > 1 ? 's' : ''}`,
+        title: `${files.length} immagine${files.length > 1 ? '' : ''} caricata${files.length > 1 ? 'e' : ''}`,
+        description: `Caricate con successo ${files.length} immagine${files.length > 1 ? '' : ''}`,
       });
     } catch (error: any) {
       console.error("Error uploading files:", error);
-      setUploadError(error.message || "Upload failed");
+      setUploadError(error.message || "Caricamento fallito");
       toast({
-        title: "Upload failed",
-        description: error.message || "There was an error uploading your files. Please try again.",
+        title: "Caricamento fallito",
+        description: error.message || "C'è stato un errore nel caricare i tuoi file. Riprova.",
         variant: "destructive",
       });
     } finally {
@@ -261,7 +261,7 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
         {isUploading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Uploading...
+            Caricamento...
           </>
         ) : (
           <>
@@ -321,11 +321,11 @@ const MultipleImageUploader: React.FC<MultipleImageUploaderProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Tag size={14} className="text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700">Label:</span>
+                    <span className="text-sm font-medium text-gray-700">Etichetta:</span>
                   </div>
                   <Input
                     type="text"
-                    placeholder="Enter image label..."
+                    placeholder="Inserisci etichetta immagine..."
                     value={image.label}
                     onChange={(e) => updateImageLabel(index, e.target.value)}
                     className="text-sm"
