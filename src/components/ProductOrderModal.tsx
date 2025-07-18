@@ -40,19 +40,19 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
     setIsProcessing(true);
 
     try {
-      // 🔒 SECURITY: Require authentication for orders
-      if (!isAuthenticated || !user) {
-        setShowAuthRequired(true);
-        return;
-      }
-
-      // Validate business hours first
+      // ⏰ FIRST: Check business hours (should be visible to all users)
       console.log('🕒 Checking business hours...');
       const businessHoursValidation = await businessHoursService.validateOrderTime();
       if (!businessHoursValidation.valid) {
         throw new Error(businessHoursValidation.message);
       }
       console.log('✅ Business hours validation passed');
+
+      // 🔒 SECOND: Require authentication for orders (after business hours check)
+      if (!isAuthenticated || !user) {
+        setShowAuthRequired(true);
+        return;
+      }
 
       // Get client identity for order tracking
       const clientIdentity = await getOrCreateClientIdentity();
@@ -417,16 +417,16 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
 
   // Create order function for "pay later" option
   const createOrder = async () => {
-    // 🔒 SECURITY: Require authentication for orders
-    if (!isAuthenticated || !user) {
-      setShowAuthRequired(true);
-      throw new Error('Authentication required');
-    }
-
-    // Validate business hours first
+    // ⏰ FIRST: Check business hours (should be visible to all users)
     const businessHoursValidation = await validateOrderTime();
     if (!businessHoursValidation.valid) {
       throw new Error(businessHoursValidation.message);
+    }
+
+    // 🔒 SECOND: Require authentication for orders (after business hours check)
+    if (!isAuthenticated || !user) {
+      setShowAuthRequired(true);
+      throw new Error('Authentication required');
     }
 
     if (!product || !addressValidation?.isValid) {
