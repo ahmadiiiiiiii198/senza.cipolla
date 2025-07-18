@@ -173,9 +173,9 @@ const UnifiedOrderTracker: React.FC = () => {
   const { orders: userOrders, getActiveOrder, loading: userOrdersLoading } = useUserOrders();
   const { order: anonymousOrder, loading: anonymousLoading } = usePersistentOrder();
 
-  // Memoize the active order determination to prevent unnecessary re-renders
+  // 🔒 SECURITY: Only show orders for authenticated users
   const activeOrderData = useMemo(() => {
-    // Inline the active order logic to avoid dependency on getActiveOrder function
+    // Only show orders for authenticated users
     let activeOrder = null;
     if (isAuthenticated && userOrders) {
       const activeStatuses = ['confirmed', 'preparing', 'ready', 'arrived'];
@@ -184,18 +184,16 @@ const UnifiedOrderTracker: React.FC = () => {
         const currentStatus = order.status || order.order_status;
         return activeStatuses.includes(currentStatus);
       }) || null;
-    } else {
-      activeOrder = anonymousOrder;
     }
 
-    const loading = isAuthenticated ? userOrdersLoading : anonymousLoading;
+    const loading = isAuthenticated ? userOrdersLoading : false;
 
     return {
       activeOrder,
       loading,
-      orderSource: isAuthenticated ? 'user' : 'anonymous'
+      orderSource: isAuthenticated ? 'user' : 'none'
     };
-  }, [isAuthenticated, userOrders, anonymousOrder, userOrdersLoading, anonymousLoading]);
+  }, [isAuthenticated, userOrders, userOrdersLoading]);
 
   console.log('🎯 [ORDER-TRACKER] Render state:', {
     isAuthenticated,
@@ -210,6 +208,9 @@ const UnifiedOrderTracker: React.FC = () => {
     orderSource: activeOrderData.orderSource,
     loading: activeOrderData.loading
   });
+
+  // 🔒 SECURITY: Only show for authenticated users
+  if (!isAuthenticated) return null;
 
   // If no active order, don't show the tracker
   if (!activeOrderData.activeOrder) return null;

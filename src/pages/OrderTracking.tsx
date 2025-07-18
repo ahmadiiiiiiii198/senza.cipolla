@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useCustomerAuth } from '@/hooks/useCustomerAuth';
+import useUserOrders from '@/hooks/useUserOrders';
 import {
   Clock,
   CheckCircle,
@@ -23,7 +25,9 @@ import {
   Loader2,
   ChefHat,
   DoorOpen,
-  Home
+  Home,
+  Lock,
+  LogIn
 } from 'lucide-react';
 
 interface Order {
@@ -54,12 +58,14 @@ interface OrderItem {
 
 const OrderTracking: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [orderNumber, setOrderNumber] = useState(searchParams.get('order') || '');
-  const [customerEmail, setCustomerEmail] = useState(searchParams.get('email') || '');
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { isAuthenticated, user, loading: authLoading } = useCustomerAuth();
+  const { orders: userOrders, loading: userOrdersLoading } = useUserOrders();
 
   // Order status configuration with beautiful motorcycle delivery tracking
   const orderStatuses = [
@@ -146,10 +152,15 @@ const OrderTracking: React.FC = () => {
     };
   };
 
-  // Search for order
+  // 🔒 SECURITY: Search for order only for authenticated users
   const searchOrder = async () => {
-    if (!orderNumber.trim() || !customerEmail.trim()) {
-      setError('Inserisci sia il numero ordine che l\'email');
+    if (!isAuthenticated || !user) {
+      setError('Devi essere autenticato per visualizzare gli ordini');
+      return;
+    }
+
+    if (!orderNumber.trim()) {
+      setError('Inserisci il numero ordine');
       return;
     }
 
@@ -158,6 +169,7 @@ const OrderTracking: React.FC = () => {
     setOrder(null);
 
     try {
+      // 🔒 SECURITY: Only search orders belonging to the authenticated user
       const { data, error: searchError } = await supabase
         .from('orders')
         .select(`
@@ -173,12 +185,12 @@ const OrderTracking: React.FC = () => {
           )
         `)
         .eq('order_number', orderNumber.trim())
-        .eq('customer_email', customerEmail.trim().toLowerCase())
+        .eq('user_id', user.id) // 🔒 SECURITY: Only user's own orders
         .single();
 
       if (searchError) {
         if (searchError.code === 'PGRST116') {
-          setError('Ordine non trovato. Verifica il numero ordine e l\'email.');
+          setError('Ordine non trovato. Verifica il numero ordine.');
         } else {
           setError('Errore durante la ricerca dell\'ordine.');
         }
@@ -253,6 +265,65 @@ const OrderTracking: React.FC = () => {
     return `€${price.toFixed(2)}`;
   };
 
+  // 🔒 SECURITY: Show authentication required message if not logged in
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-purple-50 py-8 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-pizza-orange mx-auto mb-4" />
+          <p className="text-lg text-gray-600">Caricamento...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-purple-50 py-8 px-4">
+        <div className="max-w-2xl mx-auto">
+          <Card className="shadow-2xl border-0 bg-gradient-to-br from-white to-orange-50 overflow-hidden">
+            <CardHeader className="text-center pb-6 bg-gradient-to-r from-pizza-orange to-red-500 text-white">
+              <div className="flex justify-center mb-4">
+                <div className="bg-white/20 p-4 rounded-full">
+                  <Lock className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl font-bold">
+                Accesso Richiesto
+              </CardTitle>
+              <p className="text-white/90 mt-2">
+                Devi essere autenticato per visualizzare i tuoi ordini
+              </p>
+            </CardHeader>
+            <CardContent className="p-8 text-center space-y-6">
+              <div className="space-y-4">
+                <p className="text-gray-600">
+                  Per garantire la sicurezza e la privacy dei tuoi ordini, è necessario effettuare l'accesso al tuo account.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    onClick={() => navigate('/my-orders')}
+                    className="bg-gradient-to-r from-pizza-orange to-red-500 hover:from-red-500 hover:to-pizza-orange text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                  >
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Accedi ai tuoi Ordini
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/')}
+                    className="border-pizza-orange text-pizza-orange hover:bg-pizza-orange hover:text-white py-3 px-6 rounded-xl transition-all duration-200"
+                  >
+                    Torna alla Home
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-purple-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -264,10 +335,10 @@ const OrderTracking: React.FC = () => {
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-pizza-orange to-red-500 bg-clip-text text-transparent">
-            Traccia il tuo Ordine
+            I tuoi Ordini
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Inserisci i tuoi dati per seguire lo stato del tuo ordine in tempo reale con il nostro sistema di tracking avanzato
+            Benvenuto {user?.user_metadata?.full_name || user?.email}! Inserisci il numero ordine per seguire lo stato in tempo reale
           </p>
         </div>
 
@@ -283,7 +354,7 @@ const OrderTracking: React.FC = () => {
               Cerca il tuo Ordine
             </CardTitle>
             <p className="text-white/90 mt-2">
-              Inserisci i tuoi dati per iniziare il tracking
+              Inserisci il numero ordine per iniziare il tracking
             </p>
           </CardHeader>
           <CardContent className="p-8 space-y-6">
@@ -303,20 +374,14 @@ const OrderTracking: React.FC = () => {
                 </div>
               </div>
 
-              <div className="relative">
-                <label className="block text-sm font-semibold mb-3 text-gray-700">
-                  📧 Email di Conferma
-                </label>
-                <div className="relative">
-                  <Input
-                    type="email"
-                    placeholder="la-tua-email@esempio.com"
-                    value={customerEmail}
-                    onChange={(e) => setCustomerEmail(e.target.value)}
-                    className="w-full h-12 pl-12 text-lg border-2 border-gray-200 focus:border-pizza-orange rounded-xl shadow-sm transition-all duration-200"
-                  />
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-blue-700">
+                  <Lock className="h-4 w-4" />
+                  <span className="text-sm font-medium">Account: {user?.email}</span>
                 </div>
+                <p className="text-xs text-blue-600 mt-1">
+                  Verranno mostrati solo i tuoi ordini personali
+                </p>
               </div>
             </div>
 

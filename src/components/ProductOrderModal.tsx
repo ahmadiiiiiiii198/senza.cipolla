@@ -17,6 +17,7 @@ import { saveOrderForTracking } from '@/utils/orderTracking';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
+import AuthRequiredModal from './AuthRequiredModal';
 
 // Direct payment button component - no abstractions
 interface DirectPaymentButtonProps {
@@ -39,6 +40,12 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
     setIsProcessing(true);
 
     try {
+      // 🔒 SECURITY: Require authentication for orders
+      if (!isAuthenticated || !user) {
+        setShowAuthRequired(true);
+        return;
+      }
+
       // Validate business hours first
       console.log('🕒 Checking business hours...');
       const businessHoursValidation = await businessHoursService.validateOrderTime();
@@ -71,7 +78,7 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
           status: 'confirmed',
           payment_status: 'pending',
           payment_method: 'stripe',
-          user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
+          user_id: user.id, // 🔒 SECURITY: Always associate with authenticated user
           special_instructions: `Product Order - ${product.name}\nQuantity: ${orderData.quantity}\nSpecial Requests: ${orderData.specialRequests}`,
           metadata: {
             product_id: product.id,
@@ -284,6 +291,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
   const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValidatingAddress, setIsValidatingAddress] = useState(false);
+  const [showAuthRequired, setShowAuthRequired] = useState(false);
   const [addressValidation, setAddressValidation] = useState<any>(null);
   const [addressValidationTimeout, setAddressValidationTimeout] = useState<NodeJS.Timeout | null>(null);
   const [orderData, setOrderData] = useState<OrderData>({
@@ -409,6 +417,12 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
 
   // Create order function for "pay later" option
   const createOrder = async () => {
+    // 🔒 SECURITY: Require authentication for orders
+    if (!isAuthenticated || !user) {
+      setShowAuthRequired(true);
+      throw new Error('Authentication required');
+    }
+
     // Validate business hours first
     const businessHoursValidation = await validateOrderTime();
     if (!businessHoursValidation.valid) {
@@ -444,7 +458,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
         status: 'confirmed', // Orders are automatically confirmed
         payment_status: 'pending',
         payment_method: 'cash_on_delivery',
-        user_id: isAuthenticated && user ? user.id : null, // 🎯 ASSOCIATE WITH USER IF AUTHENTICATED
+        user_id: user.id, // 🔒 SECURITY: Always associate with authenticated user
         metadata: {
           deliveryFee: addressValidation.deliveryFee,
           estimatedTime: addressValidation.estimatedTime,
@@ -882,6 +896,14 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
           </form>
         </div>
       </DialogContent>
+
+      {/* Authentication Required Modal */}
+      <AuthRequiredModal
+        isOpen={showAuthRequired}
+        onClose={() => setShowAuthRequired(false)}
+        title="Accesso Richiesto per Ordinare"
+        message="Per garantire la sicurezza dei tuoi ordini e permetterti di tracciare le consegne, devi essere autenticato per effettuare un ordine."
+      />
     </Dialog>
   );
 };

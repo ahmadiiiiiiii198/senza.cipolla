@@ -26,24 +26,23 @@ import { useNavigate } from 'react-router-dom';
 const HomeOrderTracker: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated } = useCustomerAuth();
+  const { isAuthenticated, user } = useCustomerAuth();
   const { orders: userOrders, loading: userOrdersLoading, hasActiveOrders } = useUserOrders();
-  const { order: anonymousOrder, loading: anonymousLoading, hasStoredOrder } = usePersistentOrder();
 
-  // Determine which order to show
-  const activeOrder = isAuthenticated 
-    ? userOrders?.find(order => {
-        const activeStatuses = ['confirmed', 'preparing', 'ready', 'out_for_delivery', 'arrived'];
-        const currentStatus = order.status || order.order_status;
-        return activeStatuses.includes(currentStatus);
-      })
-    : anonymousOrder;
+  // 🔒 SECURITY: Only show order tracking for authenticated users
+  if (!isAuthenticated || !user) {
+    return null;
+  }
 
-  const loading = isAuthenticated ? userOrdersLoading : anonymousLoading;
-  const hasOrder = isAuthenticated ? hasActiveOrders : hasStoredOrder;
+  // Find active order for the authenticated user only
+  const activeOrder = userOrders?.find(order => {
+    const activeStatuses = ['confirmed', 'preparing', 'ready', 'out_for_delivery', 'arrived'];
+    const currentStatus = order.status || order.order_status;
+    return activeStatuses.includes(currentStatus);
+  });
 
   // Don't render if no active order or still loading
-  if (loading || !hasOrder || !activeOrder) {
+  if (userOrdersLoading || !hasActiveOrders || !activeOrder) {
     return null;
   }
 

@@ -29,7 +29,9 @@ const OrderStatusWidget: React.FC = () => {
     window.location.reload(); // Refresh to update all components
   };
 
-  if (!order) return null;
+  // 🔒 SECURITY: This widget is deprecated in favor of authenticated order tracking
+  // Only show for authenticated users with proper order association
+  return null;
 
   // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
   const currentStatus = order.status || order.order_status || 'pending';
