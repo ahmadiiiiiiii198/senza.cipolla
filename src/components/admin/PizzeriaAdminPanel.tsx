@@ -42,6 +42,7 @@ const PopupManager = lazy(() => import('./PopupManager').catch(() => ({ default:
 const SettingsManager = lazy(() => import('./SettingsManager').catch(() => ({ default: () => <div>Error loading SettingsManager</div> })));
 const AnalyticsDashboard = lazy(() => import('./AnalyticsDashboard').catch(() => ({ default: () => <div>Error loading AnalyticsDashboard</div> })));
 const WeOfferManager = lazy(() => import('./WeOfferManager').catch(() => ({ default: () => <div>Error loading WeOfferManager</div> })));
+const ChiSiamoImageManager = lazy(() => import('./ChiSiamoImageManager').catch(() => ({ default: () => <div>Error loading ChiSiamoImageManager</div> })));
 const SystemTest = lazy(() => import('./SystemTest').catch(() => ({ default: () => <div>Error loading SystemTest</div> })));
 const DatabaseTest = lazy(() => import('./DatabaseTest').catch(() => ({ default: () => <div>Error loading DatabaseTest</div> })));
 const SystemConnectionTest = lazy(() => import('../SystemConnectionTest').catch(() => ({ default: () => <div>Error loading SystemConnectionTest</div> })));
@@ -671,6 +672,26 @@ const PizzeriaAdminPanel = () => {
                   <CardContent className="p-6">
                     <Suspense fallback={<LoadingSpinner />}>
                       <WeOfferManager />
+                    </Suspense>
+                  </CardContent>
+                </Card>
+
+                {/* Chi Siamo Image Management */}
+                <Card className="bg-white rounded-2xl shadow-xl border border-gray-200">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-2xl border-b border-blue-200">
+                    <CardTitle className="flex items-center text-blue-800">
+                      <div className="bg-blue-500 p-2 rounded-lg mr-3">
+                        <Users className="h-6 w-6 text-white" />
+                      </div>
+                      Gestione Immagine "Chi Siamo"
+                    </CardTitle>
+                    <CardDescription className="text-blue-600">
+                      Gestisci l'immagine sul lato destro della sezione Chi Siamo
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <ChiSiamoImageManager />
                     </Suspense>
                   </CardContent>
                 </Card>

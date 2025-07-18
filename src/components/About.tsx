@@ -7,6 +7,10 @@ import { supabase } from '@/integrations/supabase/client';
 const About = () => {
   const { language, t } = useLanguage();
   const [aboutContent, setAboutContent] = useState(null);
+  const [chiSiamoImage, setChiSiamoImage] = useState({
+    image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+    alt: 'Pizzeria Regina 2000 - La nostra storia'
+  });
 
   useEffect(() => {
     const loadAboutContent = async () => {
@@ -25,7 +29,51 @@ const About = () => {
       }
     };
 
+    const loadChiSiamoImage = async () => {
+      try {
+        console.log('🔄 [About] Loading Chi Siamo image from database...');
+        const { data, error } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'chiSiamoImage')
+          .single();
+
+        if (!error && data?.value) {
+          console.log('✅ [About] Chi Siamo image loaded:', data.value);
+          setChiSiamoImage(data.value);
+        } else {
+          console.log('⚠️ [About] No Chi Siamo image found, using default');
+        }
+      } catch (error) {
+        console.error('❌ [About] Error loading Chi Siamo image:', error);
+      }
+    };
+
     loadAboutContent();
+    loadChiSiamoImage();
+
+    // Set up real-time listener for Chi Siamo image changes
+    const timestamp = Date.now();
+    const channelName = `chi-siamo-image-updates-${timestamp}`;
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'settings',
+        filter: 'key=eq.chiSiamoImage'
+      }, async (payload) => {
+        console.log('🔔 [About] Real-time Chi Siamo image update received from admin');
+        if (payload.new?.value) {
+          setChiSiamoImage(payload.new.value);
+          console.log('✅ [About] Chi Siamo image updated from real-time change');
+        }
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   // Multilingual content
@@ -143,7 +191,6 @@ const About = () => {
   };
 
   const currentContent = content[language] || content.it;
-  const image = 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
 
   return (
     <section id="about" className="py-20 bg-gradient-to-br from-pizza-cream via-white to-pizza-orange/10 relative overflow-hidden">
@@ -153,6 +200,8 @@ const About = () => {
         <div className="absolute bottom-10 right-10 w-40 h-40 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
         <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pizza-green rounded-full blur-xl animate-pulse animation-delay-4000"></div>
       </div>
+
+
 
       {/* Floating pizza icons */}
       <div className="absolute top-20 right-20 text-pizza-orange/20 animate-float">
@@ -218,28 +267,13 @@ const About = () => {
             </div>
             <div className="relative">
               <div className="relative rounded-xl overflow-hidden shadow-2xl">
-                <img 
-                  src={image}
-                  alt="Francesco Florist at work"
+                <img
+                  src={chiSiamoImage.image}
+                  alt={chiSiamoImage.alt}
                   className="rounded-xl"
                 />
               </div>
-              <div className="absolute -bottom-6 -left-6 bg-gradient-to-br from-white to-peach-50 p-6 rounded-xl shadow-lg border border-peach-200 max-w-sm">
-                <p className="text-sm font-semibold text-gray-800 font-playfair mb-3">{currentContent.quote}</p>
-                {currentContent.quote && (
-                  <ul className="text-xs text-gray-600 font-inter space-y-1">
-                    {currentContent.services.map((service, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="text-peach-500 mr-2">•</span>
-                        <span>{service}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {currentContent.quoteAuthor && (
-                  <p className="text-xs text-gray-600 font-inter italic mt-2">{currentContent.quoteAuthor}</p>
-                )}
-              </div>
+              {/* REMOVED: The overlay panel that was here */}
             </div>
           </div>
 

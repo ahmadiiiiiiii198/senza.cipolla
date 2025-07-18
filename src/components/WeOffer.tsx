@@ -145,7 +145,7 @@ const WeOffer = () => {
         {/* Offers Grid */}
         <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {(offerContent.offers || []).map((offer, index) => (
-            <div 
+            <div
               key={offer.id}
               className={`group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover-lift animate-fade-in-up`}
               style={{ animationDelay: `${index * 200}ms` }}
@@ -157,7 +157,7 @@ const WeOffer = () => {
                     <Pizza className="text-pizza-orange animate-pizza-spin" size={48} />
                   </div>
                 )}
-                
+
                 <img
                   src={offer.image}
                   alt={offer.title}
@@ -170,9 +170,9 @@ const WeOffer = () => {
                     handleImageLoad(offer.id);
                   }}
                 />
-                
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-                
+
                 {/* Badge */}
                 <div className="absolute top-4 left-4 bg-pizza-red text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg animate-bounce-gentle">
                   <div className="flex items-center space-x-1">
