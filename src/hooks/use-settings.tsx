@@ -92,40 +92,6 @@ export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => P
     }
   }, [key]);
 
-
-
-  // Monitor online status
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      // Refresh data when coming back online
-      loadSetting();
-    };
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, [loadSetting]); // Fixed dependency array
-  
-  // Set up subscription using the global manager to prevent duplicates
-  useEffect(() => {
-    console.log(`[useSetting] Setting up subscription for ${key}`);
-
-    const unsubscribe = subscriptionManager.subscribe(key, (newValue: T) => {
-      console.log(`[useSetting] Received update for ${key}:`, newValue);
-      setValue(newValue);
-      // Update localStorage to keep in sync
-      localStorage.setItem(key, JSON.stringify(newValue));
-    });
-
-    return unsubscribe;
-  }, [key]);
-
   // Load setting function that can be called to refresh data
   const loadSetting = useCallback(async () => {
     setIsLoading(true);
@@ -150,6 +116,38 @@ export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => P
       setIsLoading(false);
     }
   }, [key, defaultValue]);
+
+  // Monitor online status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      // Refresh data when coming back online
+      loadSetting();
+    };
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [loadSetting]); // Fixed dependency array
+
+  // Set up subscription using the global manager to prevent duplicates
+  useEffect(() => {
+    console.log(`[useSetting] Setting up subscription for ${key}`);
+
+    const unsubscribe = subscriptionManager.subscribe(key, (newValue: T) => {
+      console.log(`[useSetting] Received update for ${key}:`, newValue);
+      setValue(newValue);
+      // Update localStorage to keep in sync
+      localStorage.setItem(key, JSON.stringify(newValue));
+    });
+
+    return unsubscribe;
+  }, [key]);
 
   useEffect(() => {
     const initializeAndLoad = async () => {
@@ -227,51 +225,53 @@ export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => P
 }
 
 // Type-specific hooks for common settings
-export function useLogoSettings() {
-  const defaultSettings = {
-    logoUrl: "/pizzeria-regina-logo.png",
-    altText: "Pizzeria Regina 2000 Torino Logo",
-  };
+// Default settings constants to avoid hoisting issues
+const DEFAULT_LOGO_SETTINGS = {
+  logoUrl: "/pizzeria-regina-logo.png",
+  altText: "Pizzeria Regina 2000 Torino Logo",
+};
 
-  return useSetting('logoSettings', defaultSettings);
+export function useLogoSettings() {
+  return useSetting('logoSettings', DEFAULT_LOGO_SETTINGS);
 }
+
+// Default content constants to avoid hoisting issues
+const DEFAULT_HERO_CONTENT = {
+  heading: "🍕 PIZZERIA Regina 2000",
+  subheading: "Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino",
+  backgroundImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+  heroImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+};
 
 export function useHeroContent() {
-  const defaultContent = {
-    heading: "🍕 PIZZERIA Regina 2000",
-    subheading: "Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino",
-    backgroundImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-    heroImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
-  };
-
-  return useSetting('heroContent', defaultContent);
+  return useSetting('heroContent', DEFAULT_HERO_CONTENT);
 }
+
+const DEFAULT_ABOUT_CONTENT = {
+  heading: "La Nostra Storia",
+  subheading: "Passione per la bellezza naturale e l'arte floreale",
+  backgroundImage: "",
+  backgroundColor: "#FEF7CD",
+  paragraphs: [
+    "Francesco Fiori & Piante nasce dalla passione per la bellezza naturale e dall'esperienza artigianale tramandata nel tempo.",
+    "Dai momenti più delicati come i funerali, ai giorni più belli come i matrimoni, offriamo composizioni floreali create con amore e cura.",
+    "Le nostre creazioni nascono da una profonda passione per la bellezza naturale. Solo fiori selezionati, solo eleganza made in Torino."
+  ]
+};
 
 export function useAboutContent() {
-  const defaultContent = {
-    heading: "La Nostra Storia",
-    subheading: "Passione per la bellezza naturale e l'arte floreale",
-    backgroundImage: "",
-    backgroundColor: "#FEF7CD",
-    paragraphs: [
-      "Francesco Fiori & Piante nasce dalla passione per la bellezza naturale e dall'esperienza artigianale tramandata nel tempo.",
-      "Dai momenti più delicati come i funerali, ai giorni più belli come i matrimoni, offriamo composizioni floreali create con amore e cura.",
-      "Le nostre creazioni nascono da una profonda passione per la bellezza naturale. Solo fiori selezionati, solo eleganza made in Torino."
-    ]
-  };
-
-  return useSetting('aboutContent', defaultContent);
+  return useSetting('aboutContent', DEFAULT_ABOUT_CONTENT);
 }
 
+const DEFAULT_RESTAURANT_SETTINGS = {
+  totalSeats: 50,
+  reservationDuration: 120,
+  openingTime: "11:30",
+  closingTime: "22:00",
+  languages: ["it", "en", "ar", "fa"],
+  defaultLanguage: "it"
+};
+
 export function useRestaurantSettings() {
-  const defaultSettings = {
-    totalSeats: 50,
-    reservationDuration: 120,
-    openingTime: "11:30",
-    closingTime: "22:00",
-    languages: ["it", "en", "ar", "fa"],
-    defaultLanguage: "it"
-  };
-  
-  return useSetting('restaurantSettings', defaultSettings);
+  return useSetting('restaurantSettings', DEFAULT_RESTAURANT_SETTINGS);
 }
