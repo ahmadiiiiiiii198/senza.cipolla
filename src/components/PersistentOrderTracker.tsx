@@ -20,7 +20,10 @@ import {
   EyeOff,
   AlertCircle,
   Loader2,
-  MapPin
+  MapPin,
+  ChefHat,
+  DoorOpen,
+  Home
 } from 'lucide-react';
 
 interface Order {
@@ -55,6 +58,430 @@ interface StoredOrderInfo {
   customerEmail: string;
   lastChecked: string;
 }
+
+// Ultra-Modern Beautiful Pizza Delivery Motorcycle Animation Component
+const ModernMotorcycleDelivery: React.FC<{
+  className?: string;
+  isAnimated?: boolean;
+  status?: string;
+}> = ({ className = "h-16 w-16", isAnimated = true, status = "preparing" }) => {
+  const getMotorcycleSpeed = () => {
+    switch (status) {
+      case 'preparing': return '3s';
+      case 'ready': return '2s';
+      case 'arrived': return '1.5s';
+      case 'delivered': return '4s';
+      default: return '2.5s';
+    }
+  };
+
+  return (
+    <div className={`${className} relative overflow-hidden`}>
+      <style jsx>{`
+        @keyframes motorcycle-ride {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          25% { transform: translateY(-3px) rotate(1.5deg); }
+          50% { transform: translateY(-1px) rotate(0deg); }
+          75% { transform: translateY(-2px) rotate(-1deg); }
+        }
+
+        @keyframes wheel-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes exhaust-puff {
+          0% { opacity: 0.8; transform: scale(1) translateX(0px); }
+          50% { opacity: 0.4; transform: scale(1.5) translateX(-8px); }
+          100% { opacity: 0; transform: scale(2) translateX(-15px); }
+        }
+
+        @keyframes pizza-glow {
+          0%, 100% { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)); }
+          50% { filter: drop-shadow(0 0 20px rgba(251, 191, 36, 1)); }
+        }
+
+        @keyframes headlight-beam {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+
+        @keyframes speed-lines {
+          0% { transform: translateX(0px); opacity: 0.8; }
+          100% { transform: translateX(-25px); opacity: 0; }
+        }
+
+        .motorcycle-body {
+          animation: ${isAnimated ? `motorcycle-ride ${getMotorcycleSpeed()} ease-in-out infinite` : 'none'};
+        }
+
+        .wheel-rotation {
+          animation: ${isAnimated ? `wheel-spin 0.4s linear infinite` : 'none'};
+          transform-origin: center;
+        }
+
+        .exhaust-smoke {
+          animation: ${isAnimated ? 'exhaust-puff 2.5s ease-out infinite' : 'none'};
+        }
+
+        .pizza-box {
+          animation: ${isAnimated ? 'pizza-glow 3s ease-in-out infinite' : 'none'};
+        }
+
+        .headlight {
+          animation: ${isAnimated ? 'headlight-beam 2s ease-in-out infinite' : 'none'};
+        }
+
+        .speed-lines {
+          animation: ${isAnimated ? 'speed-lines 1.5s linear infinite' : 'none'};
+        }
+      `}</style>
+
+      <svg
+        viewBox="0 0 140 90"
+        className="w-full h-full drop-shadow-2xl"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* Enhanced Gradients and Filters */}
+        <defs>
+          <linearGradient id="roadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#1f2937" />
+            <stop offset="50%" stopColor="#374151" />
+            <stop offset="100%" stopColor="#1f2937" />
+          </linearGradient>
+
+          <linearGradient id="motorcycleBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#dc2626" />
+            <stop offset="30%" stopColor="#ef4444" />
+            <stop offset="70%" stopColor="#dc2626" />
+            <stop offset="100%" stopColor="#991b1b" />
+          </linearGradient>
+
+          <linearGradient id="motorcycleChromeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f8fafc" />
+            <stop offset="50%" stopColor="#e2e8f0" />
+            <stop offset="100%" stopColor="#cbd5e0" />
+          </linearGradient>
+
+          <linearGradient id="pizzaBoxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#fbbf24" />
+            <stop offset="50%" stopColor="#f59e0b" />
+            <stop offset="100%" stopColor="#d97706" />
+          </linearGradient>
+
+          <linearGradient id="wheelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#374151" />
+            <stop offset="50%" stopColor="#1f2937" />
+            <stop offset="100%" stopColor="#111827" />
+          </linearGradient>
+
+          <radialGradient id="headlightGradient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#fef3c7" />
+            <stop offset="50%" stopColor="#fbbf24" />
+            <stop offset="100%" stopColor="#f59e0b" />
+          </radialGradient>
+
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="2" dy="4" stdDeviation="3" floodColor="#000000" floodOpacity="0.3"/>
+          </filter>
+        </defs>
+
+        {/* Enhanced Animated Road */}
+        <rect x="0" y="70" width="140" height="15" fill="url(#roadGradient)" rx="3" filter="url(#shadow)" />
+
+        {/* Road markings with enhanced animation */}
+        <g className="speed-lines">
+          <rect x="15" y="75" width="15" height="3" fill="#fbbf24" opacity="0.9" rx="1.5" />
+          <rect x="40" y="75" width="15" height="3" fill="#fbbf24" opacity="0.7" rx="1.5" />
+          <rect x="65" y="75" width="15" height="3" fill="#fbbf24" opacity="0.9" rx="1.5" />
+          <rect x="90" y="75" width="15" height="3" fill="#fbbf24" opacity="0.7" rx="1.5" />
+          <rect x="115" y="75" width="15" height="3" fill="#fbbf24" opacity="0.9" rx="1.5" />
+        </g>
+
+        {/* Beautiful Enhanced Motorcycle */}
+        <g className="motorcycle-body" filter="url(#shadow)">
+          {/* Main motorcycle frame - sleek sport bike design */}
+          <path
+            d="M45 55 Q60 45 85 55 Q85 60 75 65 Q60 65 45 60 Z"
+            fill="url(#motorcycleBodyGradient)"
+            filter="url(#glow)"
+          />
+
+          {/* Fuel tank */}
+          <ellipse cx="65" cy="50" rx="12" ry="6" fill="url(#motorcycleBodyGradient)" />
+          <ellipse cx="65" cy="48" rx="8" ry="3" fill="url(#motorcycleChromeGradient)" opacity="0.8" />
+
+          {/* Engine block */}
+          <rect x="58" y="55" width="14" height="8" fill="url(#motorcycleChromeGradient)" rx="2" />
+          <rect x="60" y="57" width="10" height="4" fill="#374151" rx="1" />
+
+          {/* Front wheel - enhanced with detailed spokes */}
+          <g className="wheel-rotation">
+            <circle cx="45" cy="68" r="8" fill="url(#wheelGradient)" stroke="#111827" strokeWidth="2" />
+            <circle cx="45" cy="68" r="6" fill="#4b5563" />
+            <circle cx="45" cy="68" r="4" fill="#6b7280" />
+            {/* Spokes */}
+            <line x1="37" y1="68" x2="53" y2="68" stroke="#e5e7eb" strokeWidth="1" />
+            <line x1="45" y1="60" x2="45" y2="76" stroke="#e5e7eb" strokeWidth="1" />
+            <line x1="39.3" y1="61.9" x2="50.7" y2="74.1" stroke="#e5e7eb" strokeWidth="0.8" />
+            <line x1="50.7" y1="61.9" x2="39.3" y2="74.1" stroke="#e5e7eb" strokeWidth="0.8" />
+            <circle cx="45" cy="68" r="2" fill="#f3f4f6" />
+          </g>
+
+          {/* Rear wheel - enhanced with detailed spokes */}
+          <g className="wheel-rotation">
+            <circle cx="85" cy="68" r="8" fill="url(#wheelGradient)" stroke="#111827" strokeWidth="2" />
+            <circle cx="85" cy="68" r="6" fill="#4b5563" />
+            <circle cx="85" cy="68" r="4" fill="#6b7280" />
+            {/* Spokes */}
+            <line x1="77" y1="68" x2="93" y2="68" stroke="#e5e7eb" strokeWidth="1" />
+            <line x1="85" y1="60" x2="85" y2="76" stroke="#e5e7eb" strokeWidth="1" />
+            <line x1="79.3" y1="61.9" x2="90.7" y2="74.1" stroke="#e5e7eb" strokeWidth="0.8" />
+            <line x1="90.7" y1="61.9" x2="79.3" y2="74.1" stroke="#e5e7eb" strokeWidth="0.8" />
+            <circle cx="85" cy="68" r="2" fill="#f3f4f6" />
+          </g>
+
+          {/* Front suspension and forks */}
+          <line x1="45" y1="55" x2="45" y2="68" stroke="url(#motorcycleChromeGradient)" strokeWidth="3" />
+          <line x1="43" y1="55" x2="43" y2="68" stroke="#6b7280" strokeWidth="1" />
+          <line x1="47" y1="55" x2="47" y2="68" stroke="#6b7280" strokeWidth="1" />
+
+          {/* Handlebars - sport bike style */}
+          <path d="M40 45 Q45 42 50 45" stroke="url(#motorcycleChromeGradient)" strokeWidth="3" fill="none" />
+          <circle cx="38" cy="46" r="1.5" fill="#374151" />
+          <circle cx="52" cy="46" r="1.5" fill="#374151" />
+
+          {/* Rider with detailed helmet and gear */}
+          <ellipse cx="65" cy="35" rx="6" ry="7" fill="#1e40af" /> {/* Body */}
+          <circle cx="65" cy="28" r="5" fill="#fbbf24" /> {/* Helmet */}
+          <rect x="62" y="25" width="6" height="4" fill="#1f2937" rx="2" /> {/* Visor */}
+          <ellipse cx="65" cy="26" rx="2" ry="1" fill="#ef4444" opacity="0.8" /> {/* Helmet stripe */}
+
+          {/* Premium Pizza delivery box with enhanced glow */}
+          <rect
+            x="75"
+            y="45"
+            width="15"
+            height="10"
+            fill="url(#pizzaBoxGradient)"
+            rx="3"
+            stroke="#d97706"
+            strokeWidth="1.5"
+            className="pizza-box"
+            filter="url(#glow)"
+          />
+          <text x="82.5" y="51" fontSize="5" fill="white" textAnchor="middle">🍕</text>
+          <text x="82.5" y="56" fontSize="2.5" fill="white" textAnchor="middle">REGINA</text>
+
+          {/* Delivery company flag */}
+          <rect x="90" y="42" width="8" height="5" fill="#ef4444" rx="1" />
+          <line x1="90" y1="42" x2="90" y2="55" stroke="#374151" strokeWidth="1.5" />
+          <text x="94" y="45.5" fontSize="2.5" fill="white" textAnchor="middle">🏁</text>
+
+          {/* Headlight with beam effect */}
+          <circle cx="35" cy="50" r="4" fill="url(#headlightGradient)" className="headlight" filter="url(#glow)" />
+          <circle cx="35" cy="50" r="2" fill="#fef3c7" />
+
+          {/* Exhaust pipe */}
+          <path d="M85 60 Q95 62 100 65" stroke="#6b7280" strokeWidth="3" fill="none" />
+          <ellipse cx="100" cy="65" rx="2" ry="1" fill="#374151" />
+        </g>
+
+        {/* Enhanced speed lines for dynamic movement */}
+        <g className="speed-lines" opacity="0.8">
+          <line x1="25" y1="45" x2="15" y2="45" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
+          <line x1="28" y1="50" x2="18" y2="50" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="23" y1="55" x2="13" y2="55" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
+          <line x1="30" y1="60" x2="20" y2="60" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+        </g>
+
+        {/* Beautiful exhaust smoke with realistic effects */}
+        <g className="exhaust-smoke">
+          <ellipse cx="102" cy="65" rx="2" ry="1.5" fill="#9ca3af" opacity="0.7" />
+          <ellipse cx="105" cy="63" rx="2.5" ry="2" fill="#9ca3af" opacity="0.5" />
+          <ellipse cx="108" cy="61" rx="3" ry="2.5" fill="#d1d5db" opacity="0.3" />
+        </g>
+
+        {/* Multiple exhaust puffs with staggered animation */}
+        {isAnimated && (
+          <>
+            <g className="exhaust-smoke" style={{ animationDelay: '0.8s' }}>
+              <ellipse cx="104" cy="66" rx="2.2" ry="1.8" fill="#d1d5db" opacity="0.6" />
+              <ellipse cx="107" cy="64" rx="2.8" ry="2.2" fill="#e5e7eb" opacity="0.4" />
+            </g>
+            <g className="exhaust-smoke" style={{ animationDelay: '1.6s' }}>
+              <ellipse cx="103" cy="67" rx="1.8" ry="1.4" fill="#e5e7eb" opacity="0.5" />
+              <ellipse cx="106" cy="65" rx="2.4" ry="1.9" fill="#f3f4f6" opacity="0.3" />
+            </g>
+            <g className="exhaust-smoke" style={{ animationDelay: '2.4s' }}>
+              <ellipse cx="105" cy="68" rx="2" ry="1.6" fill="#f3f4f6" opacity="0.4" />
+            </g>
+          </>
+        )}
+
+        {/* Headlight beam effect */}
+        {isAnimated && (
+          <path
+            d="M35 50 L10 45 L10 55 Z"
+            fill="url(#headlightGradient)"
+            opacity="0.3"
+            className="headlight"
+          />
+        )}
+
+        {/* Ground shadow */}
+        <ellipse cx="65" cy="85" rx="35" ry="3" fill="#000000" opacity="0.2" />
+
+        {/* Tire tracks */}
+        <g opacity="0.3">
+          <rect x="37" y="76" width="16" height="1" fill="#374151" rx="0.5" />
+          <rect x="77" y="76" width="16" height="1" fill="#374151" rx="0.5" />
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+// Modern Status Progress Component
+const ModernStatusProgress: React.FC<{
+  currentStatus: string;
+  orderTime: string;
+}> = ({ currentStatus, orderTime }) => {
+  const statusSteps = [
+    {
+      key: 'confirmed',
+      label: 'Confermato',
+      icon: CheckCircle,
+      color: 'text-green-600',
+      bgColor: 'bg-green-100',
+      description: 'Il tuo ordine è stato confermato'
+    },
+    {
+      key: 'preparing',
+      label: 'In Preparazione',
+      icon: ChefHat,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
+      description: 'I nostri chef stanno preparando la tua pizza'
+    },
+    {
+      key: 'ready',
+      label: 'Pronto',
+      icon: Package,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100',
+      description: 'La tua pizza è pronta per la consegna'
+    },
+    {
+      key: 'arrived',
+      label: 'Arrivato',
+      icon: DoorOpen,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100',
+      description: 'Il rider è arrivato alla tua porta'
+    },
+    {
+      key: 'delivered',
+      label: 'Consegnato',
+      icon: Home,
+      color: 'text-green-700',
+      bgColor: 'bg-green-200',
+      description: 'Ordine consegnato con successo!'
+    }
+  ];
+
+  const getCurrentStepIndex = () => {
+    return statusSteps.findIndex(step => step.key === currentStatus);
+  };
+
+  const currentStepIndex = getCurrentStepIndex();
+
+  return (
+    <div className="space-y-6">
+      {/* Progress Bar */}
+      <div className="relative">
+        <div className="flex items-center justify-between">
+          {statusSteps.map((step, index) => {
+            const isCompleted = index <= currentStepIndex;
+            const isCurrent = index === currentStepIndex;
+            const IconComponent = step.icon;
+
+            return (
+              <div key={step.key} className="flex flex-col items-center relative z-10">
+                <div
+                  className={`
+                    w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 transform
+                    ${isCompleted
+                      ? `${step.bgColor} ${step.color} scale-110 shadow-lg`
+                      : 'bg-gray-200 text-gray-400 scale-100'
+                    }
+                    ${isCurrent ? 'animate-pulse ring-4 ring-opacity-50 ring-current' : ''}
+                  `}
+                >
+                  <IconComponent className="h-6 w-6" />
+                </div>
+                <div className="mt-2 text-center">
+                  <div className={`text-sm font-medium ${isCompleted ? step.color : 'text-gray-400'}`}>
+                    {step.label}
+                  </div>
+                  {isCurrent && (
+                    <div className="text-xs text-gray-600 mt-1 max-w-24 leading-tight">
+                      {step.description}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Progress Line */}
+        <div className="absolute top-6 left-6 right-6 h-1 bg-gray-200 -z-10">
+          <div
+            className="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-1000 ease-out"
+            style={{
+              width: `${currentStepIndex >= 0 ? (currentStepIndex / (statusSteps.length - 1)) * 100 : 0}%`
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Current Status Card */}
+      {currentStepIndex >= 0 && (
+        <Card className="border-l-4 border-l-pizza-orange bg-gradient-to-r from-orange-50 to-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <ModernMotorcycleDelivery
+                className="h-12 w-12"
+                isAnimated={true}
+                status={currentStatus}
+              />
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900">
+                  {statusSteps[currentStepIndex].label}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {statusSteps[currentStepIndex].description}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Ordinato: {new Date(orderTime).toLocaleString('it-IT')}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
 
 const PersistentOrderTracker: React.FC = () => {
   const [orderNumber, setOrderNumber] = useState('');
@@ -460,36 +887,40 @@ const PersistentOrderTracker: React.FC = () => {
 
           {/* Order Display or Search Form */}
           {order ? (
-            /* Order Status Display */
-            <div className="space-y-6">
-              {/* Order Header with Controls */}
-              <Card className="shadow-lg border-l-4 border-pizza-orange">
-                <CardHeader className="pb-3">
+            /* Modern Order Status Display */
+            <div className="space-y-8">
+              {/* Modern Order Header */}
+              <Card className="shadow-xl border-0 bg-gradient-to-r from-white to-orange-50 overflow-hidden">
+                <CardHeader className="pb-4 bg-gradient-to-r from-pizza-orange to-red-500 text-white">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                      <CardTitle className="text-xl flex items-center gap-2">
-                        <Pizza className="h-5 w-5 text-pizza-orange" />
-                        Ordine #{order.order_number}
-                      </CardTitle>
-                      <p className="text-gray-600 mt-1">
-                        Ordinato il {formatDate(order.created_at)}
-                      </p>
+                    <div className="flex items-center gap-4">
+                      <div className="bg-white/20 p-3 rounded-full">
+                        <Pizza className="h-8 w-8 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-2xl font-bold">
+                          Ordine #{order.order_number}
+                        </CardTitle>
+                        <p className="text-white/90 mt-1">
+                          Ordinato il {formatDate(order.created_at)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-pizza-orange">
+                        <div className="text-3xl font-bold text-white">
                           {formatPrice(order.total_amount)}
                         </div>
-                        <Badge className={`${currentStatusInfo.color} border`}>
+                        <Badge className="bg-white/20 text-white border-white/30 mt-1">
                           {currentStatusInfo.label}
                         </Badge>
                       </div>
-                      <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setAutoRefresh(!autoRefresh)}
-                          className={autoRefresh ? 'text-green-600' : 'text-gray-600'}
+                          className={`border-white/30 text-white hover:bg-white/20 ${autoRefresh ? 'bg-white/20' : ''}`}
                         >
                           <RefreshCw className={`h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} />
                         </Button>
@@ -497,6 +928,7 @@ const PersistentOrderTracker: React.FC = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => setIsExpanded(!isExpanded)}
+                          className="border-white/30 text-white hover:bg-white/20"
                         >
                           {isExpanded ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
@@ -504,7 +936,7 @@ const PersistentOrderTracker: React.FC = () => {
                           variant="outline"
                           size="sm"
                           onClick={clearStoredOrderInfo}
-                          className="text-red-600 hover:text-red-700"
+                          className="border-red-300 text-red-100 hover:bg-red-500/20"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -513,279 +945,69 @@ const PersistentOrderTracker: React.FC = () => {
                   </div>
                 </CardHeader>
 
-                <CardContent>
-                  {/* Current Status */}
-                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg mb-4">
-                    {React.createElement(currentStatusInfo.icon, {
-                      className: "h-8 w-8 text-pizza-orange"
-                    })}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">
-                        {currentStatusInfo.label}
-                      </h3>
-                      <p className="text-gray-600">
-                        {currentStatusInfo.description}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Ultimo aggiornamento: {formatDate(order.updated_at)}
-                      </p>
-                    </div>
-                  </div>
+                <CardContent className="p-6">
+                  {/* Modern Status Progress */}
+                  <ModernStatusProgress
+                    currentStatus={currentStatus}
+                    orderTime={order.created_at}
+                  />
 
-                  {/* Progress Bar */}
-                  {currentStatus !== 'cancelled' && (
-                    <div className="space-y-2 mb-4">
-                      <div className="flex justify-between text-sm text-gray-600">
-                        <span>Progresso</span>
-                        <span>{progress.percentage.toFixed(0)}%</span>
+                  {/* Modern Pizza Delivery Tracking */}
+                  <Card className="mt-6 bg-gradient-to-br from-blue-50 to-purple-50 border-0 shadow-xl overflow-hidden">
+                    <CardHeader className="text-center pb-4">
+                      <div className="flex items-center justify-center gap-3 mb-2">
+                        <div className="bg-gradient-to-r from-pizza-orange to-red-500 p-3 rounded-full shadow-lg">
+                          <Truck className="h-6 w-6 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800">Tracciamento Live</h3>
+                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-lg"></div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div
-                          className="bg-gradient-to-r from-pizza-orange to-pizza-red h-3 rounded-full transition-all duration-1000"
-                          style={{ width: `${progress.percentage}%` }}
+                      <p className="text-gray-600">Segui il tuo rider in tempo reale</p>
+                    </CardHeader>
+
+                    <CardContent className="p-6">
+                      {/* Animated Motorcycle Display */}
+                      <div className="flex justify-center mb-6">
+                        <ModernMotorcycleDelivery
+                          className="h-24 w-32"
+                          isAnimated={true}
+                          status={currentStatus}
                         />
                       </div>
-                    </div>
-                  )}
 
-                  {/* Premium Motorcycle Delivery Tracking */}
-                  <div className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-green-50 p-8 rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
-
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-5">
-                      <div className="absolute inset-0" style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                        backgroundSize: '30px 30px'
-                      }}></div>
-                    </div>
-
-                    {/* Header */}
-                    <div className="relative z-10 text-center mb-8">
-                      <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full border border-slate-200 shadow-sm">
-                        <div className="w-10 h-10 bg-gradient-to-r from-pizza-orange to-red-500 rounded-full flex items-center justify-center">
-                          <Package className="h-5 w-5 text-white" />
-                        </div>
-                        <span className="font-semibold text-slate-700 text-lg">Tracciamento Consegna Live</span>
-                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                      </div>
-                    </div>
-
-                    {/* Professional Road with Motorcycle */}
-                    <div className="relative h-32 mb-8">
-                      {/* Road Base */}
-                      <div className="absolute inset-x-0 bottom-12 h-5 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-700 rounded-full shadow-inner">
-                        {/* Road Surface Texture */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full"></div>
-
-                        {/* Animated Road Markings */}
-                        <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full">
-                          <div className="w-full h-0.5 bg-yellow-400 opacity-90 relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-300 to-transparent animate-pulse"></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Status Checkpoints */}
-                      <div className="absolute inset-x-0 bottom-0 flex justify-between items-end px-6">
-                        {orderStatuses
-                          .filter(status => status.value !== 'cancelled')
-                          .map((status, index) => {
-                            const isCompleted = orderStatuses.findIndex(s => s.value === currentStatus) >= index;
-                            const isCurrent = status.value === currentStatus;
-                            const StatusIcon = status.icon;
-
-                            return (
-                              <div key={status.value} className="flex flex-col items-center">
-                                {/* Checkpoint Pole */}
-                                <div className={`w-1.5 h-16 mb-3 rounded-full transition-all duration-500 ${
-                                  isCompleted ? 'bg-gradient-to-t from-green-500 to-green-400' : 'bg-slate-300'
-                                }`}></div>
-
-                                {/* Checkpoint Circle */}
-                                <div className={`relative w-12 h-12 rounded-full border-3 transition-all duration-500 ${
-                                  isCurrent
-                                    ? 'bg-pizza-orange border-pizza-orange shadow-xl scale-110'
-                                    : isCompleted
-                                    ? 'bg-green-500 border-green-500 shadow-lg'
-                                    : 'bg-white border-slate-300'
-                                }`}>
-                                  <StatusIcon className={`h-6 w-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${
-                                    isCurrent || isCompleted ? 'text-white' : 'text-slate-400'
-                                  }`} />
-
-                                  {/* Pulse Animation for Current Status */}
-                                  {isCurrent && (
-                                    <div className="absolute inset-0 rounded-full bg-pizza-orange opacity-30 animate-ping"></div>
-                                  )}
-                                </div>
-
-                                {/* Label */}
-                                <div className="mt-3 text-center max-w-24">
-                                  <p className={`text-sm font-semibold ${
-                                    isCurrent ? 'text-pizza-orange' : isCompleted ? 'text-green-700' : 'text-slate-500'
-                                  }`}>
-                                    {status.label}
-                                  </p>
-                                  <p className={`text-xs mt-1 ${
-                                    isCurrent ? 'text-pizza-orange/70' : isCompleted ? 'text-green-600' : 'text-slate-400'
-                                  }`}>
-                                    {status.description}
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-
-                      {/* Premium Motorcycle with Realistic Movement */}
-                      <div
-                        className="absolute bottom-8 transition-all duration-2000 ease-in-out z-20"
-                        style={{
-                          left: `${Math.max(8, Math.min(85, progress * 0.8 + 10))}%`,
-                          transform: 'translateX(-50%)'
-                        }}
-                      >
-                        <div className="relative">
-                          {/* Motorcycle Shadow */}
-                          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-10 h-3 bg-black/20 rounded-full blur-sm"></div>
-
-                          {/* Beautiful Delivery Motorcycle SVG */}
-                          <div className={`relative transition-all duration-300 ${
-                            currentStatus === 'delivered'
-                              ? 'animate-bounce'
-                              : currentStatus === 'out_for_delivery' || currentStatus === 'preparing'
-                              ? 'animate-pulse'
-                              : ''
-                          }`}>
-                            <svg width="64" height="40" viewBox="0 0 64 40" className="drop-shadow-lg">
-                              {/* Motorcycle Shadow */}
-                              <ellipse cx="32" cy="38" rx="28" ry="2" fill="rgba(0,0,0,0.2)" />
-
-                              {/* Front Wheel */}
-                              <circle cx="12" cy="30" r="8" fill="#2d3748" stroke="#4a5568" strokeWidth="1"/>
-                              <circle cx="12" cy="30" r="5" fill="#e2e8f0" stroke="#cbd5e0" strokeWidth="1"/>
-                              <circle cx="12" cy="30" r="2" fill="#4a5568"/>
-
-                              {/* Rear Wheel */}
-                              <circle cx="52" cy="30" r="8" fill="#2d3748" stroke="#4a5568" strokeWidth="1"/>
-                              <circle cx="52" cy="30" r="5" fill="#e2e8f0" stroke="#cbd5e0" strokeWidth="1"/>
-                              <circle cx="52" cy="30" r="2" fill="#4a5568"/>
-
-                              {/* Main Frame */}
-                              <path d="M20 30 L44 30 L42 20 L22 20 Z" fill="#3182ce" stroke="#2c5282" strokeWidth="1"/>
-
-                              {/* Seat */}
-                              <ellipse cx="35" cy="18" rx="8" ry="3" fill="#2d3748"/>
-
-                              {/* Handlebars */}
-                              <path d="M18 22 L8 18 M18 22 L8 26" stroke="#4a5568" strokeWidth="2" strokeLinecap="round"/>
-                              <circle cx="8" cy="22" r="1.5" fill="#4a5568"/>
-
-                              {/* Front Fork */}
-                              <line x1="12" y1="22" x2="12" y2="30" stroke="#4a5568" strokeWidth="2"/>
-
-                              {/* Exhaust Pipe */}
-                              <path d="M44 25 Q50 25 54 28" stroke="#6b7280" strokeWidth="2" fill="none"/>
-
-                              {/* Headlight */}
-                              <circle cx="6" cy="22" r="3" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1"/>
-                              <circle cx="6" cy="22" r="1.5" fill="#fef3c7"/>
-                            </svg>
-
-                            {/* Premium Delivery Box */}
-                            <div className="absolute -top-1 -right-2 w-8 h-8 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-lg border-2 border-white shadow-lg flex items-center justify-center transform rotate-12">
-                              <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded flex items-center justify-center">
-                                <span className="text-xs font-bold text-white">🍕</span>
-                              </div>
+                      {/* Delivery Status Info */}
+                      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-white/50 shadow-lg">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-gradient-to-r from-green-400 to-blue-500 p-2 rounded-full">
+                              <MapPin className="h-5 w-5 text-white" />
                             </div>
-
-                            {/* Speed Lines Effect */}
-                            {(currentStatus === 'out_for_delivery' || currentStatus === 'preparing') && (
-                              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-full">
-                                <div className="flex space-x-1">
-                                  {[...Array(4)].map((_, i) => (
-                                    <div
-                                      key={i}
-                                      className={`bg-blue-400 rounded-full animate-pulse`}
-                                      style={{
-                                        width: `${4 - i}px`,
-                                        height: '2px',
-                                        animationDelay: `${i * 0.1}s`,
-                                        opacity: 1 - (i * 0.2)
-                                      }}
-                                    ></div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Exhaust Smoke when moving */}
-                            {(currentStatus === 'out_for_delivery' || currentStatus === 'preparing') && (
-                              <div className="absolute right-0 top-2 transform translate-x-full">
-                                <div className="flex space-x-1">
-                                  {[...Array(3)].map((_, i) => (
-                                    <div
-                                      key={i}
-                                      className="w-1 h-1 bg-gray-400 rounded-full animate-ping"
-                                      style={{
-                                        animationDelay: `${i * 0.2}s`,
-                                        opacity: 0.6 - (i * 0.2)
-                                      }}
-                                    ></div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
+                            <div>
+                              <h4 className="font-semibold text-gray-800">Posizione Rider</h4>
+                              <p className="text-sm text-gray-600">
+                                {currentStatus === 'preparing' && 'In cucina - Preparazione in corso'}
+                                {currentStatus === 'ready' && 'Pronto per il ritiro'}
+                                {currentStatus === 'arrived' && 'Arrivato alla tua porta'}
+                                {currentStatus === 'delivered' && 'Consegnato con successo!'}
+                                {!['preparing', 'ready', 'arrived', 'delivered'].includes(currentStatus) && 'In attesa di aggiornamenti'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-gray-700">Tempo stimato</div>
+                            <div className="text-lg font-bold text-pizza-orange">
+                              {currentStatus === 'preparing' && '15-20 min'}
+                              {currentStatus === 'ready' && '5-10 min'}
+                              {currentStatus === 'arrived' && '2-3 min'}
+                              {currentStatus === 'delivered' && 'Completato'}
+                              {!['preparing', 'ready', 'arrived', 'delivered'].includes(currentStatus) && '--'}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Progress Bar */}
-                    <div className="relative mb-6">
-                      <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-pizza-orange via-yellow-400 to-green-500 rounded-full transition-all duration-2000 ease-out relative"
-                          style={{ width: `${progress}%` }}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Status Message */}
-                    <div className="text-center">
-                      <div className={`inline-flex items-center gap-4 px-6 py-3 rounded-full text-base font-medium backdrop-blur-sm ${
-                        currentStatus === 'delivered'
-                          ? 'bg-green-100/80 text-green-800 border border-green-200'
-                          : currentStatus === 'out_for_delivery'
-                          ? 'bg-blue-100/80 text-blue-800 border border-blue-200'
-                          : currentStatus === 'preparing'
-                          ? 'bg-orange-100/80 text-orange-800 border border-orange-200'
-                          : 'bg-slate-100/80 text-slate-800 border border-slate-200'
-                      }`}>
-                        <div className={`w-3 h-3 rounded-full ${
-                          currentStatus === 'delivered' ? 'bg-green-500' :
-                          currentStatus === 'out_for_delivery' ? 'bg-blue-500 animate-pulse' :
-                          currentStatus === 'preparing' ? 'bg-orange-500 animate-pulse' :
-                          'bg-slate-500'
-                        }`}></div>
-                        <span className="font-semibold">{currentStatusInfo.description}</span>
-                        {currentStatus === 'out_for_delivery' && <span className="text-sm opacity-75">• In arrivo</span>}
-                        {currentStatus === 'preparing' && <span className="text-sm opacity-75">• Nel forno</span>}
-                        {currentStatus === 'delivered' && <span className="text-sm opacity-75">• Consegnato!</span>}
-                      </div>
-
-                      {/* Estimated Time (if in delivery) */}
-                      {currentStatus === 'out_for_delivery' && (
-                        <div className="mt-4">
-                          <p className="text-sm text-slate-600">
-                            🕒 Tempo stimato di consegna: <span className="font-semibold text-blue-600">15-30 minuti</span>
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </CardContent>
               </Card>
 
@@ -857,73 +1079,96 @@ const PersistentOrderTracker: React.FC = () => {
               )}
             </div>
           ) : (
-            /* Search Form */
-            <Card className="shadow-lg max-w-2xl mx-auto">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Search className="h-5 w-5 text-pizza-orange" />
+            /* Modern Search Form */
+            <Card className="shadow-2xl max-w-2xl mx-auto border-0 bg-gradient-to-br from-white to-orange-50 overflow-hidden">
+              <CardHeader className="text-center pb-6 bg-gradient-to-r from-pizza-orange to-red-500 text-white">
+                <div className="flex justify-center mb-4">
+                  <div className="bg-white/20 p-4 rounded-full">
+                    <Search className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                <CardTitle className="text-2xl font-bold">
                   Cerca il tuo Ordine
                 </CardTitle>
-                <p className="text-gray-600">
-                  I tuoi dati verranno salvati per non doverli reinserire
+                <p className="text-white/90 mt-2">
+                  Inserisci i tuoi dati per seguire lo stato del tuo ordine
                 </p>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Numero Ordine *
+              <CardContent className="p-8 space-y-6">
+                {/* Modern Form Inputs */}
+                <div className="space-y-6">
+                  <div className="relative">
+                    <label className="block text-sm font-semibold mb-3 text-gray-700">
+                      🎫 Numero Ordine
                     </label>
-                    <Input
-                      placeholder="es. ORD-2024-001"
-                      value={orderNumber}
-                      onChange={(e) => setOrderNumber(e.target.value)}
-                      className="w-full"
-                    />
+                    <div className="relative">
+                      <Input
+                        placeholder="es. ORD-996366156"
+                        value={orderNumber}
+                        onChange={(e) => setOrderNumber(e.target.value)}
+                        className="w-full h-12 pl-12 text-lg border-2 border-gray-200 focus:border-pizza-orange rounded-xl shadow-sm transition-all duration-200"
+                      />
+                      <Package className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Email *
+
+                  <div className="relative">
+                    <label className="block text-sm font-semibold mb-3 text-gray-700">
+                      📧 Email di Conferma
                     </label>
-                    <Input
-                      type="email"
-                      placeholder="la-tua-email@esempio.com"
-                      value={customerEmail}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      className="w-full"
-                    />
+                    <div className="relative">
+                      <Input
+                        type="email"
+                        placeholder="la-tua-email@esempio.com"
+                        value={customerEmail}
+                        onChange={(e) => setCustomerEmail(e.target.value)}
+                        className="w-full h-12 pl-12 text-lg border-2 border-gray-200 focus:border-pizza-orange rounded-xl shadow-sm transition-all duration-200"
+                      />
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    </div>
                   </div>
                 </div>
 
                 {error && (
-                  <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                    <AlertCircle className="h-4 w-4" />
-                    <span className="text-sm">{error}</span>
+                  <div className="flex items-center gap-3 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg text-red-700 animate-pulse">
+                    <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                    <span className="text-sm font-medium">{error}</span>
                   </div>
                 )}
 
                 <Button
                   onClick={() => searchOrder()}
                   disabled={loading}
-                  className="w-full bg-pizza-orange hover:bg-pizza-red"
+                  className="w-full h-14 bg-gradient-to-r from-pizza-orange to-red-500 hover:from-red-500 hover:to-pizza-orange text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-5 w-5 mr-3 animate-spin" />
                       Ricerca in corso...
                     </>
                   ) : (
                     <>
-                      <Search className="h-4 w-4 mr-2" />
-                      Traccia Ordine
+                      <Search className="h-5 w-5 mr-3" />
+                      Traccia il tuo Ordine
                     </>
                   )}
                 </Button>
 
-                <div className="text-center text-sm text-gray-500">
-                  <p>
-                    💾 I tuoi dati verranno salvati localmente per comodità
-                  </p>
+                {/* Info Card */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-200">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-500 p-2 rounded-full">
+                      <Pizza className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">
+                        I tuoi dati vengono salvati in sicurezza
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Non dovrai reinserirli la prossima volta
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Temporary Debug Section */}

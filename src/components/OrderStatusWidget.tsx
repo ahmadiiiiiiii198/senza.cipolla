@@ -2,17 +2,20 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Pizza, 
-  Clock, 
-  CheckCircle, 
-  Package, 
-  Truck, 
+import {
+  Pizza,
+  Clock,
+  CheckCircle,
+  Package,
+  Truck,
   XCircle,
   ChevronDown,
   ChevronUp,
   X,
-  RefreshCw
+  RefreshCw,
+  ChefHat,
+  DoorOpen,
+  Home
 } from 'lucide-react';
 import { usePersistentOrder, getOrderStatusInfo, getOrderProgress } from '@/hooks/use-persistent-order';
 import { clearOrderTracking } from '@/utils/orderTracking';
@@ -28,7 +31,8 @@ const OrderStatusWidget: React.FC = () => {
 
   if (!order) return null;
 
-  const currentStatus = order.order_status || order.status || 'pending';
+  // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
+  const currentStatus = order.status || order.order_status || 'pending';
   const statusInfo = getOrderStatusInfo(currentStatus);
   const progress = getOrderProgress(currentStatus);
 
@@ -45,9 +49,11 @@ const OrderStatusWidget: React.FC = () => {
     switch (status) {
       case 'pending': return Clock;
       case 'confirmed': return CheckCircle;
-      case 'preparing': return Package;
-      case 'ready': return CheckCircle;
-      case 'delivered': return Truck;
+      case 'preparing': return ChefHat;
+      case 'ready': return Package;
+      case 'out_for_delivery': return Truck;
+      case 'arrived': return DoorOpen;
+      case 'delivered': return Home;
       case 'cancelled': return XCircle;
       default: return Clock;
     }
@@ -119,27 +125,28 @@ const OrderStatusWidget: React.FC = () => {
 
               {/* Quick Status Timeline */}
               <div className="flex justify-between">
-                {['pending', 'confirmed', 'preparing', 'ready', 'delivered'].map((status, index) => {
-                  const isCompleted = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'].findIndex(s => s === currentStatus) >= index;
+                {['confirmed', 'preparing', 'ready', 'out_for_delivery', 'arrived', 'delivered'].map((status, index) => {
+                  const statusOrder = ['confirmed', 'preparing', 'ready', 'out_for_delivery', 'arrived', 'delivered'];
+                  const isCompleted = statusOrder.findIndex(s => s === currentStatus) >= index;
                   const isCurrent = status === currentStatus;
                   const StepIcon = getStatusIcon(status);
 
                   return (
-                    <div 
+                    <div
                       key={status}
                       className={`flex flex-col items-center ${
-                        isCurrent 
-                          ? 'text-pizza-orange' 
-                          : isCompleted 
-                          ? 'text-green-600' 
+                        isCurrent
+                          ? 'text-pizza-orange'
+                          : isCompleted
+                          ? 'text-green-600'
                           : 'text-gray-400'
                       }`}
                     >
                       <div className={`p-1 rounded-full ${
-                        isCurrent 
-                          ? 'bg-pizza-orange text-white' 
-                          : isCompleted 
-                          ? 'bg-green-100' 
+                        isCurrent
+                          ? 'bg-pizza-orange text-white'
+                          : isCompleted
+                          ? 'bg-green-100'
                           : 'bg-gray-100'
                       }`}>
                         <StepIcon className="h-3 w-3" />

@@ -3,11 +3,12 @@ import React from 'react';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
+import HomeOrderTracker from '../components/HomeOrderTracker';
 import WeOffer from '../components/WeOffer';
 import YouTubeSection from '../components/YouTubeSection';
 import Products from '../components/Products';
 import Gallery from '../components/Gallery';
-import UnifiedOrderTracker from '../components/UnifiedOrderTracker';
+
 import About from '../components/About';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
@@ -25,29 +26,29 @@ const Index = () => {
           <Hero />
         </div>
       </ErrorBoundary>
-      <ErrorBoundary componentName="WeOffer">
+      <ErrorBoundary componentName="HomeOrderTracker">
         <div className="animate-fade-in-up animate-stagger-1">
+          <HomeOrderTracker />
+        </div>
+      </ErrorBoundary>
+      <ErrorBoundary componentName="WeOffer">
+        <div className="animate-fade-in-up animate-stagger-2">
           <WeOffer />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="YouTubeSection">
-        <div className="animate-fade-in-up animate-stagger-2">
+        <div className="animate-fade-in-up animate-stagger-3">
           <YouTubeSection />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="Products">
-        <div className="animate-fade-in-right animate-stagger-3">
+        <div className="animate-fade-in-right animate-stagger-4">
           <Products />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="Gallery">
-        <div className="animate-fade-in-up animate-stagger-4">
-          <Gallery />
-        </div>
-      </ErrorBoundary>
-      <ErrorBoundary componentName="UnifiedOrderTracker">
         <div className="animate-fade-in-up animate-stagger-5">
-          <UnifiedOrderTracker />
+          <Gallery />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="About">

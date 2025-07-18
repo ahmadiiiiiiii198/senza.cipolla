@@ -29,11 +29,11 @@ import ClientTrackingTest from "./pages/ClientTrackingTest";
 import DebugClientTracking from "./pages/DebugClientTracking";
 // DatabaseSetup component removed to prevent accidental initialization
 import SimpleStripeTest from "./components/SimpleStripeTest";
-import OrderStatusWidget from "./components/OrderStatusWidget";
 import AuthTest from "./components/AuthTest";
 import AuthTestHelper from "./components/AuthTestHelper";
 import AuthSeparationTest from "./components/AuthSeparationTest";
 import MyOrders from "./pages/MyOrders";
+import UnifiedOrderTracker from "./components/UnifiedOrderTracker";
 import ComponentLoadingTest from "./tests/ComponentLoadingTest";
 
 const queryClient = new QueryClient({
@@ -62,7 +62,6 @@ const App = () => (
             {/* ButtonDebugger removed - no more debug overlays */}
             <Toaster />
             <Sonner />
-            <OrderStatusWidget />
             <BrowserRouter>
             <Routes>
               <Route path="/" element={
@@ -154,6 +153,12 @@ const App = () => (
               } />
               <Route path="*" element={<NotFound />} />
             </Routes>
+
+            {/* Global Order Tracker - appears on all pages as floating widget */}
+            <ErrorBoundary componentName="UnifiedOrderTracker">
+              <UnifiedOrderTracker />
+            </ErrorBoundary>
+
           </BrowserRouter>
           {/* <DiagnosticInfo /> */}
               </SimpleCartProvider>

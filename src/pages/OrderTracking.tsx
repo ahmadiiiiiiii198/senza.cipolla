@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Clock, 
-  CheckCircle, 
-  Package, 
-  Truck, 
-  XCircle, 
+import {
+  Clock,
+  CheckCircle,
+  Package,
+  Truck,
+  XCircle,
   Search,
   Phone,
   Mail,
@@ -20,7 +20,10 @@ import {
   Euro,
   Pizza,
   AlertCircle,
-  Loader2
+  Loader2,
+  ChefHat,
+  DoorOpen,
+  Home
 } from 'lucide-react';
 
 interface Order {
@@ -58,49 +61,63 @@ const OrderTracking: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Order status configuration - NO PENDING STATES
+  // Order status configuration with beautiful motorcycle delivery tracking
   const orderStatuses = [
     {
       value: 'confirmed',
       label: 'Confermato',
       color: 'bg-blue-100 text-blue-800 border-blue-200',
       icon: CheckCircle,
-      description: 'Il tuo ordine è stato confermato e verrà preparato'
+      description: 'Il tuo ordine è stato confermato e verrà preparato',
+      motorcyclePosition: 0
     },
     {
       value: 'preparing',
       label: 'In preparazione',
       color: 'bg-orange-100 text-orange-800 border-orange-200',
-      icon: Package,
-      description: 'I nostri chef stanno preparando il tuo ordine'
+      icon: ChefHat,
+      description: 'I nostri chef stanno preparando il tuo ordine',
+      motorcyclePosition: 25
     },
     {
       value: 'ready',
       label: 'Pronto',
       color: 'bg-green-100 text-green-800 border-green-200',
-      icon: CheckCircle,
-      description: 'Il tuo ordine è pronto per la consegna'
+      icon: Package,
+      description: 'Il tuo ordine è pronto per la consegna',
+      motorcyclePosition: 50
+    },
+    {
+      value: 'out_for_delivery',
+      label: 'In consegna',
+      color: 'bg-purple-100 text-purple-800 border-purple-200',
+      icon: Truck,
+      description: 'Il tuo ordine è in viaggio verso di te',
+      motorcyclePosition: 75
     },
     {
       value: 'arrived',
-      label: 'Arrivato',
-      color: 'bg-purple-100 text-purple-800 border-purple-200',
-      icon: MapPin,
-      description: 'Il tuo ordine è arrivato alla porta'
+      label: 'Arrivato alla porta',
+      color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      icon: DoorOpen,
+      description: 'Il nostro rider è arrivato alla tua porta',
+      motorcyclePosition: 90
     },
     {
       value: 'delivered',
       label: 'Consegnato',
       color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-      icon: Truck,
-      description: 'Il tuo ordine è stato consegnato con successo'
+      icon: Home,
+      description: 'Il tuo ordine è stato consegnato con successo',
+      motorcyclePosition: 100
     },
     {
       value: 'cancelled',
       label: 'Annullato',
       color: 'bg-red-100 text-red-800 border-red-200',
       icon: XCircle,
-      description: 'Il tuo ordine è stato annullato'
+      description: 'Il tuo ordine è stato annullato',
+      motorcyclePosition: 0
     }
   ];
 
@@ -109,19 +126,23 @@ const OrderTracking: React.FC = () => {
     return orderStatuses.find(s => s.value === status) || orderStatuses[0];
   };
 
-  // Get status progress
+  // Get status progress with motorcycle positioning
   const getStatusProgress = (currentStatus: string) => {
-    const statusOrder = ['pending', 'confirmed', 'preparing', 'ready', 'arrived', 'delivered'];
+    const statusOrder = ['confirmed', 'preparing', 'ready', 'out_for_delivery', 'arrived', 'delivered'];
     const currentIndex = statusOrder.indexOf(currentStatus);
 
     if (currentStatus === 'cancelled') {
       return { current: -1, total: statusOrder.length, percentage: 0 };
     }
 
+    // Use motorcycle position from status configuration for more accurate positioning
+    const statusInfo = getCurrentStatusInfo(currentStatus);
+    const percentage = statusInfo.motorcyclePosition || ((currentIndex + 1) / statusOrder.length) * 100;
+
     return {
       current: currentIndex + 1,
       total: statusOrder.length,
-      percentage: ((currentIndex + 1) / statusOrder.length) * 100
+      percentage: percentage
     };
   };
 
@@ -233,79 +254,93 @@ const OrderTracking: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-purple-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="bg-pizza-orange p-4 rounded-full">
-              <Pizza className="h-8 w-8 text-white" />
+        {/* Modern Header */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center mb-6">
+            <div className="bg-gradient-to-r from-pizza-orange to-red-500 p-6 rounded-full shadow-2xl">
+              <Pizza className="h-12 w-12 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-pizza-orange to-red-500 bg-clip-text text-transparent">
             Traccia il tuo Ordine
           </h1>
-          <p className="text-gray-600">
-            Inserisci i tuoi dati per seguire lo stato del tuo ordine in tempo reale
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Inserisci i tuoi dati per seguire lo stato del tuo ordine in tempo reale con il nostro sistema di tracking avanzato
           </p>
         </div>
 
-        {/* Search Form */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Cerca il tuo Ordine
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Numero Ordine
-                </label>
-                <Input
-                  placeholder="es. ORD-2024-001"
-                  value={orderNumber}
-                  onChange={(e) => setOrderNumber(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Email
-                </label>
-                <Input
-                  type="email"
-                  placeholder="la-tua-email@esempio.com"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  className="w-full"
-                />
+        {/* Modern Search Form */}
+        <Card className="mb-12 shadow-2xl border-0 bg-gradient-to-br from-white to-orange-50 overflow-hidden max-w-2xl mx-auto">
+          <CardHeader className="text-center pb-6 bg-gradient-to-r from-pizza-orange to-red-500 text-white">
+            <div className="flex justify-center mb-4">
+              <div className="bg-white/20 p-4 rounded-full">
+                <Search className="h-8 w-8 text-white" />
               </div>
             </div>
-            
+            <CardTitle className="text-2xl font-bold">
+              Cerca il tuo Ordine
+            </CardTitle>
+            <p className="text-white/90 mt-2">
+              Inserisci i tuoi dati per iniziare il tracking
+            </p>
+          </CardHeader>
+          <CardContent className="p-8 space-y-6">
+            <div className="space-y-6">
+              <div className="relative">
+                <label className="block text-sm font-semibold mb-3 text-gray-700">
+                  🎫 Numero Ordine
+                </label>
+                <div className="relative">
+                  <Input
+                    placeholder="es. ORD-996366156"
+                    value={orderNumber}
+                    onChange={(e) => setOrderNumber(e.target.value)}
+                    className="w-full h-12 pl-12 text-lg border-2 border-gray-200 focus:border-pizza-orange rounded-xl shadow-sm transition-all duration-200"
+                  />
+                  <Package className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+
+              <div className="relative">
+                <label className="block text-sm font-semibold mb-3 text-gray-700">
+                  📧 Email di Conferma
+                </label>
+                <div className="relative">
+                  <Input
+                    type="email"
+                    placeholder="la-tua-email@esempio.com"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    className="w-full h-12 pl-12 text-lg border-2 border-gray-200 focus:border-pizza-orange rounded-xl shadow-sm transition-all duration-200"
+                  />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
             {error && (
-              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                <AlertCircle className="h-4 w-4" />
-                <span className="text-sm">{error}</span>
+              <div className="flex items-center gap-3 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg text-red-700 animate-pulse">
+                <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-medium">{error}</span>
               </div>
             )}
 
-            <Button 
-              onClick={searchOrder} 
+            <Button
+              onClick={searchOrder}
               disabled={loading}
-              className="w-full bg-pizza-orange hover:bg-pizza-red"
+              className="w-full h-14 bg-gradient-to-r from-pizza-orange to-red-500 hover:from-red-500 hover:to-pizza-orange text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-5 w-5 mr-3 animate-spin" />
                   Ricerca in corso...
                 </>
               ) : (
                 <>
-                  <Search className="h-4 w-4 mr-2" />
-                  Cerca Ordine
+                  <Search className="h-5 w-5 mr-3" />
+                  Traccia il tuo Ordine
                 </>
               )}
             </Button>
@@ -537,6 +572,8 @@ const OrderTracking: React.FC = () => {
                       <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full text-base font-medium ${
                         order.status === 'delivered'
                           ? 'bg-green-100 text-green-800 border-2 border-green-200'
+                          : order.status === 'arrived'
+                          ? 'bg-yellow-100 text-yellow-800 border-2 border-yellow-200'
                           : order.status === 'out_for_delivery'
                           ? 'bg-blue-100 text-blue-800 border-2 border-blue-200'
                           : order.status === 'preparing'
@@ -545,6 +582,7 @@ const OrderTracking: React.FC = () => {
                       }`}>
                         <div className={`w-3 h-3 rounded-full ${
                           order.status === 'delivered' ? 'bg-green-500' :
+                          order.status === 'arrived' ? 'bg-yellow-500 animate-pulse' :
                           order.status === 'out_for_delivery' ? 'bg-blue-500 animate-pulse' :
                           order.status === 'preparing' ? 'bg-orange-500 animate-pulse' :
                           'bg-gray-500'
@@ -563,6 +601,11 @@ const OrderTracking: React.FC = () => {
                       {order.status === 'preparing' && (
                         <p className="text-sm text-orange-600 font-medium">
                           👨‍🍳 La tua pizza è in preparazione nel nostro forno a legna!
+                        </p>
+                      )}
+                      {order.status === 'arrived' && (
+                        <p className="text-sm text-yellow-600 font-medium">
+                          🚪 Il nostro rider è arrivato alla tua porta! Preparati a ricevere il tuo ordine!
                         </p>
                       )}
                       {order.status === 'delivered' && (

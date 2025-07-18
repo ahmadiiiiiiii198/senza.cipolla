@@ -25,6 +25,17 @@
   --pizza-dark: #1A1B2E;
 }
 
+/* Order Tracker Widget Styles */
+.order-tracker-widget {
+  position: fixed !important;
+  bottom: 16px !important;
+  right: 16px !important;
+  z-index: 9999 !important;
+  width: 320px !important;
+  max-width: 90vw !important;
+  pointer-events: auto !important;
+}
+
 /* Flegrea-themed animations */
 @keyframes pizzaSpin {
   0% {

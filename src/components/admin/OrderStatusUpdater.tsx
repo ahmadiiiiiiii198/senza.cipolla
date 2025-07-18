@@ -84,8 +84,8 @@ const OrderStatusUpdater: React.FC<OrderStatusUpdaterProps> = ({
     }
   ];
 
-  // Get current status (check both status and order_status fields)
-  const currentStatus = order.order_status || order.status || 'confirmed';
+  // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
+  const currentStatus = order.status || order.order_status || 'confirmed';
 
   // Get current status info
   const getCurrentStatusInfo = () => {
