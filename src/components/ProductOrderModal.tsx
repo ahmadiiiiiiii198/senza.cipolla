@@ -10,7 +10,7 @@ import { Loader2, ShoppingCart, Plus, Minus, User, Mail, Phone, MapPin, CreditCa
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types/category';
 import shippingZoneService from '@/services/shippingZoneService';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import BusinessHoursStatus from './BusinessHoursStatus';
 import { businessHoursService } from '@/services/businessHoursService';
 import { saveOrderForTracking } from '@/utils/orderTracking';
@@ -287,7 +287,7 @@ interface OrderData {
 
 const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, onClose }) => {
   const { toast } = useToast();
-  const { validateOrderTime } = useBusinessHours(true, 'product-order-modal');
+  const { validateOrderTime } = useBusinessHoursContext();
   const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValidatingAddress, setIsValidatingAddress] = useState(false);

@@ -11,7 +11,7 @@ import OrderOptionsModal from './OrderOptionsModal';
 
 import { Product, ProductsByCategory } from '@/types/category';
 import { useStockManagement } from '@/hooks/useStockManagement';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 
 // Memoized ProductCard to prevent unnecessary re-renders
 const MemoizedProductCard = memo(ProductCard);
@@ -123,7 +123,7 @@ const OptimizedProducts = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   // Get business hours for all product cards
-  const { isOpen: businessIsOpen, message: businessMessage, validateOrderTime } = useBusinessHours(true, 'optimized-products');
+  const { isOpen: businessIsOpen, message: businessMessage, validateOrderTime } = useBusinessHoursContext();
 
   // Memoized load functions to prevent recreation
   const loadProducts = useCallback(async () => {

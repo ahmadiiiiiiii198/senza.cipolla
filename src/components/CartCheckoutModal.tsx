@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { CartItem } from '@/hooks/use-simple-cart';
 import { useSimpleCart } from '@/hooks/use-simple-cart';
 import shippingZoneService from '@/services/shippingZoneService';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
@@ -35,7 +35,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
   totalAmount
 }) => {
   const { toast } = useToast();
-  const { validateOrderTime } = useBusinessHours();
+  const { validateOrderTime } = useBusinessHoursContext();
   const { user, isAuthenticated } = useCustomerAuth();
   const { clearCart } = useSimpleCart();
   const [isSubmitting, setIsSubmitting] = useState(false);

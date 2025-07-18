@@ -57,6 +57,15 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
       const result = await businessHoursService.isBusinessOpen();
       const formatted = await businessHoursService.getFormattedHours();
 
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🕒 [BusinessHoursProvider] Service returned:', {
+          isOpen: result.isOpen,
+          message: result.message,
+          todayHours: result.todayHours,
+          formatted
+        });
+      }
+
       setIsOpen(result.isOpen);
       setMessage(result.message);
       setNextOpenTime(result.nextOpenTime);
@@ -71,9 +80,9 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
       }
     } catch (error) {
       console.error('❌ [BusinessHoursProvider] Error checking business status:', error);
-      // Set safe defaults on error
-      setIsOpen(true); // Default to open to allow orders
-      setMessage('Orari non disponibili');
+      // Set realistic defaults on error - don't assume open
+      setIsOpen(false); // Default to closed for safety
+      setMessage('Errore nel caricamento degli orari. Riprova più tardi.');
       setNextOpenTime(undefined);
       setTodayHours(undefined);
       setFormattedHours('Orari non disponibili');

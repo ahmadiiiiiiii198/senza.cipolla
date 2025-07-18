@@ -2,7 +2,7 @@ import React from 'react';
 import { Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 
 interface BusinessHoursStatusProps {
   showFullHours?: boolean;
@@ -22,7 +22,7 @@ const BusinessHoursStatus: React.FC<BusinessHoursStatusProps> = ({
     nextOpenTime,
     todayHours,
     formattedHours
-  } = useBusinessHours(true, 'business-hours-status');
+  } = useBusinessHoursContext();
 
   if (isLoading) {
     return (

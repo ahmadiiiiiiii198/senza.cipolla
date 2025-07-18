@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import { ShoppingCart, MessageSquare, Loader2, Package, Send } from 'lucide-react';
 
 interface OrderOptionsModalProps {
@@ -25,7 +25,7 @@ const OrderOptionsModal: React.FC<OrderOptionsModalProps> = ({ isOpen, onClose }
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const { validateOrderTime } = useBusinessHours();
+  const { validateOrderTime } = useBusinessHoursContext();
   
   const [formData, setFormData] = useState<CustomRequestForm>({
     customerPhone: '',

@@ -8,7 +8,7 @@ import PatternDivider from "./PatternDivider";
 import { useToast } from "@/hooks/use-toast";
 import OrderOptionsModal from "./OrderOptionsModal";
 import BusinessHoursStatus from "./BusinessHoursStatus";
-import { useBusinessHours } from "@/hooks/useBusinessHours";
+import { useBusinessHoursContext } from "@/contexts/BusinessHoursContext";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ContactContent {
@@ -22,7 +22,7 @@ interface ContactContent {
 
 const Contact = () => {
   const { toast } = useToast();
-  const { formattedHours } = useBusinessHours(true, 'contact');
+  const { formattedHours } = useBusinessHoursContext();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",

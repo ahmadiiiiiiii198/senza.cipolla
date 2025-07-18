@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ShoppingCart, Phone, Mail, User, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import BusinessHoursStatus from './BusinessHoursStatus';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
@@ -40,7 +40,7 @@ interface OrderFormData {
 
 const OrderForm = () => {
   const { toast } = useToast();
-  const { validateOrderTime } = useBusinessHours(true, 'order-form');
+  const { validateOrderTime } = useBusinessHoursContext();
   const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<OrderFormData>({

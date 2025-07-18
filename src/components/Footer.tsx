@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Pizza, ChefHat, Clock, MapPin, Phone, Mail } from 'lucide-react';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import { useLanguage } from '@/hooks/use-language';
 import { supabase } from '@/integrations/supabase/client';
 
 const Footer = () => {
-  const { formattedHours } = useBusinessHours(true, 'footer');
+  const { formattedHours } = useBusinessHoursContext();
   const { t } = useLanguage();
   const [contactHours, setContactHours] = useState<string>('');
 

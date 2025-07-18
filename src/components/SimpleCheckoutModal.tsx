@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CartItem, useSimpleCart } from '@/hooks/use-simple-cart';
 import { supabase } from '@/integrations/supabase/client';
 import shippingZoneService from '@/services/shippingZoneService';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
@@ -27,7 +27,7 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
   totalAmount
 }) => {
   const { toast } = useToast();
-  const { validateOrderTime, isOpen: businessIsOpen, message: businessMessage } = useBusinessHours();
+  const { validateOrderTime, isOpen: businessIsOpen, message: businessMessage } = useBusinessHoursContext();
   const { clearCart } = useSimpleCart();
   const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);

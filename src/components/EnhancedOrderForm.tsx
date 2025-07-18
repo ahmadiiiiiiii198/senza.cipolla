@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import AddressValidator from './AddressValidator';
 import StripeCheckout from './StripeCheckout';
 import shippingZoneService from '@/services/shippingZoneService';
-import { useBusinessHours } from '@/hooks/useBusinessHours';
+import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
@@ -39,7 +39,7 @@ interface AddressValidationResult {
 
 const EnhancedOrderForm = () => {
   const { toast } = useToast();
-  const { validateOrderTime } = useBusinessHours();
+  const { validateOrderTime } = useBusinessHoursContext();
   const { user, isAuthenticated } = useCustomerAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1: Form, 2: Address Validation, 3: Payment
