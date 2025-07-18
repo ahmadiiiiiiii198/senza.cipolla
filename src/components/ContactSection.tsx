@@ -18,6 +18,7 @@ import {
   ChefHat
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { usePizzeriaHours } from '@/hooks/usePizzeriaHours';
 
 interface ContactFormData {
   name: string;
@@ -36,6 +37,7 @@ interface ContactInfo {
 
 const ContactSection = () => {
   const { toast } = useToast();
+  const { allHours } = usePizzeriaHours();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     address: 'Corso Regina Margherita, 53, 10152 Torino TO',
@@ -393,7 +395,7 @@ const ContactSection = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-1">Orari di Apertura</h3>
-                    <p className="text-gray-600">{contactInfo.hours}</p>
+                    <p className="text-gray-600 whitespace-pre-line">{allHours || contactInfo.hours}</p>
                   </div>
                 </div>
               </CardContent>

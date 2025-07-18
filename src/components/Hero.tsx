@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Pizza, ChefHat, Clock, Star, Camera, Phone } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import { usePizzeriaHours } from '@/hooks/usePizzeriaHours';
 
 const Hero = () => {
   const { t } = useLanguage();
+  const { displayText, isLoading: hoursLoading } = usePizzeriaHours();
 
   const [heroContent, setHeroContent] = useState({
     heading: "Pizzeria Regina 2000 Torino",
@@ -318,7 +320,9 @@ const Hero = () => {
                 <div className="font-bold text-xl mb-2 tracking-wide">
                   Aperto Oggi
                 </div>
-                <div className="text-yellow-300 font-mono text-2xl font-bold">12:00 - 24:00</div>
+                <div className="text-yellow-300 font-mono text-2xl font-bold">
+                  {hoursLoading ? '...' : displayText}
+                </div>
               </div>
             </div>
 
