@@ -119,6 +119,14 @@
   animation: tomatoBounce 1.5s ease-in-out infinite;
 }
 
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
 .animation-delay-2000 {
   animation-delay: 2s;
 }
@@ -648,6 +656,100 @@
     animation: shimmer 2s infinite;
   }
 
+  /* Hero image column stability - prevent disappearing when authenticated */
+  .hero-image-column {
+    position: relative !important;
+    z-index: 15 !important;
+    /* Ensure the column maintains its space */
+    min-height: 550px !important;
+    /* Prevent layout shifts */
+    flex-shrink: 0 !important;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Prevent any transforms that might hide it */
+    transform: none !important;
+  }
+
+  .hero-main-image {
+    /* Ensure image stays visible with maximum priority */
+    position: relative !important;
+    z-index: 20 !important;
+    /* Prevent image from being hidden by other elements */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Prevent any CSS that might hide the image */
+    max-width: 100% !important;
+    height: 500px !important;
+    min-height: 400px !important;
+    /* Ensure it's always on top */
+    isolation: isolate !important;
+  }
+
+  /* Ensure hero section maintains proper layout when order tracker appears */
+  .hero-container-mobile {
+    position: relative;
+    z-index: 1;
+    /* Ensure hero content stays above background elements */
+    isolation: isolate;
+  }
+
+  /* Hero grid stability - force proper layout */
+  .hero-main-grid {
+    /* Ensure grid maintains proper layout */
+    position: relative !important;
+    z-index: 10 !important;
+    /* Prevent grid collapse */
+    min-height: 80vh !important;
+    /* Force grid display */
+    display: grid !important;
+    /* Ensure both columns maintain their space */
+    grid-template-columns: 1fr 1fr !important;
+    /* Prevent any layout issues */
+    width: 100% !important;
+    gap: 3rem !important;
+  }
+
+  @media (max-width: 1023px) {
+    .hero-main-grid {
+      grid-template-columns: 1fr !important;
+      gap: 3rem !important;
+      /* Ensure both columns are still visible on mobile */
+      min-height: auto !important;
+    }
+
+    /* Force hero image column to be visible on mobile */
+    .hero-image-column {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      order: 2 !important; /* Show after logo on mobile */
+    }
+  }
+
+  /* Additional safety for very small screens */
+  @media (max-width: 768px) {
+    .hero-image-column {
+      min-height: 420px !important;
+      margin-top: 2rem !important;
+    }
+
+    .hero-main-image {
+      min-height: 350px !important;
+      height: 380px !important;
+    }
+  }
+
+  /* Desktop specific styles */
+  @media (min-width: 769px) {
+    .hero-main-image {
+      min-height: 450px !important;
+      height: 500px !important;
+    }
+  }
+
   @keyframes shimmer {
     0% {
       background-position: -200% 0;
@@ -735,8 +837,8 @@
     /* Mobile gallery optimizations */
     .mobile-gallery-image {
       /* Ensure images are fully visible on mobile */
-      min-height: 320px;
-      max-height: 400px;
+      min-height: 240px;
+      max-height: 320px;
       /* Better touch interaction */
       touch-action: pan-x pan-y;
       -webkit-touch-callout: none;
@@ -763,7 +865,7 @@
   /* Desktop gallery optimizations */
   @media (min-width: 768px) {
     .desktop-gallery-image {
-      height: 280px;
+      height: 240px;
     }
 
     .desktop-gallery-image img {

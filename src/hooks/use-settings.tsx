@@ -98,10 +98,10 @@ export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => P
     try {
       console.log(`[useSetting] Loading setting: ${key}`);
 
-      // Add timeout to prevent hanging
+      // Add timeout to prevent hanging (reduced to 5 seconds for better UX)
       const settingPromise = settingsService.getSetting<T>(key, defaultValue);
       const timeoutPromise = new Promise<T>((_, reject) => {
-        setTimeout(() => reject(new Error(`Timeout loading setting ${key}`)), 10000);
+        setTimeout(() => reject(new Error(`Timeout loading setting ${key}`)), 5000);
       });
 
       const setting = await Promise.race([settingPromise, timeoutPromise]);
@@ -243,8 +243,78 @@ const DEFAULT_HERO_CONTENT = {
   heroImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
 };
 
+// Preload hero content for faster loading with localStorage cache
+let heroContentCache: any = null;
+let heroContentPromise: Promise<any> | null = null;
+
+const HERO_CACHE_KEY = 'heroContent_cache';
+const HERO_CACHE_TIMESTAMP_KEY = 'heroContent_cache_timestamp';
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const preloadHeroContent = async () => {
+  if (heroContentCache || heroContentPromise) return heroContentCache;
+
+  // Try to get from localStorage cache first
+  try {
+    const cachedData = localStorage.getItem(HERO_CACHE_KEY);
+    const cacheTimestamp = localStorage.getItem(HERO_CACHE_TIMESTAMP_KEY);
+
+    if (cachedData && cacheTimestamp) {
+      const age = Date.now() - parseInt(cacheTimestamp);
+      if (age < CACHE_DURATION) {
+        heroContentCache = JSON.parse(cachedData);
+        console.log('[preloadHeroContent] Using cached hero content');
+        return heroContentCache;
+      }
+    }
+  } catch (error) {
+    console.warn('[preloadHeroContent] Cache read failed:', error);
+  }
+
+  heroContentPromise = (async () => {
+    try {
+      const { settingsService } = await import('@/services/settingsService');
+      await settingsService.initialize();
+      const content = await settingsService.getSetting('heroContent', DEFAULT_HERO_CONTENT);
+      heroContentCache = content;
+
+      // Cache the result
+      try {
+        localStorage.setItem(HERO_CACHE_KEY, JSON.stringify(content));
+        localStorage.setItem(HERO_CACHE_TIMESTAMP_KEY, Date.now().toString());
+      } catch (error) {
+        console.warn('[preloadHeroContent] Cache write failed:', error);
+      }
+
+      return content;
+    } catch (error) {
+      console.warn('[preloadHeroContent] Failed to preload, using default:', error);
+      heroContentCache = DEFAULT_HERO_CONTENT;
+      return DEFAULT_HERO_CONTENT;
+    }
+  })();
+
+  return heroContentPromise;
+};
+
+// Start preloading immediately
+preloadHeroContent();
+
 export function useHeroContent() {
-  return useSetting('heroContent', DEFAULT_HERO_CONTENT);
+  const [content, updateContent, isLoading] = useSetting('heroContent', DEFAULT_HERO_CONTENT);
+
+  // Use cached content if available to reduce loading time
+  useEffect(() => {
+    if (heroContentCache && !isLoading) {
+      // Only update if the cached content is different
+      if (JSON.stringify(content) !== JSON.stringify(heroContentCache)) {
+        // Don't call updateContent here to avoid infinite loops
+        // The useSetting hook will handle the update
+      }
+    }
+  }, [content, isLoading]);
+
+  return [heroContentCache || content, updateContent, isLoading] as const;
 }
 
 const DEFAULT_ABOUT_CONTENT = {

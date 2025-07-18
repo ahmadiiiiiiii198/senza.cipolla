@@ -2,74 +2,92 @@ import React, { useState, useEffect } from 'react';
 import { Pizza, ChefHat, Clock, Star, Camera, Phone } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { usePizzeriaHours } from '@/hooks/usePizzeriaHours';
+import { useCustomerAuth } from '@/hooks/useCustomerAuth';
+import { useHeroContent, useLogoSettings } from '@/hooks/use-settings';
 
 const Hero = () => {
   const { t } = useLanguage();
   const { displayText, allHours, isLoading: hoursLoading } = usePizzeriaHours();
+  const { isAuthenticated, user } = useCustomerAuth();
 
-  const [heroContent, setHeroContent] = useState({
-    heading: "Pizzeria Regina 2000 Torino",
-    subheading: "Autentica pizza italiana nel cuore di Torino dal 2000",
-    backgroundImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    heroImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
-  });
-
-  const [logoSettings, setLogoSettings] = useState({
-    logoUrl: "/logo.png",
-    altText: "Pizzeria Regina 2000 Torino Logo",
-  });
+  // Use the proper hooks to load content from database
+  const [heroContent, , heroLoading] = useHeroContent();
+  const [logoSettings, , logoLoading] = useLogoSettings();
 
   const [heroImageLoaded, setHeroImageLoaded] = useState(false);
   const [logoImageLoaded, setLogoImageLoaded] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadContent = async () => {
-      try {
-        // Try to load content from settings service with timeout
-        const { settingsService } = await import('@/services/settingsService');
+  // Combine loading states
+  const isLoading = heroLoading || logoLoading || hoursLoading;
 
-        // Initialize with timeout
-        const initPromise = settingsService.initialize();
-        const initTimeout = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Settings init timeout')), 5000);
-        });
+  // Show loading skeleton while data is being fetched
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen overflow-x-hidden hero-container-mobile">
+        {/* Background with gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-pizza-red/20 via-pizza-orange/10 to-pizza-cheese/20"></div>
 
-        await Promise.race([initPromise, initTimeout]);
+        {/* Loading skeleton */}
+        <div className="relative z-10 container mx-auto px-4 py-16 lg:py-24">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[80vh]">
 
-        // Load hero content with timeout
-        const heroPromise = settingsService.getSetting('heroContent', heroContent);
-        const heroTimeout = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Hero content timeout')), 3000);
-        });
+            {/* Left Column Skeleton */}
+            <div className="text-center lg:text-left space-y-8">
+              {/* Logo skeleton */}
+              <div className="flex justify-center lg:justify-start mb-8">
+                <div className="h-96 md:h-[480px] w-96 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl animate-pulse flex items-center justify-center">
+                  <Pizza className="text-red-400 animate-float" size={64} />
+                </div>
+              </div>
 
-        const loadedHeroContent = await Promise.race([heroPromise, heroTimeout]);
-        setHeroContent(loadedHeroContent);
+              {/* Text skeleton */}
+              <div className="space-y-4">
+                <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div className="h-6 bg-gray-200 rounded-lg animate-pulse w-3/4"></div>
+                <div className="h-6 bg-gray-200 rounded-lg animate-pulse w-1/2"></div>
+              </div>
 
-        // Load logo settings with timeout
-        const logoPromise = settingsService.getSetting('logoSettings', logoSettings);
-        const logoTimeout = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Logo settings timeout')), 3000);
-        });
+              {/* Hours skeleton */}
+              <div className="bg-gradient-to-br from-pizza-red/90 to-pizza-orange/90 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/20">
+                <div className="text-center">
+                  <div className="text-5xl mb-4">⏰</div>
+                  <div className="h-6 bg-white/20 rounded animate-pulse mb-4"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-white/20 rounded animate-pulse"></div>
+                    <div className="h-4 bg-white/20 rounded animate-pulse"></div>
+                    <div className="h-4 bg-white/20 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        const loadedLogoSettings = await Promise.race([logoPromise, logoTimeout]);
-        setLogoSettings(loadedLogoSettings);
+            {/* Right Column Skeleton */}
+            <div className="relative">
+              <div className="h-96 md:h-[500px] bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl animate-pulse flex items-center justify-center">
+                <Pizza className="text-red-400 animate-float" size={64} />
+                <div className="ml-4 text-red-600 font-semibold">
+                  Caricamento...
+                </div>
+              </div>
+            </div>
 
-        console.log('✅ [Hero] Content loaded successfully');
-      } catch (error) {
-        console.warn('⚠️ [Hero] Failed to load content, using defaults:', error);
-        // Keep default values
-      } finally {
-        setIsLoading(false);
-      }
-    };
+          </div>
+        </div>
 
-    // Add a small delay to let the app initialize
-    const timer = setTimeout(loadContent, 500);
-    return () => clearTimeout(timer);
-  }, []);
+        {/* Loading indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
+            <div className="w-2 h-2 bg-pizza-red rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-pizza-orange rounded-full animate-bounce animation-delay-200"></div>
+            <div className="w-2 h-2 bg-pizza-cheese rounded-full animate-bounce animation-delay-400"></div>
+            <span className="text-white text-sm ml-2">Caricamento contenuto...</span>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative min-h-screen overflow-x-hidden hero-container-mobile">
@@ -106,11 +124,9 @@ const Hero = () => {
               minHeight: '100%'
             }}
             onLoadedData={() => {
-              console.log('✅ [Hero] Background video loaded successfully');
               setVideoLoaded(true);
             }}
             onError={(e) => {
-              console.error('❌ [Hero] Background video failed to load:', e);
               setVideoError(true);
             }}
           >
@@ -166,7 +182,7 @@ const Hero = () => {
       </div>
 
       <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[80vh] hero-main-grid">
 
           {/* Left Column - Logo and Text */}
           <div className="text-center lg:text-left space-y-8 animate-fade-in-left">
@@ -188,11 +204,9 @@ const Hero = () => {
                       logoImageLoaded ? 'opacity-100' : 'opacity-0'
                     }`}
                     onLoad={() => {
-                      console.log('✅ [Hero] Large logo loaded successfully');
                       setLogoImageLoaded(true);
                     }}
                     onError={(e) => {
-                      console.error('❌ [Hero] Large logo failed to load:', logoSettings.logoUrl);
                       setLogoImageLoaded(true);
                     }}
                   />
@@ -207,36 +221,71 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Right Column - Hero Image */}
-          <div className="relative animate-fade-in-right animate-stagger-1">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-white via-red-50 to-orange-50 p-8 hover-lift">
+          {/* Right Column - Hero Image - FORCED VISIBILITY */}
+          <div
+            className="relative animate-fade-in-right animate-stagger-1 hero-image-column"
+            style={{
+              display: 'block !important',
+              visibility: 'visible !important',
+              opacity: 1,
+              position: 'relative',
+              zIndex: 25
+            }}
+          >
+            <div
+              className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-white via-red-50 to-orange-50 p-8 hover-lift"
+              style={{
+                display: 'block !important',
+                visibility: 'visible !important',
+                minHeight: '550px'
+              }}
+            >
               {/* Hero image loading placeholder */}
               {!heroImageLoaded && (
                 <div className="absolute inset-8 rounded-2xl bg-gradient-to-br from-red-100 to-orange-100 animate-pulse flex items-center justify-center">
                   <Pizza className="text-red-400 animate-float" size={64} />
+                  <div className="ml-4 text-red-600 font-semibold">
+                    Caricamento immagine...
+                  </div>
                 </div>
               )}
               <img
                 src={heroContent.heroImage || heroContent.backgroundImage}
                 alt="Delicious authentic Italian pizza"
-                className={`w-full h-96 md:h-[500px] object-cover rounded-2xl transition-opacity duration-700 hover-scale ${
+                className={`w-full h-96 md:h-[500px] lg:h-[600px] object-cover rounded-2xl transition-opacity duration-700 hover-scale hero-main-image ${
                   heroImageLoaded ? 'opacity-100' : 'opacity-0'
                 }`}
-                onLoad={() => {
+                style={{
+                  display: 'block !important',
+                  visibility: 'visible !important',
+                  position: 'relative',
+                  zIndex: 10,
+                  height: '500px', // Much bigger height for desktop
+                  minHeight: '400px', // Much bigger minimum
+                  maxWidth: '100%'
+                }}
+                onLoad={(e) => {
                   setHeroImageLoaded(true);
+                  console.log('🍕 [Hero Image] Loaded with computed height:', e.currentTarget.offsetHeight);
+                  console.log('🍕 [Hero Image] Inline styles:', e.currentTarget.style.height);
+                  console.log('🍕 [Hero Image] CSS classes:', e.currentTarget.className);
                 }}
                 onError={(e) => {
-                  console.error(`❌ Hero image failed to load: ${e.currentTarget.src}`);
                   // Try fallback image
                   const fallbackImage = 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80';
                   if (e.currentTarget.src !== fallbackImage) {
                     e.currentTarget.src = fallbackImage;
                   } else {
+                    console.warn('⚠️ [Hero] Fallback image also failed, keeping placeholder');
                     setHeroImageLoaded(false);
                   }
                 }}
               />
               <div className="absolute inset-8 rounded-2xl bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+
+
+
+
             </div>
           </div>
         </div>
@@ -398,17 +447,13 @@ const Hero = () => {
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log('📸 Gallery button clicked, scrolling to gallery...');
                   try {
                     const gallerySection = document.getElementById('gallery');
                     if (gallerySection) {
                       gallerySection.scrollIntoView({ behavior: 'smooth' });
-                      console.log('✅ Scrolled to gallery successfully');
-                    } else {
-                      console.error('❌ Gallery section not found');
                     }
                   } catch (error) {
-                    console.error('❌ Error scrolling to gallery:', error);
+                    // Handle error silently
                   }
                 }}
                 className="group relative bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-12 py-5 rounded-2xl font-bold text-xl hover:from-purple-500 hover:to-indigo-500 transform hover:scale-110 transition-all duration-500 shadow-2xl hover:shadow-3xl border-2 border-purple-300/60 hover:border-purple-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"

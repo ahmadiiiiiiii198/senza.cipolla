@@ -30,6 +30,8 @@ const HomeOrderTracker: React.FC = () => {
   const { orders: userOrders, loading: userOrdersLoading, hasActiveOrders } = useUserOrders();
 
   // 🔒 SECURITY: Only show order tracking for authenticated users
+  console.log('🔍 [HomeOrderTracker] Authentication state:', { isAuthenticated, userEmail: user?.email });
+
   if (!isAuthenticated || !user) {
     return null;
   }
