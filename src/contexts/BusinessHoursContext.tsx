@@ -52,6 +52,15 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
 
       if (process.env.NODE_ENV === 'development') {
         console.log('🕒 [BusinessHoursProvider] Checking business hours status...');
+
+        // Log current auth state to debug authentication interference
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('🔐 [BusinessHoursProvider] Current auth state:', {
+          hasSession: !!session,
+          userId: session?.user?.id,
+          userEmail: session?.user?.email,
+          timestamp: new Date().toISOString()
+        });
       }
 
       const result = await businessHoursService.isBusinessOpen();
@@ -80,9 +89,15 @@ export const BusinessHoursProvider: React.FC<BusinessHoursProviderProps> = ({ ch
       }
     } catch (error) {
       console.error('❌ [BusinessHoursProvider] Error checking business status:', error);
+      console.error('❌ [BusinessHoursProvider] Full error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+
       // Set realistic defaults on error - don't assume open
       setIsOpen(false); // Default to closed for safety
-      setMessage('Errore nel caricamento degli orari. Riprova più tardi.');
+      setMessage(`Errore nel caricamento degli orari: ${error.message}. Riprova più tardi.`);
       setNextOpenTime(undefined);
       setTodayHours(undefined);
       setFormattedHours('Orari non disponibili');

@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { createClient } from '@supabase/supabase-js';
 
 interface DayHours {
   isOpen: boolean;
@@ -29,6 +30,20 @@ class BusinessHoursService {
   private lastFetch: number = 0;
   private readonly CACHE_DURATION = 30 * 1000; // 30 seconds for faster updates
 
+  // Create a separate, non-authenticated Supabase client for business hours
+  // This ensures business hours work regardless of user authentication state
+  private readonly publicSupabase = createClient(
+    'https://sixnfemtvmighstbgrbd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I',
+    {
+      auth: {
+        persistSession: false, // Don't persist sessions for this client
+        autoRefreshToken: false, // Don't auto-refresh tokens
+        detectSessionInUrl: false // Don't detect sessions from URL
+      }
+    }
+  );
+
   static getInstance(): BusinessHoursService {
     if (!BusinessHoursService.instance) {
       BusinessHoursService.instance = new BusinessHoursService();
@@ -50,8 +65,16 @@ class BusinessHoursService {
     try {
       console.log('🕒 Fetching business hours from database...');
 
-      // Add timeout protection
-      const queryPromise = supabase
+      // Log current auth state to debug authentication interference
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔐 [BusinessHours] Current auth state:', {
+        hasSession: !!session,
+        userId: session?.user?.id,
+        userEmail: session?.user?.email
+      });
+
+      // Use the public client to avoid authentication interference
+      const queryPromise = this.publicSupabase
         .from('settings')
         .select('value')
         .eq('key', 'businessHours')
@@ -63,8 +86,17 @@ class BusinessHoursService {
 
       const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
 
+      console.log('🕒 [BusinessHours] Database query result:', {
+        hasData: !!data,
+        hasError: !!error,
+        errorMessage: error?.message,
+        errorCode: error?.code,
+        errorDetails: error?.details
+      });
+
       if (error) {
         console.error('❌ Error fetching business hours:', error);
+        console.error('❌ Full error object:', JSON.stringify(error, null, 2));
         // Return default hours if database fetch fails
         return this.getDefaultHours();
       }
@@ -109,18 +141,30 @@ class BusinessHoursService {
    * Check if business is currently open
    */
   async isBusinessOpen(checkTime?: Date): Promise<BusinessHoursResult> {
+    console.log('🕒 [BusinessHours] Starting isBusinessOpen check...');
+
     const hours = await this.getBusinessHours();
     const now = checkTime || new Date();
-    
+
+    console.log('🕒 [BusinessHours] Business hours fetched:', hours);
+    console.log('🕒 [BusinessHours] Check time:', {
+      checkTime: now.toLocaleString('it-IT'),
+      dayOfWeek: now.getDay(),
+      currentTimeString: this.formatTime(now)
+    });
+
     // Get current day of week (0 = Sunday, 1 = Monday, etc.)
     const dayOfWeek = now.getDay();
     const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const currentDay = dayNames[dayOfWeek] as keyof WeeklyHours;
-    
+
     const todayHours = hours[currentDay];
-    
+
+    console.log('🕒 [BusinessHours] Today is:', currentDay, 'Hours:', todayHours);
+
     // Check if business is open today
     if (!todayHours.isOpen) {
+      console.log('🚫 [BusinessHours] Business is closed today');
       const nextOpenTime = this.getNextOpenTime(hours, now);
       return {
         isOpen: false,
@@ -133,14 +177,23 @@ class BusinessHoursService {
     // Check if current time is within business hours
     const currentTime = this.formatTime(now);
     const isWithinHours = this.isTimeWithinRange(currentTime, todayHours.openTime, todayHours.closeTime);
-    
+
+    console.log('🕒 [BusinessHours] Time check:', {
+      currentTime,
+      openTime: todayHours.openTime,
+      closeTime: todayHours.closeTime,
+      isWithinHours
+    });
+
     if (isWithinHours) {
+      console.log('✅ [BusinessHours] Business is OPEN');
       return {
         isOpen: true,
         message: 'Siamo aperti! Puoi effettuare il tuo ordine.',
         todayHours
       };
     } else {
+      console.log('❌ [BusinessHours] Business is CLOSED');
       const nextOpenTime = this.getNextOpenTime(hours, now);
       return {
         isOpen: false,
@@ -183,13 +236,29 @@ class BusinessHoursService {
     const current = this.timeToMinutes(currentTime);
     const open = this.timeToMinutes(openTime);
     const close = this.timeToMinutes(closeTime);
-    
+
+    console.log('🕒 [BusinessHours] Time comparison details:', {
+      currentTime: `${currentTime} (${current} minutes)`,
+      openTime: `${openTime} (${open} minutes)`,
+      closeTime: `${closeTime} (${close} minutes)`
+    });
+
     // Handle overnight hours (e.g., 22:00 - 02:00)
     if (close < open) {
-      return current >= open || current <= close;
+      const result = current >= open || current <= close;
+      console.log('🌙 [BusinessHours] Overnight hours logic:', {
+        condition: `${current} >= ${open} || ${current} <= ${close}`,
+        result
+      });
+      return result;
     }
-    
-    return current >= open && current <= close;
+
+    const result = current >= open && current <= close;
+    console.log('☀️ [BusinessHours] Regular hours logic:', {
+      condition: `${current} >= ${open} && ${current} <= ${close}`,
+      result
+    });
+    return result;
   }
 
   /**
@@ -316,7 +385,7 @@ class BusinessHoursService {
     const timestamp = Date.now();
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await this.publicSupabase
         .from('settings')
         .select('value, updated_at')
         .eq('key', 'businessHours')
