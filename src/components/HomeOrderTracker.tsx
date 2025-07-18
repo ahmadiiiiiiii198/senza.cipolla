@@ -3,15 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { usePersistentOrder, getOrderStatusInfo, getOrderProgress } from '@/hooks/use-persistent-order';
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 import useUserOrders from '@/hooks/useUserOrders';
-import { 
-  Pizza, 
-  Clock, 
-  CheckCircle, 
-  Package, 
-  Truck, 
+import { supabase } from '@/integrations/supabase/client';
+import {
+  Pizza,
+  Clock,
+  CheckCircle,
+  Package,
+  Truck,
   XCircle,
   ChefHat,
   DoorOpen,
@@ -27,7 +27,8 @@ const HomeOrderTracker: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAuthenticated, user } = useCustomerAuth();
-  const { orders: userOrders, loading: userOrdersLoading, hasActiveOrders } = useUserOrders();
+  const { orders: userOrders, loading: userOrdersLoading, refetchOrders } = useUserOrders();
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   // 🔒 SECURITY: Only show order tracking for authenticated users
   console.log('🔍 [HomeOrderTracker] Authentication state:', { isAuthenticated, userEmail: user?.email });
@@ -44,11 +45,68 @@ const HomeOrderTracker: React.FC = () => {
   });
 
   // Don't render if no active order or still loading
-  if (userOrdersLoading || !hasActiveOrders || !activeOrder) {
+  if (userOrdersLoading || !activeOrder) {
     return null;
   }
 
+  // Real-time order updates using Supabase subscriptions
+  useEffect(() => {
+    if (!activeOrder || !autoRefresh || !isAuthenticated) return;
+
+    console.log('🔄 Setting up real-time order tracking for:', activeOrder.order_number);
+
+    const channel = supabase
+      .channel(`home-order-tracking-${activeOrder.id}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'orders',
+        filter: `id=eq.${activeOrder.id}`
+      }, (payload) => {
+        console.log('📦 Order updated on home page:', payload);
+
+        // Refresh the orders list to get updated data
+        refetchOrders();
+
+        toast({
+          title: '🔄 Ordine aggiornato!',
+          description: 'Lo stato del tuo ordine è cambiato',
+        });
+      })
+      .subscribe();
+
+    return () => {
+      console.log('🔄 Cleaning up home order tracking subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [activeOrder, autoRefresh, isAuthenticated, refetchOrders, toast]);
+
   const currentStatus = activeOrder.status || activeOrder.order_status || 'confirmed';
+
+  // Helper functions for status info and progress
+  const getOrderStatusInfo = (status: string) => {
+    const statusMap = {
+      'confirmed': { label: 'Confermato', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: CheckCircle },
+      'preparing': { label: 'In preparazione', color: 'bg-orange-100 text-orange-800 border-orange-200', icon: ChefHat },
+      'ready': { label: 'Pronto', color: 'bg-green-100 text-green-800 border-green-200', icon: Package },
+      'out_for_delivery': { label: 'In consegna', color: 'bg-purple-100 text-purple-800 border-purple-200', icon: Truck },
+      'arrived': { label: 'Arrivato', color: 'bg-indigo-100 text-indigo-800 border-indigo-200', icon: DoorOpen },
+      'delivered': { label: 'Consegnato', color: 'bg-green-100 text-green-800 border-green-200', icon: Home },
+      'cancelled': { label: 'Annullato', color: 'bg-red-100 text-red-800 border-red-200', icon: XCircle }
+    };
+    return statusMap[status as keyof typeof statusMap] || statusMap.confirmed;
+  };
+
+  const getOrderProgress = (status: string) => {
+    const statusOrder = ['confirmed', 'preparing', 'ready', 'out_for_delivery', 'arrived', 'delivered'];
+    const currentIndex = statusOrder.indexOf(status);
+    return {
+      current: currentIndex + 1,
+      total: statusOrder.length,
+      percentage: ((currentIndex + 1) / statusOrder.length) * 100
+    };
+  };
+
   const statusInfo = getOrderStatusInfo(currentStatus);
   const progress = getOrderProgress(currentStatus);
 

@@ -161,7 +161,6 @@ const MotorcycleDeliveryIcon: React.FC<{ className?: string; isAnimated?: boolea
 );
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 import useUserOrders, { getOrderStatusInfo, formatPrice, formatDate } from '@/hooks/useUserOrders';
-import { usePersistentOrder } from '@/hooks/use-persistent-order';
 import { Order, getOrderItemPrice } from '@/types/order';
 
 const UnifiedOrderTracker: React.FC = () => {
@@ -171,7 +170,6 @@ const UnifiedOrderTracker: React.FC = () => {
   // Hooks must be called at the top level - MEMOIZED to prevent infinite loops
   const { isAuthenticated } = useCustomerAuth();
   const { orders: userOrders, getActiveOrder, loading: userOrdersLoading } = useUserOrders();
-  const { order: anonymousOrder, loading: anonymousLoading } = usePersistentOrder();
 
   // 🔒 SECURITY: Only show orders for authenticated users
   const activeOrderData = useMemo(() => {

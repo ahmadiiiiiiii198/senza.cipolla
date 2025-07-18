@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/hooks/use-language";
 import { SimpleCartProvider } from "@/hooks/use-simple-cart";
 import { CustomerAuthProvider } from "@/hooks/useCustomerAuth";
 import { BusinessHoursProvider } from "@/contexts/BusinessHoursContext";
+import { initializeDatabaseOnlyTracking } from "@/utils/clearLocalStorageOrders";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 // import DiagnosticInfo from "./components/DiagnosticInfo"; // Removed diagnostic button
@@ -48,6 +49,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Initialize database-only order tracking (clear localStorage/cookies)
+initializeDatabaseOnlyTracking();
 
 const App = () => (
   <ErrorBoundary componentName="App">
