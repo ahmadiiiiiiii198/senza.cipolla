@@ -59,7 +59,7 @@ const DEFAULT_CONTENT: ChiSiamoContent = {
   it: {
     title: 'Chi Siamo - Pizzeria Regina 2000',
     storyTitle: 'La Nostra Storia',
-    paragraph1: 'Pizzeria Regina 2000 nasce dalla passione per l\'autentica tradizione italiana e dall\'esperienza culinaria tramandata nel tempo. Dal 2000, offriamo pizza italiana preparata con amore, ingredienti freschi e il nostro forno a legna tradizionale.',
+    paragraph1: 'Pizzeria Regina 2000 nasce dalla passione per l\'autentica tradizione italiana e dall\'esperienza culinaria tramandata nel tempo. Da 14 anni, offriamo pizza italiana preparata con amore, ingredienti freschi e il nostro forno a legna tradizionale.',
     paragraph2: 'Le nostre pizze nascono da una profonda passione per la tradizione culinaria italiana. Solo ingredienti selezionati, solo autenticità made in Torino. 🍕 Situati nel cuore di Torino, offriamo esperienza artigianale e passione per la vera pizza italiana.',
     quote: '📍 Trovaci nel centro di Torino – dove la tradizione italiana incontra l\'ospitalità piemontese.',
     quoteAuthor: 'Un viaggio tra sapori, tradizione e autenticità',
@@ -81,7 +81,7 @@ const DEFAULT_CONTENT: ChiSiamoContent = {
   en: {
     title: 'About Pizzeria Regina 2000',
     storyTitle: 'Our Story',
-    paragraph1: 'Pizzeria Regina 2000 was born from a passion for authentic Italian tradition and culinary experience passed down through time. Since 2000, we offer Italian pizza prepared with love, fresh ingredients and our traditional wood-fired oven.',
+    paragraph1: 'Pizzeria Regina 2000 was born from a passion for authentic Italian tradition and culinary experience passed down through time. For 14 years, we offer Italian pizza prepared with love, fresh ingredients and our traditional wood-fired oven.',
     paragraph2: 'Our pizzas are born from a deep passion for Italian culinary tradition. Only selected ingredients, only authenticity made in Turin. 🍕 Located in the heart of Turin, we offer artisanal experience and passion for authentic Italian pizza.',
     quote: '📍 Find us in the center of Turin – where Italian tradition meets Piedmontese hospitality.',
     quoteAuthor: 'A journey through flavors, tradition and authenticity',

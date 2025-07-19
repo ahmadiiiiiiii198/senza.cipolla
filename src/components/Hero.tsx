@@ -391,9 +391,9 @@ const Hero = () => {
               <div className="text-5xl mb-4 group-hover:animate-pulse">⭐</div>
               <div className="text-white">
                 <div className="font-bold text-xl mb-2 tracking-wide">
-                  Dal 2000
+                  Esperienza
                 </div>
-                <div className="text-blue-300 font-mono text-2xl font-bold">24+ anni</div>
+                <div className="text-blue-300 font-mono text-2xl font-bold">14 anni</div>
               </div>
             </div>
 

@@ -5,8 +5,8 @@ const TwoImageSection = () => {
   const [sectionContent, setSectionContent] = useState({
     leftImage: {
       url: "https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      title: "Tradizione dal 2000",
-      description: "Da oltre 20 anni serviamo la migliore pizza italiana nel cuore di Torino. La nostra passione per la tradizione culinaria italiana si riflette in ogni pizza che prepariamo con ingredienti freschi e di qualità."
+      title: "Tradizione Italiana",
+      description: "Da 14 anni serviamo la migliore pizza italiana nel cuore di Torino. La nostra passione per la tradizione culinaria italiana si riflette in ogni pizza che prepariamo con ingredienti freschi e di qualità."
     },
     rightImage: {
       url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -76,7 +76,7 @@ const TwoImageSection = () => {
                 <div className="absolute top-6 left-6 bg-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg animate-bounce-gentle">
                   <div className="flex items-center space-x-2">
                     <Star className="w-4 h-4" />
-                    <span>Dal 2000</span>
+                    <span>Tradizione</span>
                   </div>
                 </div>
               </div>
@@ -95,7 +95,7 @@ const TwoImageSection = () => {
               <div className="flex items-center space-x-6 mt-6">
                 <div className="flex items-center space-x-2 text-red-600">
                   <Clock className="w-5 h-5" />
-                  <span className="font-semibold">20+ Anni</span>
+                  <span className="font-semibold">14 Anni</span>
                 </div>
                 <div className="flex items-center space-x-2 text-orange-500">
                   <Heart className="w-5 h-5" />
