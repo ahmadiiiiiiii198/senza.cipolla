@@ -60,6 +60,7 @@ const OrderTracking: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [orderNumber, setOrderNumber] = useState(searchParams.get('order') || '');
+  const [customerEmail, setCustomerEmail] = useState(searchParams.get('email') || '');
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -485,14 +486,27 @@ const OrderTracking: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Motorcycle Delivery Tracking */}
-                  <div className="relative bg-gradient-to-r from-blue-50 to-green-50 p-8 rounded-xl border-2 border-dashed border-blue-200">
-                    {/* Road Background */}
-                    <div className="absolute inset-x-0 bottom-12 h-3 bg-gray-800 rounded-full">
-                      <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-900 rounded-full"></div>
-                      {/* Road markings */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-full h-0.5 bg-yellow-400 opacity-80 animate-pulse"></div>
+                  {/* Modern Motorcycle Delivery Tracking */}
+                  <div className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-8 rounded-2xl border border-indigo-200 shadow-lg overflow-hidden">
+                    {/* Animated Background Pattern */}
+                    <div className="absolute inset-0 opacity-10">
+                      <div className="absolute top-4 left-4 w-8 h-8 bg-pizza-orange rounded-full animate-pulse"></div>
+                      <div className="absolute top-12 right-8 w-6 h-6 bg-blue-500 rounded-full animate-pulse delay-300"></div>
+                      <div className="absolute bottom-8 left-12 w-4 h-4 bg-green-500 rounded-full animate-pulse delay-700"></div>
+                    </div>
+
+                    {/* Modern Road with 3D Effect */}
+                    <div className="absolute inset-x-0 bottom-16 h-4 bg-gradient-to-r from-gray-700 via-gray-800 to-gray-700 rounded-full shadow-inner">
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900 to-transparent rounded-full"></div>
+                      {/* Animated Road Markings */}
+                      <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                        <div className="w-full h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-90 animate-pulse"></div>
+                        <div className="absolute w-full flex justify-between px-8">
+                          <div className="w-8 h-0.5 bg-white opacity-60 animate-pulse delay-100"></div>
+                          <div className="w-8 h-0.5 bg-white opacity-60 animate-pulse delay-300"></div>
+                          <div className="w-8 h-0.5 bg-white opacity-60 animate-pulse delay-500"></div>
+                          <div className="w-8 h-0.5 bg-white opacity-60 animate-pulse delay-700"></div>
+                        </div>
                       </div>
                     </div>
 
@@ -562,39 +576,80 @@ const OrderTracking: React.FC = () => {
                         <div className={`transition-transform duration-300 ${
                           order.status === 'delivered' ? 'animate-bounce' : 'animate-pulse'
                         }`}>
-                          <svg width="64" height="40" viewBox="0 0 64 40" className="drop-shadow-lg">
+                          <svg width="80" height="50" viewBox="0 0 80 50" className="drop-shadow-2xl">
                             {/* Motorcycle Shadow */}
-                            <ellipse cx="32" cy="38" rx="28" ry="2" fill="rgba(0,0,0,0.2)" />
+                            <ellipse cx="40" cy="47" rx="35" ry="3" fill="rgba(0,0,0,0.15)" />
 
-                            {/* Front Wheel */}
-                            <circle cx="12" cy="30" r="8" fill="#2d3748" stroke="#4a5568" strokeWidth="1"/>
-                            <circle cx="12" cy="30" r="5" fill="#e2e8f0" stroke="#cbd5e0" strokeWidth="1"/>
-                            <circle cx="12" cy="30" r="2" fill="#4a5568"/>
+                            {/* Front Wheel with Spokes */}
+                            <circle cx="15" cy="37" r="10" fill="#1a202c" stroke="#2d3748" strokeWidth="1"/>
+                            <circle cx="15" cy="37" r="7" fill="#4a5568" stroke="#718096" strokeWidth="1"/>
+                            <circle cx="15" cy="37" r="4" fill="#e2e8f0"/>
+                            <circle cx="15" cy="37" r="1.5" fill="#2d3748"/>
+                            {/* Spokes */}
+                            <g stroke="#cbd5e0" strokeWidth="0.5">
+                              <line x1="15" y1="30" x2="15" y2="44"/>
+                              <line x1="8" y1="37" x2="22" y2="37"/>
+                              <line x1="10" y1="32" x2="20" y2="42"/>
+                              <line x1="20" y1="32" x2="10" y2="42"/>
+                            </g>
 
-                            {/* Rear Wheel */}
-                            <circle cx="52" cy="30" r="8" fill="#2d3748" stroke="#4a5568" strokeWidth="1"/>
-                            <circle cx="52" cy="30" r="5" fill="#e2e8f0" stroke="#cbd5e0" strokeWidth="1"/>
-                            <circle cx="52" cy="30" r="2" fill="#4a5568"/>
+                            {/* Rear Wheel with Spokes */}
+                            <circle cx="65" cy="37" r="10" fill="#1a202c" stroke="#2d3748" strokeWidth="1"/>
+                            <circle cx="65" cy="37" r="7" fill="#4a5568" stroke="#718096" strokeWidth="1"/>
+                            <circle cx="65" cy="37" r="4" fill="#e2e8f0"/>
+                            <circle cx="65" cy="37" r="1.5" fill="#2d3748"/>
+                            {/* Spokes */}
+                            <g stroke="#cbd5e0" strokeWidth="0.5">
+                              <line x1="65" y1="30" x2="65" y2="44"/>
+                              <line x1="58" y1="37" x2="72" y2="37"/>
+                              <line x1="60" y1="32" x2="70" y2="42"/>
+                              <line x1="70" y1="32" x2="60" y2="42"/>
+                            </g>
 
-                            {/* Main Frame */}
-                            <path d="M20 30 L44 30 L42 20 L22 20 Z" fill="#3182ce" stroke="#2c5282" strokeWidth="1"/>
+                            {/* Gradients */}
+                            <defs>
+                              <linearGradient id="frameGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#3182ce"/>
+                                <stop offset="50%" stopColor="#2c5282"/>
+                                <stop offset="100%" stopColor="#2a4365"/>
+                              </linearGradient>
+                              <linearGradient id="seatGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#4a5568"/>
+                                <stop offset="100%" stopColor="#2d3748"/>
+                              </linearGradient>
+                            </defs>
+
+                            {/* Frame Body */}
+                            <path d="M25 37 L55 37 L53 25 L27 25 Z" fill="url(#frameGradient)" stroke="#2c5282" strokeWidth="1"/>
+                            <path d="M25 37 L15 32 L20 25 L27 25" fill="url(#frameGradient)" stroke="#2c5282" strokeWidth="1"/>
+                            <path d="M55 37 L65 32 L60 25 L53 25" fill="url(#frameGradient)" stroke="#2c5282" strokeWidth="1"/>
 
                             {/* Seat */}
-                            <ellipse cx="35" cy="18" rx="8" ry="3" fill="#2d3748"/>
+                            <ellipse cx="45" cy="22" rx="10" ry="4" fill="url(#seatGradient)" stroke="#1a202c" strokeWidth="1"/>
 
                             {/* Handlebars */}
-                            <path d="M18 22 L8 18 M18 22 L8 26" stroke="#4a5568" strokeWidth="2" strokeLinecap="round"/>
-                            <circle cx="8" cy="22" r="1.5" fill="#4a5568"/>
+                            <path d="M22 27 L12 22 M22 27 L12 32" stroke="#4a5568" strokeWidth="2.5" strokeLinecap="round"/>
+                            <circle cx="12" cy="22" r="1.5" fill="#e2e8f0"/>
+                            <circle cx="12" cy="32" r="1.5" fill="#e2e8f0"/>
 
-                            {/* Front Fork */}
-                            <line x1="12" y1="22" x2="12" y2="30" stroke="#4a5568" strokeWidth="2"/>
+                            {/* Rider with Better Details */}
+                            <circle cx="38" cy="18" r="5" fill="#fbbf24"/>
+                            <ellipse cx="38" cy="25" rx="4" ry="6" fill="#3182ce"/>
+                            <ellipse cx="35" cy="30" rx="2" ry="4" fill="#2c5282"/>
+                            <ellipse cx="41" cy="30" rx="2" ry="4" fill="#2c5282"/>
+
+                            {/* Modern Helmet with Visor */}
+                            <circle cx="38" cy="18" r="6" fill="#dc2626" stroke="#991b1b" strokeWidth="1"/>
+                            <ellipse cx="38" cy="16" rx="4" ry="2" fill="rgba(255,255,255,0.4)"/>
+                            <ellipse cx="38" cy="16" rx="3" ry="1.5" fill="rgba(59, 130, 246, 0.3)"/>
 
                             {/* Exhaust Pipe */}
-                            <path d="M44 25 Q50 25 54 28" stroke="#6b7280" strokeWidth="2" fill="none"/>
+                            <ellipse cx="70" cy="35" rx="3" ry="1" fill="#718096"/>
+                            <ellipse cx="73" cy="35" rx="1" ry="0.5" fill="#a0aec0"/>
 
                             {/* Headlight */}
-                            <circle cx="6" cy="22" r="3" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1"/>
-                            <circle cx="6" cy="22" r="1.5" fill="#fef3c7"/>
+                            <circle cx="8" cy="27" r="3" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1"/>
+                            <circle cx="8" cy="27" r="1.5" fill="#fef3c7"/>
                           </svg>
 
                           {/* Premium Delivery Box */}
@@ -605,54 +660,63 @@ const OrderTracking: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Speed lines when in transit */}
-                        {(order.status === 'out_for_delivery' || order.status === 'preparing') && (
-                          <div className="absolute -left-10 top-1/2 transform -translate-y-1/2">
+                        {/* Enhanced Speed Lines for Motion */}
+                        {(order.status === 'out_for_delivery' || order.status === 'arrived') && (
+                          <div className="absolute -left-12 top-1/2 transform -translate-y-1/2">
                             <div className="flex space-x-1">
-                              <div className="w-3 h-1 bg-blue-400 animate-pulse"></div>
-                              <div className="w-2 h-1 bg-blue-300 animate-pulse delay-75"></div>
-                              <div className="w-1 h-1 bg-blue-200 animate-pulse delay-150"></div>
+                              <div className="w-6 h-1 bg-gradient-to-r from-blue-500 to-transparent opacity-70 animate-pulse rounded-full"></div>
+                              <div className="w-4 h-0.5 bg-gradient-to-r from-blue-400 to-transparent opacity-50 animate-pulse delay-100 rounded-full"></div>
+                              <div className="w-3 h-0.5 bg-gradient-to-r from-blue-300 to-transparent opacity-30 animate-pulse delay-200 rounded-full"></div>
                             </div>
                           </div>
                         )}
 
-                        {/* Delivery box */}
-                        <div className="absolute -top-3 -right-2 text-2xl">📦</div>
-
-                        {/* Pizza emoji for food orders */}
-                        <div className="absolute -top-1 -left-2 text-lg">🍕</div>
+                        {/* Status Indicator */}
+                        {order.status === 'delivered' && (
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                            <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                              ✓ Consegnato!
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="absolute inset-x-8 bottom-6 h-2 bg-gray-300 rounded-full overflow-hidden">
+                    {/* Modern Progress Bar */}
+                    <div className="absolute inset-x-8 bottom-6 h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full overflow-hidden shadow-inner">
                       <div
-                        className="h-full bg-gradient-to-r from-pizza-orange via-yellow-400 to-green-500 rounded-full transition-all duration-1000 ease-out"
+                        className="h-full bg-gradient-to-r from-pizza-orange via-yellow-400 to-green-500 rounded-full transition-all duration-1000 ease-out shadow-sm"
                         style={{ width: `${getStatusProgress(order.status).percentage}%` }}
-                      ></div>
+                      >
+                        <div className="h-full bg-gradient-to-t from-transparent via-white/20 to-white/40 rounded-full"></div>
+                      </div>
                     </div>
 
-                    {/* Current Status Message */}
-                    <div className="mt-6 text-center">
-                      <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full text-base font-medium ${
+                    {/* Modern Status Message */}
+                    <div className="mt-8 text-center">
+                      <div className={`inline-flex items-center gap-4 px-8 py-4 rounded-2xl text-lg font-semibold shadow-lg transform transition-all duration-300 hover:scale-105 ${
                         order.status === 'delivered'
-                          ? 'bg-green-100 text-green-800 border-2 border-green-200'
+                          ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-300'
                           : order.status === 'arrived'
-                          ? 'bg-yellow-100 text-yellow-800 border-2 border-yellow-200'
+                          ? 'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border-2 border-yellow-300'
                           : order.status === 'out_for_delivery'
-                          ? 'bg-blue-100 text-blue-800 border-2 border-blue-200'
+                          ? 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-2 border-blue-300'
                           : order.status === 'preparing'
-                          ? 'bg-orange-100 text-orange-800 border-2 border-orange-200'
-                          : 'bg-gray-100 text-gray-800 border-2 border-gray-200'
+                          ? 'bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 border-2 border-orange-300'
+                          : 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border-2 border-gray-300'
                       }`}>
-                        <div className={`w-3 h-3 rounded-full ${
+                        <div className={`w-4 h-4 rounded-full shadow-sm ${
                           order.status === 'delivered' ? 'bg-green-500' :
                           order.status === 'arrived' ? 'bg-yellow-500 animate-pulse' :
                           order.status === 'out_for_delivery' ? 'bg-blue-500 animate-pulse' :
                           order.status === 'preparing' ? 'bg-orange-500 animate-pulse' :
                           'bg-gray-500'
                         }`}></div>
-                        {getCurrentStatusInfo(order.status).description}
+                        <span className="font-bold">{getCurrentStatusInfo(order.status).description}</span>
+                        {order.status === 'delivered' && <span className="text-2xl">🎉</span>}
+                        {order.status === 'arrived' && <span className="text-2xl">🚪</span>}
+                        {order.status === 'out_for_delivery' && <span className="text-2xl">🏍️</span>}
+                        {order.status === 'preparing' && <span className="text-2xl">👨‍🍳</span>}
                       </div>
                     </div>
 

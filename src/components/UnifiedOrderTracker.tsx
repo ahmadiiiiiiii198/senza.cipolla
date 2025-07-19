@@ -1,8 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useCustomerAuth } from '@/hooks/useCustomerAuth';
+import useUserOrders, { getOrderStatusInfo, formatPrice, formatDate } from '@/hooks/useUserOrders';
+import { Order, getOrderItemPrice } from '@/types/order';
 import {
   Package,
   Clock,
@@ -159,72 +162,65 @@ const MotorcycleDeliveryIcon: React.FC<{ className?: string; isAnimated?: boolea
     </svg>
   </div>
 );
-import { useCustomerAuth } from '@/hooks/useCustomerAuth';
-import useUserOrders, { getOrderStatusInfo, formatPrice, formatDate } from '@/hooks/useUserOrders';
-import { Order, getOrderItemPrice } from '@/types/order';
 
 const UnifiedOrderTracker: React.FC = () => {
-  // FORCE collapsed state - no persistence, always minimal
+  // ✅ ALL HOOKS MUST BE CALLED AT TOP LEVEL - NO CONDITIONAL EXECUTION
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // Hooks must be called at the top level - MEMOIZED to prevent infinite loops
+  const [hasInitialized, setHasInitialized] = useState(false);
   const { isAuthenticated } = useCustomerAuth();
-  const { orders: userOrders, getActiveOrder, loading: userOrdersLoading } = useUserOrders();
+  const { orders: userOrders, loading: userOrdersLoading } = useUserOrders();
 
-  // 🔒 SECURITY: Only show orders for authenticated users
-  const activeOrderData = useMemo(() => {
-    // Only show orders for authenticated users
-    let activeOrder = null;
-    if (isAuthenticated && userOrders) {
-      const activeStatuses = ['confirmed', 'preparing', 'ready', 'arrived'];
-      activeOrder = userOrders.find(order => {
-        // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
-        const currentStatus = order.status || order.order_status;
-        return activeStatuses.includes(currentStatus);
-      }) || null;
-    }
+  // Delay rendering until after initial mount to prevent context timing issues
+  useEffect(() => {
+    // Use requestAnimationFrame to ensure DOM is ready
+    const frame = requestAnimationFrame(() => {
+      setHasInitialized(true);
+    });
 
-    const loading = isAuthenticated ? userOrdersLoading : false;
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
-    return {
-      activeOrder,
-      loading,
-      orderSource: isAuthenticated ? 'user' : 'none'
-    };
-  }, [isAuthenticated, userOrders, userOrdersLoading]);
+  // ✅ SIMPLIFIED: Calculate active order directly - more stable than function dependency
+  const activeOrder = useMemo(() => {
+    if (!isAuthenticated || !userOrders || userOrders.length === 0) return null;
+
+    const activeStatuses = ['confirmed', 'preparing', 'ready', 'arrived'];
+    const foundOrder = userOrders.find(order => {
+      const currentStatus = order.status || order.order_status;
+      return activeStatuses.includes(currentStatus);
+    });
+
+    return foundOrder || null;
+  }, [isAuthenticated, userOrders]);
 
   console.log('🎯 [ORDER-TRACKER] Render state:', {
     isAuthenticated,
     userOrdersCount: userOrders?.length || 0,
     userOrdersLoading,
-    hasAnonymousOrder: !!anonymousOrder,
-    anonymousLoading
+    hasActiveOrder: !!activeOrder
   });
 
-  console.log('🎯 [ORDER-TRACKER] Active order determination:', {
-    hasActiveOrder: !!activeOrderData.activeOrder,
-    orderSource: activeOrderData.orderSource,
-    loading: activeOrderData.loading
-  });
-
-  // 🔒 SECURITY: Only show for authenticated users
+  // ✅ EARLY RETURNS AFTER ALL HOOKS
+  if (!hasInitialized) return null;
   if (!isAuthenticated) return null;
-
-  // If no active order, don't show the tracker
-  if (!activeOrderData.activeOrder) return null;
+  if (!activeOrder) return null;
+  if (userOrdersLoading) return null;
 
   // Safety checks for order data
-  if (!activeOrderData.activeOrder.order_number && !activeOrderData.activeOrder.id) {
-    console.warn('UnifiedOrderTracker: Invalid order data', activeOrderData.activeOrder);
+  if (!activeOrder || (!activeOrder.order_number && !activeOrder.id)) {
+    console.warn('UnifiedOrderTracker: Invalid order data', activeOrder);
     return null;
   }
 
-  // FIXED: Prioritize 'status' over 'order_status' based on MCP database analysis
-  const currentStatus = activeOrderData.activeOrder.status || activeOrderData.activeOrder.order_status || 'pending';
+  // Get current status with safe fallback
+  const currentStatus = activeOrder?.status || activeOrder?.order_status || 'pending';
 
   let statusInfo;
   try {
     statusInfo = getOrderStatusInfo(currentStatus);
+    if (!statusInfo) {
+      statusInfo = { label: 'Stato sconosciuto', color: 'bg-gray-100 text-gray-800', icon: '❓' };
+    }
   } catch (err) {
     console.error('Error getting status info:', err);
     statusInfo = { label: 'Stato sconosciuto', color: 'bg-gray-100 text-gray-800', icon: '❓' };
@@ -244,24 +240,26 @@ const UnifiedOrderTracker: React.FC = () => {
   };
 
   console.log('UnifiedOrderTracker rendering:', {
-    hasActiveOrder: !!activeOrderData.activeOrder,
+    hasActiveOrder: !!activeOrder,
     isExpanded,
-    orderNumber: activeOrderData.activeOrder?.order_number,
+    orderNumber: activeOrder?.order_number,
     status: currentStatus
   });
 
-  const portalContent = (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '16px',
-        right: '16px',
-        zIndex: 9999,
-        width: isExpanded ? '320px' : '240px',
-        maxWidth: '90vw',
-        pointerEvents: 'auto'
-      }}
-    >
+  let portalContent;
+  try {
+    portalContent = (
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '16px',
+          right: '16px',
+          zIndex: 9999,
+          width: isExpanded ? '320px' : '240px',
+          maxWidth: '90vw',
+          pointerEvents: 'auto'
+        }}
+      >
       <Card className="bg-white shadow-md border border-gray-200 hover:shadow-lg transition-all duration-200 rounded-lg">
         <CardHeader
           className={`cursor-pointer hover:bg-gray-50 transition-colors ${isExpanded ? 'pb-2 px-4 py-3' : 'px-2 py-1.5'}`}
@@ -278,7 +276,7 @@ const UnifiedOrderTracker: React.FC = () => {
               </div>
               <div>
                 <CardTitle className="text-xs font-medium text-gray-800">
-                  #{activeOrderData.activeOrder.order_number || 'N/A'}
+                  #{activeOrder.order_number || 'N/A'}
                 </CardTitle>
                 {!isExpanded && (
                   <Badge className={`${statusInfo.color} text-xs mt-0.5 px-1 py-0`}>
@@ -288,7 +286,7 @@ const UnifiedOrderTracker: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center">
-              {activeOrderData.loading && <RefreshCw className="h-2.5 w-2.5 animate-spin text-gray-400" />}
+              {userOrdersLoading && <RefreshCw className="h-2.5 w-2.5 animate-spin text-gray-400" />}
               {isExpanded ? (
                 <ChevronUp className="h-2.5 w-2.5 text-gray-500" />
               ) : (
@@ -309,36 +307,36 @@ const UnifiedOrderTracker: React.FC = () => {
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Totale:</span>
-                <span className="font-semibold">{formatPrice(activeOrderData.activeOrder.total_amount)}</span>
+                <span className="font-semibold">{formatPrice(activeOrder?.total_amount || 0)}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Ordinato alle:</span>
-                <span className="text-gray-800">{formatTime(activeOrderData.activeOrder.created_at)}</span>
+                <span className="text-gray-800">{formatTime(activeOrder?.created_at || new Date().toISOString())}</span>
               </div>
-              {activeOrderData.activeOrder.customer_address && activeOrderData.activeOrder.customer_address.trim() && (
+              {activeOrder?.customer_address && activeOrder.customer_address.trim() && (
                 <div className="text-sm">
                   <span className="text-gray-600">Indirizzo:</span>
-                  <p className="text-gray-800 text-xs mt-1">{activeOrderData.activeOrder.customer_address}</p>
+                  <p className="text-gray-800 text-xs mt-1">{activeOrder.customer_address}</p>
                 </div>
               )}
             </div>
 
             {/* Order Items */}
-            {activeOrderData.activeOrder.order_items && Array.isArray(activeOrderData.activeOrder.order_items) && activeOrderData.activeOrder.order_items.length > 0 && (
+            {activeOrder?.order_items && Array.isArray(activeOrder.order_items) && activeOrder.order_items.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-gray-700">Articoli:</h4>
                 <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {activeOrderData.activeOrder.order_items.map((item, index) => (
-                    <div key={item.id || index} className="flex justify-between items-center text-xs bg-gray-50 p-2 rounded">
+                  {activeOrder.order_items.map((item, index) => (
+                    <div key={item?.id || index} className="flex justify-between items-center text-xs bg-gray-50 p-2 rounded">
                       <div>
-                        <span className="font-medium">{item.product_name}</span>
-                        {item.special_requests && (
+                        <span className="font-medium">{item?.product_name || 'Prodotto'}</span>
+                        {item?.special_requests && (
                           <p className="text-gray-500 text-xs">Note: {item.special_requests}</p>
                         )}
                       </div>
                       <div className="text-right">
-                        <span className="font-medium">{item.quantity}x</span>
-                        <p className="text-gray-600">{formatPrice(item.subtotal || (getOrderItemPrice(item) * item.quantity))}</p>
+                        <span className="font-medium">{item?.quantity || 1}x</span>
+                        <p className="text-gray-600">{formatPrice(item?.subtotal || (getOrderItemPrice(item) * (item?.quantity || 1)))}</p>
                       </div>
                     </div>
                   ))}
@@ -416,6 +414,12 @@ const UnifiedOrderTracker: React.FC = () => {
       </Card>
     </div>
   );
+  } catch (error) {
+    console.error('UnifiedOrderTracker render error:', error);
+    portalContent = null;
+  }
+
+  if (!portalContent) return null;
 
   return createPortal(portalContent, document.body);
 };

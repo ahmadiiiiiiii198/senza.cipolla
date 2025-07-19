@@ -9,7 +9,7 @@ import { CartItem, useSimpleCart } from '@/hooks/use-simple-cart';
 import { supabase } from '@/integrations/supabase/client';
 import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
-import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
+
 import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 
@@ -398,15 +398,8 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
         .update({ stripe_session_id: session.id })
         .eq('id', order.id);
 
-      // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
-      await saveClientOrder({
-        id: order.id,
-        order_number: order.order_number,
-        customer_email: order.customer_email,
-        customer_name: order.customer_name,
-        total_amount: order.total_amount,
-        created_at: order.created_at
-      });
+      // ✅ Order saved to database - tracking handled by UnifiedOrderTracker
+      console.log('✅ Order created and will be tracked via database-only system');
       console.log('✅ Simple Stripe order automatically saved for tracking:', order.order_number);
 
       // Redirect to Stripe
@@ -520,15 +513,8 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
           is_acknowledged: false
         });
 
-      // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
-      await saveClientOrder({
-        id: order.id,
-        order_number: order.order_number,
-        customer_email: order.customer_email,
-        customer_name: order.customer_name,
-        total_amount: order.total_amount,
-        created_at: order.created_at
-      });
+      // ✅ Order saved to database - tracking handled by UnifiedOrderTracker
+      console.log('✅ PayLater order created and will be tracked via database-only system');
       console.log('✅ Simple PayLater order automatically saved for tracking:', order.order_number);
 
       return order;

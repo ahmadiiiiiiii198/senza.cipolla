@@ -26,8 +26,7 @@ import MenuPage from "./pages/MenuPage";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
-import ClientTrackingTest from "./pages/ClientTrackingTest";
-import DebugClientTracking from "./pages/DebugClientTracking";
+
 // DatabaseSetup component removed to prevent accidental initialization
 import SimpleStripeTest from "./components/SimpleStripeTest";
 import AuthTest from "./components/AuthTest";
@@ -120,16 +119,7 @@ const App = () => (
                   </ErrorBoundary>
                 </div>
               } />
-              <Route path="/client-test" element={
-                <ErrorBoundary componentName="ClientTrackingTest">
-                  <ClientTrackingTest />
-                </ErrorBoundary>
-              } />
-              <Route path="/debug-tracking" element={
-                <ErrorBoundary componentName="DebugClientTracking">
-                  <DebugClientTracking />
-                </ErrorBoundary>
-              } />
+
               <Route path="/auth-test" element={
                 <ErrorBoundary componentName="AuthTest">
                   <AuthTest />
@@ -158,10 +148,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
 
-            {/* Global Order Tracker - appears on all pages as floating widget */}
-            <ErrorBoundary componentName="UnifiedOrderTracker">
-              <UnifiedOrderTracker />
-            </ErrorBoundary>
+            {/* Global Order Tracker removed - order tracking works in hero section */}
 
           </BrowserRouter>
           {/* <DiagnosticInfo /> */}

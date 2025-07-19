@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 import useUserOrders from '@/hooks/useUserOrders';
-import { usePersistentOrder } from '@/hooks/use-persistent-order';
+
 import { useStockManagement } from '@/hooks/useStockManagement';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 const AuthDebugger: React.FC = () => {
   const { user, profile, session, loading: authLoading, isAuthenticated } = useCustomerAuth();
   const { orders, loading: ordersLoading, error: ordersError } = useUserOrders();
-  const { order: persistentOrder, loading: persistentLoading } = usePersistentOrder();
+
   const { settings: stockSettings, isLoading: stockLoading } = useStockManagement();
 
   const [productsCount, setProductsCount] = useState<number>(0);

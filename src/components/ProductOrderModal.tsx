@@ -13,9 +13,7 @@ import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import BusinessHoursStatus from './BusinessHoursStatus';
 import { businessHoursService } from '@/services/businessHoursService';
-import { saveOrderForTracking } from '@/utils/orderTracking';
-import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
-import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
+
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 import AuthRequiredModal from './AuthRequiredModal';
 
@@ -54,9 +52,7 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
         return;
       }
 
-      // Get client identity for order tracking
-      const clientIdentity = await getOrCreateClientIdentity();
-      console.log('🆔 Creating Product order with client ID:', clientIdentity.clientId.slice(-12));
+      console.log('🆔 Creating Product order for authenticated user');
 
       // Step 1: Create order directly
       console.log('📝 Creating order directly...');
@@ -143,25 +139,8 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
           is_acknowledged: false
         });
 
-      // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
-      saveOrderForTracking({
-        id: order.id,
-        order_number: order.order_number,
-        customer_email: order.customer_email,
-        customer_name: order.customer_name,
-        total_amount: order.total_amount,
-        created_at: order.created_at
-      });
-
-      // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
-      await saveClientOrder({
-        id: order.id,
-        order_number: order.order_number,
-        customer_email: order.customer_email,
-        customer_name: order.customer_name,
-        total_amount: order.total_amount,
-        created_at: order.created_at
-      });
+      // ✅ Order saved to database - tracking handled by UnifiedOrderTracker
+      console.log('✅ Order created and will be tracked via database-only system');
       console.log('✅ Product order automatically saved for tracking:', order.order_number);
 
       // Step 3: Create Stripe session directly
@@ -433,9 +412,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
       throw new Error('Product or address validation missing');
     }
 
-    // Get client identity for order tracking
-    const clientIdentity = await getOrCreateClientIdentity();
-    console.log('🆔 Creating Product PayLater order with client ID:', clientIdentity.clientId.slice(-12));
+    console.log('🆔 Creating Product PayLater order for authenticated user');
 
     const orderNumber = generateOrderNumber();
     const subtotal = (product.price || 0) * (orderData.quantity || 1);
@@ -516,25 +493,8 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
         is_acknowledged: false
       });
 
-    // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
-    saveOrderForTracking({
-      id: order.id,
-      order_number: order.order_number,
-      customer_email: order.customer_email,
-      customer_name: order.customer_name,
-      total_amount: order.total_amount,
-      created_at: order.created_at
-    });
-
-    // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
-    await saveClientOrder({
-      id: order.id,
-      order_number: order.order_number,
-      customer_email: order.customer_email,
-      customer_name: order.customer_name,
-      total_amount: order.total_amount,
-      created_at: order.created_at
-    });
+    // ✅ Order saved to database - tracking handled by UnifiedOrderTracker
+    console.log('✅ PayLater order created and will be tracked via database-only system');
     console.log('✅ Product Pay Later order automatically saved for tracking:', order.order_number);
 
     return order;

@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import stripeService from '@/services/stripeService';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
+
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -110,15 +110,8 @@ const PaymentSuccess = () => {
             if (order) {
               setOrderNumber(order.order_number);
 
-              // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING AFTER SUCCESSFUL PAYMENT
-              await saveClientOrder({
-                id: order.id,
-                order_number: order.order_number,
-                customer_email: order.customer_email,
-                customer_name: order.customer_name,
-                total_amount: order.total_amount,
-                created_at: order.created_at
-              });
+              // ✅ Order saved to database - tracking handled by UnifiedOrderTracker
+              console.log('✅ Payment successful - order will be tracked via database-only system');
               console.log('✅ Paid order automatically saved for tracking:', order.order_number);
             }
 

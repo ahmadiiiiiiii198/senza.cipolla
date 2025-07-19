@@ -10,8 +10,7 @@ import { Loader2, ShoppingCart, Phone, Mail, User, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
 import BusinessHoursStatus from './BusinessHoursStatus';
-import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
-import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
+
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 
 interface OrderFormData {

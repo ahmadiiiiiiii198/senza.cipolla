@@ -3,7 +3,8 @@ import React from 'react';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
-import HomeOrderTracker from '../components/HomeOrderTracker';
+import OrderTrackingSection from '../components/OrderTrackingSection';
+
 import WeOffer from '../components/WeOffer';
 import YouTubeSection from '../components/YouTubeSection';
 import Products from '../components/Products';
@@ -26,43 +27,45 @@ const Index = () => {
           <Hero />
         </div>
       </ErrorBoundary>
-      <ErrorBoundary componentName="HomeOrderTracker">
+
+      <ErrorBoundary componentName="OrderTrackingSection">
         <div className="animate-fade-in-up animate-stagger-1">
-          <HomeOrderTracker />
+          <OrderTrackingSection />
         </div>
       </ErrorBoundary>
+
       <ErrorBoundary componentName="WeOffer">
         <div className="animate-fade-in-up animate-stagger-2">
           <WeOffer />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="YouTubeSection">
-        <div className="animate-fade-in-up animate-stagger-3">
+        <div className="animate-fade-in-up animate-stagger-4">
           <YouTubeSection />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="Products">
-        <div className="animate-fade-in-right animate-stagger-4">
+        <div className="animate-fade-in-right animate-stagger-5">
           <Products />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="Gallery">
-        <div className="animate-fade-in-up animate-stagger-5">
+        <div className="animate-fade-in-up animate-stagger-6">
           <Gallery />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="About">
-        <div className="animate-slide-in-up animate-stagger-6">
+        <div className="animate-slide-in-up animate-stagger-7">
           <About />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="ContactSection">
-        <div className="animate-fade-in-up animate-stagger-7">
+        <div className="animate-fade-in-up animate-stagger-8">
           <ContactSection />
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="Footer">
-        <div className="animate-fade-in-up animate-stagger-8">
+        <div className="animate-fade-in-up animate-stagger-9">
           <Footer />
         </div>
       </ErrorBoundary>

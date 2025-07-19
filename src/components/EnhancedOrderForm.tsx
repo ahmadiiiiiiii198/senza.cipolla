@@ -12,8 +12,7 @@ import AddressValidator from './AddressValidator';
 import StripeCheckout from './StripeCheckout';
 import shippingZoneService from '@/services/shippingZoneService';
 import { useBusinessHoursContext } from '@/contexts/BusinessHoursContext';
-import { saveClientOrder } from '@/utils/clientSpecificOrderTracking';
-import { getOrCreateClientIdentity } from '@/utils/clientIdentification';
+
 import { useCustomerAuth } from '@/hooks/useCustomerAuth';
 
 interface OrderFormData {
