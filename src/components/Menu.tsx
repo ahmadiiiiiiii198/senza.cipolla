@@ -48,7 +48,7 @@ const Menu = () => {
   // Get category pricing information
   const getCategoryPricingInfo = (categoryName: string) => {
     if (categoryName === 'Pizze al metro per 4-5 persone') {
-      return 'Prezzo chef secondo i gusti, si stabilisce secondo i gusti';
+      return 'Prezzo chef, si stabilisce secondo i gusti';
     }
     return null;
   };

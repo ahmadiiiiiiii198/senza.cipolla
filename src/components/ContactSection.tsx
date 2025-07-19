@@ -40,7 +40,7 @@ const ContactSection = () => {
   const { allHours } = usePizzeriaHours();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
-    address: 'Corso Regina Margherita, 53, 10152 Torino TO',
+    address: 'Corso Regina Margherita, 53/10124 Torino TO',
     phone: '0110769211',
     email: 'anilamyzyri@gmail.com',
     hours: 'Lun-Dom: 12:00 - 24:00'
@@ -190,7 +190,6 @@ const ContactSection = () => {
   const subjectOptions = [
     { value: 'general', label: '🍕 Informazioni Generali' },
     { value: 'order', label: '📞 Prenotazione Pizza' },
-    { value: 'catering', label: '🎉 Catering e Eventi' },
     { value: 'delivery', label: '🚗 Consegne a Domicilio' },
     { value: 'group', label: '👥 Gruppi e Feste' },
     { value: 'complaint', label: '📝 Feedback' },
@@ -233,7 +232,7 @@ const ContactSection = () => {
           </h2>
           <p className="text-xl text-pizza-brown max-w-3xl mx-auto leading-relaxed font-roboto">
             Siamo qui per soddisfare la tua voglia di pizza! Contattaci per prenotazioni,
-            catering, eventi speciali e per scoprire le nostre deliziose pizze napoletane.
+            eventi speciali e per scoprire le nostre deliziose pizze italiana.
           </p>
         </div>
 
@@ -406,7 +405,7 @@ const ContactSection = () => {
               <CardContent className="p-0">
                 <div className="h-64 relative">
                   <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBkHCjFa0GKD7lJThAyFnSaeCXFDsBtJhs&q=Corso+Regina+Margherita+53+Torino+Italy&zoom=16&maptype=roadmap"
+                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBkHCjFa0GKD7lJThAyFnSaeCXFDsBtJhs&q=Corso+Regina+Margherita+53+10124+Torino+Italy&zoom=16&maptype=roadmap"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -417,7 +416,7 @@ const ContactSection = () => {
                   />
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-lg">
                     <a
-                      href="https://www.google.com/maps/dir//Corso+Regina+Margherita+53+Torino+Italy"
+                      href="https://www.google.com/maps/dir//Corso+Regina+Margherita+53+10124+Torino+Italy"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors text-sm font-medium"

@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 const About = () => {
   const { language, t } = useLanguage();
   const [aboutContent, setAboutContent] = useState(null);
+  const [chiSiamoContent, setChiSiamoContent] = useState(null);
   const [chiSiamoImage, setChiSiamoImage] = useState({
     image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
     alt: 'Pizzeria Regina 2000 - La nostra storia'
@@ -26,6 +27,26 @@ const About = () => {
         }
       } catch (error) {
         console.log('About content not found in database, using default');
+      }
+    };
+
+    const loadChiSiamoContent = async () => {
+      try {
+        console.log('🔄 [About] Loading Chi Siamo content from database...');
+        const { data, error } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'chiSiamoContent')
+          .single();
+
+        if (!error && data?.value) {
+          console.log('✅ [About] Chi Siamo content loaded:', data.value);
+          setChiSiamoContent(data.value);
+        } else {
+          console.log('⚠️ [About] No Chi Siamo content found, using default');
+        }
+      } catch (error) {
+        console.error('❌ [About] Error loading Chi Siamo content:', error);
       }
     };
 
@@ -50,11 +71,12 @@ const About = () => {
     };
 
     loadAboutContent();
+    loadChiSiamoContent();
     loadChiSiamoImage();
 
-    // Set up real-time listener for Chi Siamo image changes
+    // Set up real-time listener for Chi Siamo content and image changes
     const timestamp = Date.now();
-    const channelName = `chi-siamo-image-updates-${timestamp}`;
+    const channelName = `chi-siamo-updates-${timestamp}`;
     const channel = supabase
       .channel(channelName)
       .on('postgres_changes', {
@@ -67,6 +89,18 @@ const About = () => {
         if (payload.new?.value) {
           setChiSiamoImage(payload.new.value);
           console.log('✅ [About] Chi Siamo image updated from real-time change');
+        }
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'settings',
+        filter: 'key=eq.chiSiamoContent'
+      }, async (payload) => {
+        console.log('🔔 [About] Real-time Chi Siamo content update received from admin');
+        if (payload.new?.value) {
+          setChiSiamoContent(payload.new.value);
+          console.log('✅ [About] Chi Siamo content updated from real-time change');
         }
       })
       .subscribe();
@@ -90,7 +124,7 @@ const About = () => {
         'Pizza italiana cotta nel forno a legna',
         'Ingredienti freschi e di prima qualità',
         'Impasto preparato quotidianamente con lievitazione naturale',
-        'Servizio per eventi, feste e catering personalizzato'
+        'Servizio per eventi e feste personalizzato'
       ],
       stats: {
         years: 'Anni di Esperienza',
@@ -112,7 +146,7 @@ const About = () => {
         'Italian pizza cooked in a wood-fired oven',
         'Fresh and top quality ingredients',
         'Dough prepared daily with natural leavening',
-        'Service for events, parties and personalized catering'
+        'Service for events and personalized parties'
       ],
       stats: {
         years: 'Years of Experience',
@@ -134,7 +168,7 @@ const About = () => {
         'Pizza italienne cuite au four à bois',
         'Ingrédients frais et de première qualité',
         'Pâte préparée quotidiennement avec levage naturel',
-        'Service pour événements, fêtes et catering personnalisé'
+        'Service pour événements et fêtes personnalisé'
       ],
       stats: {
         years: 'Années d\'Expérience',
@@ -190,7 +224,10 @@ const About = () => {
     }
   };
 
-  const currentContent = content[language] || content.it;
+  // Use database content if available, otherwise fallback to hardcoded content
+  const currentContent = chiSiamoContent
+    ? (chiSiamoContent[language] || chiSiamoContent.it)
+    : (content[language] || content.it);
 
   return (
     <section id="about" className="py-20 bg-gradient-to-br from-pizza-cream via-white to-pizza-orange/10 relative overflow-hidden">

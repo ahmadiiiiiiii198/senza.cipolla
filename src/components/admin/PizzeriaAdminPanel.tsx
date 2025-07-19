@@ -43,6 +43,7 @@ const SettingsManager = lazy(() => import('./SettingsManager').catch(() => ({ de
 const AnalyticsDashboard = lazy(() => import('./AnalyticsDashboard').catch(() => ({ default: () => <div>Error loading AnalyticsDashboard</div> })));
 const WeOfferManager = lazy(() => import('./WeOfferManager').catch(() => ({ default: () => <div>Error loading WeOfferManager</div> })));
 const ChiSiamoImageManager = lazy(() => import('./ChiSiamoImageManager').catch(() => ({ default: () => <div>Error loading ChiSiamoImageManager</div> })));
+const ChiSiamoContentManager = lazy(() => import('./ChiSiamoContentManager').catch(() => ({ default: () => <div>Error loading ChiSiamoContentManager</div> })));
 const SystemTest = lazy(() => import('./SystemTest').catch(() => ({ default: () => <div>Error loading SystemTest</div> })));
 const DatabaseTest = lazy(() => import('./DatabaseTest').catch(() => ({ default: () => <div>Error loading DatabaseTest</div> })));
 const SystemConnectionTest = lazy(() => import('../SystemConnectionTest').catch(() => ({ default: () => <div>Error loading SystemConnectionTest</div> })));
@@ -672,6 +673,26 @@ const PizzeriaAdminPanel = () => {
                   <CardContent className="p-6">
                     <Suspense fallback={<LoadingSpinner />}>
                       <WeOfferManager />
+                    </Suspense>
+                  </CardContent>
+                </Card>
+
+                {/* Chi Siamo Content Management */}
+                <Card className="bg-white rounded-2xl shadow-xl border border-gray-200">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 rounded-t-2xl border-b border-green-200">
+                    <CardTitle className="flex items-center text-green-800">
+                      <div className="bg-green-500 p-2 rounded-lg mr-3">
+                        <Users className="h-6 w-6 text-white" />
+                      </div>
+                      Gestione Contenuto "Chi Siamo"
+                    </CardTitle>
+                    <CardDescription className="text-green-600">
+                      Modifica tutti i testi della sezione Chi Siamo (multilingua)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <ChiSiamoContentManager />
                     </Suspense>
                   </CardContent>
                 </Card>

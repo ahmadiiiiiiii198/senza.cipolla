@@ -69,7 +69,7 @@ const Footer = () => {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <MapPin size={16} className="text-pizza-orange" />
-                <p>Corso Regina Margherita, 53, 10152 Torino TO</p>
+                <p>Corso Regina Margherita, 53/10124 Torino TO</p>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={16} className="text-pizza-orange" />
@@ -98,7 +98,6 @@ const Footer = () => {
             <ul className="space-y-2 text-gray-300">
               <li>🍕 {t('pizzaAlTaglio')}</li>
               <li>🚚 {t('homeDelivery')}</li>
-              <li>🎉 {t('eventCatering')}</li>
               <li>👨‍🍳 {t('customPizza')}</li>
               <li>🥤 {t('beveragesAndDesserts')}</li>
             </ul>

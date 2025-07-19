@@ -122,7 +122,7 @@ class SettingsService {
           {
             key: 'contactContent',
             value: {
-              address: "Corso Regina Margherita, 53, 10152 Torino TO",
+              address: "Corso Regina Margherita, 53/10124 Torino TO",
               phone: "0110769211",
               email: "anilamyzyri@gmail.com",
               mapUrl: "https://maps.google.com",

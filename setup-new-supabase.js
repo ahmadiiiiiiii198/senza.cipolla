@@ -169,7 +169,7 @@ CREATE POLICY "Allow public read access to order_items"
         value: {
           phone: "0110769211",
           email: "anilamyzyri@gmail.com",
-          address: "Corso Regina Margherita, 53, 10152 Torino TO",
+          address: "Corso Regina Margherita, 53/10124 Torino TO",
           hours: "Lun-Dom: 08:00 - 19:00"
         }
       },

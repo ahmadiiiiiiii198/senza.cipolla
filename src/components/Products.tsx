@@ -207,7 +207,7 @@ const Products = () => {
   const getCategoryPricingInfo = (categorySlug: string) => {
     switch (categorySlug) {
       case 'pizze-al-metro-per-4-5-persone':
-        return 'Prezzo chef secondo i gusti, si stabilisce secondo i gusti';
+        return 'Prezzo chef, si stabilisce secondo i gusti';
       default:
         return null;
     }
@@ -445,7 +445,7 @@ const Products = () => {
                 <Pizza className="text-pizza-orange animate-pizza-spin ml-3 animation-delay-2000" size={32} />
               </div>
               <p className="text-pizza-brown mb-6 font-roboto text-lg animate-fade-in-up animate-stagger-1">
-                Chiamaci per pizze su misura, eventi speciali e catering personalizzato per le tue feste!
+                Chiamaci per pizze su misura ed eventi speciali per le tue feste!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-stagger-2">
                 <button

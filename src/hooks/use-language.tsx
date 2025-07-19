@@ -24,6 +24,7 @@ const translations: Record<Language, Record<string, string>> = {
     "menuDescription": "Scopri le nostre pizze autentiche preparate con ingredienti freschi",
     "orderNow": "Ordina Ora",
     "makeOrder": "Fai un Ordine",
+    "makeReservation": "Ordinare",
     "contactUs": "Contattaci",
     "findUs": "Trovaci",
     
@@ -136,7 +137,6 @@ const translations: Record<Language, Record<string, string>> = {
     "ourServices": "I Nostri Servizi",
     "pizzaAlTaglio": "Pizza al Taglio",
     "homeDelivery": "Consegna a Domicilio",
-    "eventCatering": "Catering per Eventi",
     "customPizza": "Pizza Personalizzata",
     "beveragesAndDesserts": "Bevande e Dolci",
     "openingHours": "Orari di Apertura",
@@ -159,7 +159,7 @@ const translations: Record<Language, Record<string, string>> = {
     "authenticBadge": "Autentico",
 
     // Store Address
-    "storeAddress": "📍 Corso Regina Margherita, 53, 10152 Torino TO, Italia"
+    "storeAddress": "📍 Corso Regina Margherita, 53/10124 Torino TO, Italia"
   },
   en: {
     // Navigation
@@ -175,6 +175,7 @@ const translations: Record<Language, Record<string, string>> = {
     "menuDescription": "Discover our authentic pizzas made with fresh ingredients",
     "orderNow": "Order Now",
     "makeOrder": "Place an Order",
+    "makeReservation": "Order Now",
     "contactUs": "Contact Us",
     "findUs": "Find Us",
     
@@ -287,7 +288,6 @@ const translations: Record<Language, Record<string, string>> = {
     "ourServices": "Our Services",
     "pizzaAlTaglio": "Pizza by the Slice",
     "homeDelivery": "Home Delivery",
-    "eventCatering": "Event Catering",
     "customPizza": "Custom Pizza",
     "beveragesAndDesserts": "Beverages and Desserts",
     "openingHours": "Opening Hours",
@@ -310,7 +310,7 @@ const translations: Record<Language, Record<string, string>> = {
     "authenticBadge": "Authentic",
 
     // Store Address
-    "storeAddress": "📍 Corso Regina Margherita, 53, 10152 Turin TO, Italy"
+    "storeAddress": "📍 Corso Regina Margherita, 53/10124 Turin TO, Italy"
   }
 };
 

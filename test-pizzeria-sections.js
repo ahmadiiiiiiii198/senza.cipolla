@@ -61,7 +61,7 @@ const aboutTests = [
   '✅ Pizza story: Neapolitan tradition since 2000',
   '✅ Animated pizza icons (spinning pizzas, bouncing chef hats)',
   '✅ "🍕 La Nostra Storia" with authentic Italian content',
-  '✅ Services: Wood-fired oven, fresh ingredients, catering',
+  '✅ Services: Wood-fired oven, fresh ingredients, events',
   '✅ Pizza-themed background with floating elements'
 ];
 
@@ -73,7 +73,7 @@ const contactTests = [
   '✅ "📞 Contattaci" heading with pizza icons',
   '✅ Pizza-themed contact form with "🍕 Ordina o Scrivi"',
   '✅ Updated contact info: Via Roma, Torino, pizzeria email',
-  '✅ Pizza-themed subject options: Prenotazione, Catering, etc.',
+  '✅ Pizza-themed subject options: Prenotazione, Eventi, etc.',
   '✅ Operating hours: 12:00-24:00 (proper pizzeria hours)',
   '✅ Pizza-themed background and floating animations'
 ];
@@ -130,7 +130,7 @@ const pizzeriaTests = [
   '✅ Italian terminology and language',
   '✅ Proper pizzeria operating hours (12:00-24:00)',
   '✅ Pizza-focused menu and products',
-  '✅ Catering and events services',
+  '✅ Events and party services',
   '✅ Traditional "Dal 2000" heritage messaging',
   '✅ Torino location and Italian identity'
 ];

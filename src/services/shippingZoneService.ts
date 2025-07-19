@@ -41,8 +41,8 @@ class ShippingZoneService {
   constructor() {
     this.settings = {
       enabled: true,
-      restaurantAddress: 'Piazza della Repubblica, 10100 Torino TO',
-      restaurantLat: 45.0703, // Approximate coordinates for Piazza della Repubblica, Torino
+      restaurantAddress: 'Corso Regina Margherita, 53/10124 Torino TO',
+      restaurantLat: 45.0703, // Approximate coordinates for Corso Regina Margherita, Torino
       restaurantLng: 7.6869,
       maxDeliveryDistance: 15, // 15km default
       deliveryFee: 5.00,
