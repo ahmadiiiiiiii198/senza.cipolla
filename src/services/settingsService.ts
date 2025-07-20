@@ -122,7 +122,7 @@ class SettingsService {
           {
             key: 'contactContent',
             value: {
-              address: "Corso Regina Margherita, 53/10124 Torino TO",
+              address: "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia",
               phone: "0110769211",
               email: "anilamyzyri@gmail.com",
               mapUrl: "https://maps.google.com",
@@ -133,7 +133,7 @@ class SettingsService {
             key: 'galleryContent',
             value: {
               heading: "La Nostra Galleria",
-              subheading: "Scorci delle nostre creazioni floreali e dell'atmosfera del negozio"
+              subheading: ""
             }
           },
           {

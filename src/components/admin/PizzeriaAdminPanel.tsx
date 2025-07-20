@@ -490,7 +490,7 @@ const PizzeriaAdminPanel = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold text-blue-900">24</div>
+                    <div className="text-3xl font-bold text-blue-900">14</div>
                     <p className="text-sm text-blue-600 flex items-center mt-2">
                       <span className="text-green-600 font-medium">+3</span>
                       <span className="ml-1">nuovi prodotti</span>
@@ -522,7 +522,7 @@ const PizzeriaAdminPanel = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold text-orange-900">24</div>
+                    <div className="text-3xl font-bold text-orange-900">14</div>
                     <p className="text-sm text-orange-600 mt-2">Menu completo</p>
                   </CardContent>
                 </Card>

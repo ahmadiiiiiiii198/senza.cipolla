@@ -362,7 +362,7 @@ const Hero = () => {
           </div>
 
           {/* Info Cards - Premium Grid Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
             <div className="group bg-gradient-to-br from-yellow-500/25 to-orange-500/25 backdrop-blur-xl rounded-3xl p-8 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform hover:-translate-y-2">
               <div className="text-5xl mb-4 group-hover:animate-pulse text-center">⏰</div>
               <div className="text-white">
@@ -387,15 +387,7 @@ const Hero = () => {
               </div>
             </div>
 
-            <div className="group bg-gradient-to-br from-blue-500/25 to-purple-500/25 backdrop-blur-xl rounded-3xl p-8 border border-blue-400/30 hover:border-blue-400/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform hover:-translate-y-2">
-              <div className="text-5xl mb-4 group-hover:animate-pulse">⭐</div>
-              <div className="text-white">
-                <div className="font-bold text-xl mb-2 tracking-wide">
-                  Esperienza
-                </div>
-                <div className="text-blue-300 font-mono text-2xl font-bold">14 anni</div>
-              </div>
-            </div>
+
 
             <div className="group bg-gradient-to-br from-red-500/25 to-pink-500/25 backdrop-blur-xl rounded-3xl p-8 border border-red-400/30 hover:border-red-400/60 transition-all duration-500 hover:scale-105 hover:shadow-2xl transform hover:-translate-y-2">
               <div className="text-5xl mb-4 group-hover:animate-pulse">🇮🇹</div>

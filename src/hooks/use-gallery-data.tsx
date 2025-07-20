@@ -15,7 +15,7 @@ export function useGalleryData() {
   // Default gallery content
   const [galleryContent, setGalleryContent] = useState<GalleryContent>({
     heading: 'La Nostra Galleria',
-    subheading: "Scopri l'atmosfera unica della Pizzeria Regina 2000 attraverso le nostre foto"
+    subheading: ""
   });
 
   // Function to load gallery data
@@ -42,7 +42,7 @@ export function useGalleryData() {
         ) {
           setGalleryContent({
             heading: String(rawContent.heading || 'Gallery'),
-            subheading: String(rawContent.subheading || "Explore our restaurant's atmosphere and dishes through our gallery.")
+            subheading: String(rawContent.subheading || "")
           });
         }
       }

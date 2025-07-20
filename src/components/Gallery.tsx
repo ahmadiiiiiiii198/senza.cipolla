@@ -52,9 +52,11 @@ const Gallery = () => {
         <h2 className="text-4xl md:text-5xl text-center font-fredoka font-bold mb-4 text-pizza-dark animate-on-scroll" data-animation-id="gallery-heading">
           📸 <span className="text-pizza-orange">{galleryContent.heading || "La Nostra Galleria"}</span>
         </h2>
-        <p className="text-center text-pizza-brown mb-8 max-w-3xl mx-auto font-roboto text-lg animate-on-scroll" data-animation-id="gallery-subheading">
-          {galleryContent.subheading || "Scopri l'atmosfera unica della Pizzeria Regina 2000 attraverso le nostre foto"}
-        </p>
+        {galleryContent.subheading && (
+          <p className="text-center text-pizza-brown mb-8 max-w-3xl mx-auto font-roboto text-lg animate-on-scroll" data-animation-id="gallery-subheading">
+            {galleryContent.subheading}
+          </p>
+        )}
 
         <PatternDivider />
 

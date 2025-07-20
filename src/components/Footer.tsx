@@ -69,7 +69,7 @@ const Footer = () => {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <MapPin size={16} className="text-pizza-orange" />
-                <p>Corso Regina Margherita, 53/10124 Torino TO</p>
+                <p>Corso Regina Margherita, 53/b, 10124, Torino TO, Italia</p>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={16} className="text-pizza-orange" />

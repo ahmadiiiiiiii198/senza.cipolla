@@ -36,7 +36,7 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [contactContent, setContactContent] = useState<ContactContent>({
-    address: "Corso Regina Margherita, 53/10124 Torino TO",
+    address: "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia",
     phone: "0110769211",
     email: "anilamyzyri@gmail.com",
     mapUrl: "https://maps.google.com",

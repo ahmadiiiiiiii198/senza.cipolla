@@ -75,7 +75,7 @@ const ContactInfoEditor = () => {
     const defaultContact = {
       phone: '0110769211',
       email: 'anilamyzyri@gmail.com',
-      address: 'Corso Regina Margherita, 53/10124 Torino TO',
+      address: 'Corso Regina Margherita, 53/b, 10124, Torino TO, Italia',
       hours: 'Lun-Dom: 08:00 - 19:00'
     };
 

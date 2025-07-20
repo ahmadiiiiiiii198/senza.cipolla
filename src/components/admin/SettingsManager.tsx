@@ -51,7 +51,7 @@ const SettingsManager = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState<PizzeriaSettings>({
     restaurant_name: 'Pizzeria Regina 2000 Torino',
-    address: 'Corso Regina Margherita, 53/10124 Torino TO',
+    address: 'Corso Regina Margherita, 53/b, 10124, Torino TO, Italia',
     phone: '+39 011 123 4567',
     email: 'info@pizzeriaregina2000.it',
     website: 'https://pizzeriaregina2000.it',
