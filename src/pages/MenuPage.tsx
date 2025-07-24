@@ -27,7 +27,7 @@ const MenuPageContent = () => {
         </section>
 
         {/* Products Section */}
-        <Products />
+        <Menu />
       </main>
       <Footer />
     </div>

@@ -184,6 +184,7 @@ const OrderForm = () => {
       if (orderError) throw orderError;
 
       // Create order item
+      const unitPrice = estimatedPrice / formData.quantity;
       const { error: itemError } = await supabase
         .from('order_items')
         .insert({
@@ -191,7 +192,10 @@ const OrderForm = () => {
           product_id: 'custom-order',
           product_name: `${categories.find(c => c.value === formData.category)?.label} - ${formData.productDescription}`,
           quantity: formData.quantity,
-          price: estimatedPrice / formData.quantity
+          product_price: unitPrice,
+          unit_price: unitPrice,
+          subtotal: estimatedPrice,
+          price: unitPrice // Keep for backward compatibility
         });
 
       if (itemError) throw itemError;

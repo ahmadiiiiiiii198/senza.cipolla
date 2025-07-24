@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,27 @@ const LogoEditor = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  // Reset image loading state when logo URL changes
+  useEffect(() => {
+    if (logoSettings?.logoUrl) {
+      console.log('🔄 Logo URL changed, resetting image state:', logoSettings.logoUrl);
+      setImageLoaded(false);
+      setImageError(false);
+    }
+  }, [logoSettings?.logoUrl]);
+
+  // Separate timeout effect that doesn't depend on imageLoaded to avoid loops
+  useEffect(() => {
+    if (logoSettings?.logoUrl && !imageLoaded && !imageError) {
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Image loading timeout after 10 seconds:', logoSettings.logoUrl);
+        setImageError(true);
+      }, 10000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [logoSettings?.logoUrl, imageLoaded, imageError]);
 
   const handleSaveSettings = async () => {
     try {
@@ -50,13 +71,14 @@ const LogoEditor = () => {
   };
   
   const handleImageUploaded = (imageUrl: string) => {
-    updateLogoSettings({ ...logoSettings, logoUrl: imageUrl });
-    setImageLoaded(false);
-    setImageError(false);
+    console.log('📤 LogoEditor: Received new image URL:', imageUrl);
+    const newSettings = { ...logoSettings, logoUrl: imageUrl };
+    updateLogoSettings(newSettings);
+    // Don't manually reset image states here - let the useEffect handle it
   };
 
   const defaultSettings = {
-    logoUrl: "/pizzeria-regina-logo.png",
+    logoUrl: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f355.png",
     altText: "Pizzeria Regina 2000 Torino Logo",
   };
 
@@ -102,7 +124,7 @@ const LogoEditor = () => {
   
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">Gestione Logo</h3>
           <p className="text-sm text-gray-600">Carica e modifica il logo della pizzeria (immagine sinistra)</p>
@@ -152,12 +174,19 @@ const LogoEditor = () => {
                     className={`h-32 w-32 object-contain transition-opacity duration-300 ${
                       imageLoaded ? 'opacity-100' : 'opacity-0'
                     }`}
-                    onLoad={() => setImageLoaded(true)}
-                    onError={() => {
+                    onLoad={(e) => {
+                      console.log('✅ Logo loaded successfully:', logoSettings.logoUrl);
+                      console.log('✅ Image dimensions:', e.currentTarget.naturalWidth, 'x', e.currentTarget.naturalHeight);
+                      setImageLoaded(true);
+                      setImageError(false);
+                    }}
+                    onError={(e) => {
                       console.error('❌ Logo failed to load:', logoSettings.logoUrl);
+                      console.error('❌ Error event:', e);
                       setImageError(true);
                       setImageLoaded(false);
                     }}
+                    crossOrigin="anonymous"
                   />
                 </div>
               )}
@@ -177,18 +206,38 @@ const LogoEditor = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Carica Nuovo Logo</Label>
-              <ImageUploader
-                onImageSelected={handleImageUploaded}
-                buttonLabel="Scegli Immagine Logo"
-                bucketName="uploads"
-                folderPath="logos"
-                className="w-full"
-              />
-              <p className="text-xs text-muted-foreground">
-                Raccomandato: Immagine quadrata, almeno 200x200 pixel, PNG o SVG con sfondo trasparente
-              </p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="logoUrl">URL Logo (Alternativa)</Label>
+                <Input
+                  id="logoUrl"
+                  type="url"
+                  placeholder="https://example.com/logo.png"
+                  value={logoSettings.logoUrl || ''}
+                  onChange={(e) => updateLogoSettings({ ...logoSettings, logoUrl: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Inserisci l'URL diretto di un'immagine logo già caricata online
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Oppure Carica Nuovo Logo</Label>
+                <ImageUploader
+                  currentImage={logoSettings?.logoUrl}
+                  onImageSelected={handleImageUploaded}
+                  buttonLabel="Scegli Immagine Logo"
+                  bucketName="uploads"
+                  folderPath="logos"
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Raccomandato: Immagine quadrata, almeno 200x200 pixel, PNG o SVG con sfondo trasparente
+                </p>
+                <p className="text-xs text-orange-600">
+                  ⚠️ Se il caricamento fallisce, usa il campo URL sopra come alternativa
+                </p>
+              </div>
             </div>
 
             <div className="space-y-2">

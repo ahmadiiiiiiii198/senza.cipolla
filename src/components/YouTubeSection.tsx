@@ -200,12 +200,13 @@ const YouTubeSection = () => {
             {/* Main Logo with Animation */}
             <div className="relative group">
               <img
-                src="/logo.png"
-                alt="Pizzeria Regina 2000 Torino Logo"
+                src="/senza-cipolla-logo.png"
+                alt="Pizzeria Senza Cipolla Torino Logo"
                 className="h-48 md:h-64 lg:h-80 w-auto object-contain animate-logo-float-rotate hover:animate-logo-glow-pulse transition-all duration-500 filter drop-shadow-2xl group-hover:drop-shadow-3xl cursor-pointer"
                 onError={(e) => {
                   // Try alternative logo paths in order of preference
                   const alternatives = [
+                    '/logo.png',
                     '/flegrea-logo.png',
                     '/pizzeria-regina-logo.png',
                     '/lovable-uploads/72b893e6-73f5-4bd7-b55c-1b555cee0e99.png',

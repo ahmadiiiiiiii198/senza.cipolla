@@ -10,7 +10,7 @@ const About = () => {
   const [chiSiamoContent, setChiSiamoContent] = useState(null);
   const [chiSiamoImage, setChiSiamoImage] = useState({
     image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-    alt: 'Pizzeria Regina 2000 - La nostra storia'
+    alt: 'Pizzeria Senza Cipolla - La nostra storia'
   });
 
   useEffect(() => {
@@ -113,11 +113,11 @@ const About = () => {
   // Multilingual content
   const content = {
     it: {
-      title: 'Chi Siamo - Pizzeria Regina 2000',
-      storyTitle: 'La Nostra Storia',
-      paragraph1: 'Pizzeria Regina 2000 nasce dalla passione per l\'autentica tradizione italiana e dall\'esperienza culinaria tramandata nel tempo. Da 14 anni, offriamo pizza italiana preparata con amore, ingredienti freschi e il nostro forno a legna tradizionale.',
+      title: '👨‍🍳 Chi Siamo - Pizzeria Senza Cipolla',
+      storyTitle: '🍕 La Nostra Storia',
+      paragraph1: 'Pizzeria Senza Cipolla nasce dalla passione per l\'autentica tradizione italiana e dall\'esperienza culinaria tramandata nel tempo. Da 14 anni, offriamo pizza italiana preparata con amore, ingredienti freschi e il nostro forno a legna tradizionale.',
       paragraph2: 'Le nostre pizze nascono da una profonda passione per la tradizione culinaria italiana. Solo ingredienti selezionati, solo autenticità made in Torino. 🍕 Situati nel cuore di Torino, offriamo esperienza artigianale e passione per la vera pizza italiana.',
-      quote: '📍 Trovaci nel centro di Torino – dove la tradizione italiana incontra l\'ospitalità piemontese.',
+      quote: '🏪 Nella nostra pizzeria puoi trovare:',
       quoteAuthor: 'Un viaggio tra sapori, tradizione e autenticità',
       servicesTitle: 'Nella nostra pizzeria puoi trovare:',
       services: [
@@ -131,15 +131,15 @@ const About = () => {
         customers: 'Clienti Soddisfatti',
         varieties: 'Varietà di Pizze'
       },
-      closingMessage: 'Vieni a trovarci alla Pizzeria Regina 2000 e scopri il vero sapore della tradizione italiana.',
-      tagline: 'Creiamo bellezza, un fiore alla volta'
+      closingMessage: 'Vieni a trovarci alla Pizzeria Senza Cipolla e scopri il vero sapore della tradizione italiana.',
+      tagline: 'Creiamo sapori autentici, una pizza alla volta'
     },
     en: {
-      title: 'About Pizzeria Regina 2000',
-      storyTitle: 'Our Story',
-      paragraph1: 'Pizzeria Regina 2000 was born from a passion for authentic Italian tradition and culinary experience passed down through time. For 14 years, we offer Italian pizza prepared with love, fresh ingredients and our traditional wood-fired oven.',
+      title: '👨‍🍳 About Us - Pizzeria Senza Cipolla',
+      storyTitle: '🍕 Our Story',
+      paragraph1: 'Pizzeria Senza Cipolla was born from a passion for authentic Italian tradition and culinary experience passed down through time. For 14 years, we offer Italian pizza prepared with love, fresh ingredients and our traditional wood-fired oven.',
       paragraph2: 'Our pizzas are born from a deep passion for Italian culinary tradition. Only selected ingredients, only authenticity made in Turin. 🍕 Located in the heart of Turin, we offer artisanal experience and passion for authentic Italian pizza.',
-      quote: '📍 Find us in the center of Turin – where Italian tradition meets Piedmontese hospitality.',
+      quote: '🏪 In our pizzeria you can find:',
       quoteAuthor: 'A journey through flavors, tradition and authenticity',
       servicesTitle: 'In our pizzeria you can find:',
       services: [
@@ -153,15 +153,15 @@ const About = () => {
         customers: 'Satisfied Customers',
         varieties: 'Pizza Varieties'
       },
-      closingMessage: 'Come visit us at Pizzeria Regina 2000 and discover the true taste of Italian tradition.',
+      closingMessage: 'Come visit us at Pizzeria Senza Cipolla and discover the true taste of Italian tradition.',
       tagline: 'Creating authentic flavors, one pizza at a time'
     },
     fr: {
-      title: 'À Propos de Pizzeria Regina 2000',
-      storyTitle: 'Notre Histoire',
-      paragraph1: 'Pizzeria Regina 2000 est née d\'une passion pour la tradition italienne authentique et l\'expérience culinaire transmise à travers le temps. Depuis 2000, nous offrons de la pizza italienne préparée avec amour, des ingrédients frais et notre four à bois traditionnel.',
+      title: '👨‍🍳 À Propos - Pizzeria Senza Cipolla',
+      storyTitle: '🍕 Notre Histoire',
+      paragraph1: 'Pizzeria Senza Cipolla est née d\'une passion pour la tradition italienne authentique et l\'expérience culinaire transmise à travers le temps. Depuis 14 ans, nous offrons de la pizza italienne préparée avec amour, des ingrédients frais et notre four à bois traditionnel.',
       paragraph2: 'Nos pizzas naissent d\'une passion profonde pour la tradition culinaire italienne. Seulement des ingrédients sélectionnés, seulement l\'authenticité made in Turin. 🍕 Situés au cœur de Turin, nous offrons une expérience artisanale et une passion pour la vraie pizza italienne.',
-      quote: '📍 Trouvez-nous au centre de Turin – où la tradition italienne rencontre l\'hospitalité piémontaise.',
+      quote: '🏪 Dans notre pizzeria vous pouvez trouver:',
       quoteAuthor: 'Un voyage à travers les saveurs, la tradition et l\'authenticité',
       servicesTitle: 'Dans notre pizzeria vous pouvez trouver:',
       services: [
@@ -175,7 +175,7 @@ const About = () => {
         customers: 'Clients Satisfaits',
         varieties: 'Variétés de Pizzas'
       },
-      closingMessage: 'Venez nous rendre visite à Pizzeria Regina 2000 et découvrez le vrai goût de la tradition italienne.',
+      closingMessage: 'Venez nous rendre visite à Pizzeria Senza Cipolla et découvrez le vrai goût de la tradition italienne.',
       tagline: 'Créer des saveurs authentiques, une pizza à la fois'
     },
     ar: {
@@ -219,7 +219,7 @@ const About = () => {
         customers: 'مشتریان راضی',
         varieties: 'انواع پیتزا'
       },
-      closingMessage: 'برای دیدن ما به پیتزریا رجینا 2000 بیایید و طعم واقعی سنت ایتالیایی را کشف کنید.',
+      closingMessage: 'برای دیدن ما به پیتزریا سنزا چیپولا بیایید و طعم واقعی سنت ایتالیایی را کشف کنید.',
       tagline: 'خلق طعم‌های اصیل، یک پیتزا در هر زمان'
     }
   };

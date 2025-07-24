@@ -24,11 +24,13 @@ interface OrderItem {
   id: string;
   product_name: string;
   quantity: number;
-  unit_price: number;
+  unit_price?: number;
   product_price: number;
+  price?: number; // For backward compatibility
   subtotal: number;
   special_requests?: string;
-  toppings?: string[];
+  toppings?: string | string[];
+  size?: string;
   metadata?: any;
   products?: {
     id: string;
@@ -41,16 +43,20 @@ interface OrderItem {
 
 interface Order {
   id: string;
+  order_number: string;
   customer_name: string;
   customer_email: string;
   customer_phone?: string;
   customer_address?: string;
-  delivery_address?: string;
+  delivery_type?: string;
+  delivery_fee?: number;
   order_status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  payment_method?: string;
   total_amount: number;
-  delivery_fee?: number;
   notes?: string;
+  special_instructions?: string;
+  metadata?: any;
   created_at: string;
   updated_at: string;
   order_items: OrderItem[];
@@ -86,9 +92,11 @@ const OrdersAdmin = () => {
             quantity,
             unit_price,
             product_price,
+            price,
             subtotal,
             special_requests,
             toppings,
+            size,
             metadata,
             products (
               id,

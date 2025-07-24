@@ -17,7 +17,9 @@ import {
   Type,
   Star,
   AlertCircle,
-  Loader2
+  Loader2,
+  Trash2,
+  Plus
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -144,6 +146,47 @@ const WeOfferManager = () => {
     }));
   };
 
+  const deleteOffer = (offerId: number) => {
+    if (content.offers.length <= 1) {
+      toast.error('Cannot delete the last offer. At least one offer must remain.');
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to delete this offer? This action cannot be undone.')) {
+      setContent(prev => ({
+        ...prev,
+        offers: prev.offers.filter(offer => offer.id !== offerId)
+      }));
+
+      // Switch to general tab if we deleted the current tab
+      if (activeTab === `offer${offerId}`) {
+        setActiveTab('general');
+      }
+
+      toast.success('Offer deleted successfully');
+    }
+  };
+
+  const addNewOffer = () => {
+    const newId = Math.max(...content.offers.map(o => o.id), 0) + 1;
+    const newOffer: OfferItem = {
+      id: newId,
+      title: `New Offer ${newId}`,
+      description: 'Enter description for this new offer',
+      image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      badge: 'New'
+    };
+
+    setContent(prev => ({
+      ...prev,
+      offers: [...prev.offers, newOffer]
+    }));
+
+    // Switch to the new offer tab
+    setActiveTab(`offer${newId}`);
+    toast.success('New offer added successfully');
+  };
+
   const handleImageUpload = async (offerId: number, file: File) => {
     try {
       setLoading(true);
@@ -247,22 +290,31 @@ const WeOfferManager = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-3">
-            <Button 
-              onClick={saveContent} 
+          <div className="flex gap-3 flex-wrap">
+            <Button
+              onClick={saveContent}
               disabled={loading}
               className="bg-pizza-red hover:bg-pizza-red/90"
             >
               {loading ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
               Save Changes
             </Button>
-            <Button 
-              onClick={loadContent} 
+            <Button
+              onClick={loadContent}
               variant="outline"
               disabled={loading}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Reload
+            </Button>
+            <Button
+              onClick={addNewOffer}
+              variant="outline"
+              disabled={loading}
+              className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add New Offer
             </Button>
           </div>
         </CardContent>
@@ -270,11 +322,13 @@ const WeOfferManager = () => {
 
       {/* Content Management */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className={`grid w-full grid-cols-${Math.min(content.offers.length + 1, 6)}`}>
           <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="offer1">Offer 1</TabsTrigger>
-          <TabsTrigger value="offer2">Offer 2</TabsTrigger>
-          <TabsTrigger value="offer3">Offer 3</TabsTrigger>
+          {content.offers.map((offer) => (
+            <TabsTrigger key={offer.id} value={`offer${offer.id}`}>
+              Offer {offer.id}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         {/* General Settings */}
@@ -317,13 +371,32 @@ const WeOfferManager = () => {
           <TabsContent key={offer.id} value={`offer${offer.id}`}>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Pizza className="w-5 h-5" />
-                  Offer {offer.id}
-                  <Badge variant="secondary">{offer.badge}</Badge>
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Pizza className="w-5 h-5" />
+                    <CardTitle className="flex items-center gap-2">
+                      Offer {offer.id}
+                      <Badge variant="secondary">{offer.badge}</Badge>
+                    </CardTitle>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => deleteOffer(offer.id)}
+                    disabled={loading || content.offers.length <= 1}
+                    className="bg-red-500 hover:bg-red-600"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Delete
+                  </Button>
+                </div>
                 <CardDescription>
                   Configure content and image for offer {offer.id}
+                  {content.offers.length <= 1 && (
+                    <span className="block text-amber-600 text-sm mt-1">
+                      ⚠️ Cannot delete the last offer
+                    </span>
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">

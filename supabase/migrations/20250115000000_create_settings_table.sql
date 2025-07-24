@@ -73,7 +73,7 @@ INSERT INTO settings (key, value) VALUES
   ),
   (
     'contactContent',
-    '{"address": "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia", "phone": "0110769211", "email": "anilamyzyri@gmail.com", "mapUrl": "https://maps.google.com", "hours": "Lun-Dom: 18:30 - 22:30"}'
+    '{"address": "C.so Giulio Cesare, 36, 10152 Torino TO", "phone": "0110769211", "email": "anilamyzyri@gmail.com", "mapUrl": "https://maps.google.com", "hours": "Lun-Dom: 18:30 - 22:30"}'
   ),
   (
     'businessHours',

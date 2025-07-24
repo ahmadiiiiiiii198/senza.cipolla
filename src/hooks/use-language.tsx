@@ -159,7 +159,7 @@ const translations: Record<Language, Record<string, string>> = {
     "authenticBadge": "Autentico",
 
     // Store Address
-    "storeAddress": "📍 Corso Regina Margherita, 53/b, 10124, Torino TO, Italia"
+    "storeAddress": "📍 C.so Giulio Cesare, 36, 10152 Torino TO"
   },
   en: {
     // Navigation
@@ -310,7 +310,7 @@ const translations: Record<Language, Record<string, string>> = {
     "authenticBadge": "Authentic",
 
     // Store Address
-    "storeAddress": "📍 Corso Regina Margherita, 53/b, 10124, Turin TO, Italy"
+    "storeAddress": "📍 C.so Giulio Cesare, 36, 10152 Torino TO"
   }
 };
 

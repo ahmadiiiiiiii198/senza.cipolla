@@ -10,14 +10,15 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
 // The CORRECT database (confirmed via MCP)
-const CORRECT_DB_URL = 'https://sixnfemtvmighstbgrbd.supabase.co';
-const CORRECT_DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I';
+const CORRECT_DB_URL = 'https://htdgoceqepvrffblfvns.supabase.co';
+const CORRECT_DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0ZGdvY2VxZXB2cmZmYmxmdm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNTUwNzksImV4cCI6MjA2ODYzMTA3OX0.TJqTe3f0-GjFLoFrT64LKbUJWtXU9ht08tX9O8Yp7y8';
 
 // Wrong databases to check for
 const WRONG_DATABASES = [
   'ijhuoolcnxbdvpqmqofo',
-  'yytnyqsfofivcxbsexvs', 
-  'despodpgvkszyexvcbft'
+  'yytnyqsfofivcxbsexvs',
+  'despodpgvkszyexvcbft',
+  'sixnfemtvmighstbgrbd'  // Old database - now wrong
 ];
 
 // Flower shop content to check for
@@ -62,7 +63,7 @@ function scanDirectory(dir, results = []) {
 async function backendVerificationComplete() {
   console.log('🔍 COMPLETE BACKEND VERIFICATION');
   console.log('='.repeat(60));
-  console.log('✅ Correct database: sixnfemtvmighstbgrbd');
+  console.log('✅ Correct database: htdgoceqepvrffblfvns');
   console.log('❌ Wrong databases to check for:', WRONG_DATABASES.join(', '));
   console.log('🌸 Flower shop content to check for:', FLOWER_SHOP_CONTENT.slice(0, 3).join(', '), '...');
   console.log('');
@@ -113,8 +114,8 @@ async function backendVerificationComplete() {
   for (const file of backendFiles) {
     try {
       const content = readFileSync(file, 'utf8');
-      const hasCorrectDB = content.includes('sixnfemtvmighstbgrbd') || 
-                          content.includes('SUPABASE_URL') || 
+      const hasCorrectDB = content.includes('htdgoceqepvrffblfvns') ||
+                          content.includes('SUPABASE_URL') ||
                           content.includes('Pizzeria Regina 2000');
       const hasWrongDB = WRONG_DATABASES.some(db => content.includes(db));
       const hasFlowerContent = FLOWER_SHOP_CONTENT.some(flower => content.includes(flower));
@@ -227,7 +228,7 @@ async function backendVerificationComplete() {
   
   if (allBackendCorrect && problemFiles.length === 0) {
     console.log('✅ ALL BACKEND SYSTEMS VERIFIED: Using correct pizzeria data!');
-    console.log('✅ Database: sixnfemtvmighstbgrbd (CORRECT)');
+    console.log('✅ Database: htdgoceqepvrffblfvns (CORRECT)');
     console.log('✅ All backend files: CORRECT');
     console.log('✅ No flower shop content found');
     console.log('✅ Migration files: PIZZERIA DATA');

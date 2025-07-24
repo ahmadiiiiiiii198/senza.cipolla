@@ -293,27 +293,8 @@ class BusinessHoursService {
    * Get formatted hours string for display
    */
   async getFormattedHours(): Promise<string> {
-    const hours = await this.getBusinessHours();
-    const dayNames = {
-      monday: 'Lunedì',
-      tuesday: 'Martedì',
-      wednesday: 'Mercoledì',
-      thursday: 'Giovedì',
-      friday: 'Venerdì',
-      saturday: 'Sabato',
-      sunday: 'Domenica'
-    };
-
-    const openDays: string[] = [];
-    
-    Object.entries(hours).forEach(([day, dayHours]) => {
-      if (dayHours.isOpen) {
-        const dayName = dayNames[day as keyof typeof dayNames];
-        openDays.push(`${dayName}: ${dayHours.openTime}-${dayHours.closeTime}`);
-      }
-    });
-
-    return openDays.length > 0 ? openDays.join(', ') : 'Chiuso';
+    // Return hardcoded "11-03" format for all days as requested
+    return 'lunedì: 11-03, martedì: 11-03, mercoledì: 11-03, giovedì: 11-03, venerdì: 11-03, sabato: 11-03, domenica: 11-03';
   }
 
   /**

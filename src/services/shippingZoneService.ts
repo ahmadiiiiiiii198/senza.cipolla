@@ -41,9 +41,9 @@ class ShippingZoneService {
   constructor() {
     this.settings = {
       enabled: true,
-      restaurantAddress: 'Corso Regina Margherita, 53/10124 Torino TO',
-      restaurantLat: 45.0703, // Approximate coordinates for Corso Regina Margherita, Torino
-      restaurantLng: 7.6869,
+      restaurantAddress: 'C.so Giulio Cesare, 36, 10152 Torino TO',
+      restaurantLat: 45.047698, // Coordinates for C.so Giulio Cesare, Torino
+      restaurantLng: 7.679902,
       maxDeliveryDistance: 15, // 15km default
       deliveryFee: 5.00,
       freeDeliveryThreshold: 50.00,

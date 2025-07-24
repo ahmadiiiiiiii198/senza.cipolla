@@ -43,32 +43,45 @@ export const useGalleryPersistence = ({
       
       // First, clear existing gallery entries
       const { error: deleteError } = await supabase
-        .from('gallery')
+        .from('gallery_images')
         .delete()
-        .neq('id', 0); // Delete all records
-        
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
+
       if (deleteError) {
         console.warn("Gallery: Error deleting existing gallery items:", deleteError);
       }
-      
-      // Add new entries to the gallery table
+
+      // Transform images to match gallery_images table structure
+      const galleryRecords = processedImages.map((img, index) => ({
+        id: `${Date.now()}-${index}`,
+        title: img.title || `Gallery Image ${index + 1}`,
+        description: img.description || '',
+        image_url: img.storage_path || '',
+        category: 'main',
+        sort_order: img.order || (index + 1),
+        is_active: true,
+        is_featured: Boolean(img.featured || false),
+        created_at: new Date().toISOString()
+      }));
+
+      // Add new entries to the gallery_images table
       const { error: insertError } = await supabase
-        .from('gallery')
-        .insert(processedImages);
+        .from('gallery_images')
+        .insert(galleryRecords);
         
       if (insertError) {
         console.warn("Gallery: Error inserting new gallery items:", insertError);
-        // Fallback to settings table if gallery table insert fails
+        // Fallback to settings table if gallery_images table insert fails
         const { error: settingsError } = await supabase
           .from('settings')
-          .upsert({ 
-            key: 'galleryImages', 
+          .upsert({
+            key: 'gallery_images',
             value: images as unknown as Json,
             updated_at: new Date().toISOString()
           }, {
             onConflict: 'key'
           });
-          
+
         if (settingsError) {
           throw settingsError;
         }

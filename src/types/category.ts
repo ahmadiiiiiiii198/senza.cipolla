@@ -28,15 +28,22 @@ export interface Product {
   name: string;
   description: string | null;
   price: number;
-  slug: string;
+  slug: string | null;
   category_id: string | null;
   image_url: string | null;
   gallery: any | null; // JSON field for multiple images
+  ingredients: string[] | null;
+  allergens: string[] | null;
+  is_vegetarian: boolean | null;
+  is_vegan: boolean | null;
+  is_gluten_free: boolean | null;
   is_active: boolean | null;
   is_featured: boolean | null;
   stock_quantity: number | null;
   compare_price: number | null;
   sort_order: number | null;
+  preparation_time: number | null;
+  calories: number | null;
   meta_title: string | null;
   meta_description: string | null;
   labels: string[] | null; // Labels/tags for categorization

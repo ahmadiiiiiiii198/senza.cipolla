@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Pizza, Plus, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -10,17 +10,24 @@ import MobileSearchModal from './MobileSearchModal';
 import { useLanguage } from '@/hooks/use-language';
 import CustomerAccountWidget from './customer/CustomerAccountWidget';
 import logoImage from '@/assets/logo.png';
+import { useNavbarLogoSettings } from '@/hooks/use-settings';
 
 
 const Header = () => {
   const { getTotalItems, openCart } = useSimpleCart();
   const { t } = useLanguage();
+  const [navbarLogoSettings, , isNavbarLogoLoading] = useNavbarLogoSettings();
 
-  // Use static logo settings to avoid hook issues
-  const logoSettings = {
-    logoUrl: "/flegrea-logo.png?v=" + Date.now(),
-    altText: "Flegrea Pizzeria Logo",
-  };
+  // DEBUG: Log navbar logo settings
+  useEffect(() => {
+    console.log('🔍 [Header] Logo settings changed:', {
+      logoUrl: navbarLogoSettings.logoUrl,
+      altText: navbarLogoSettings.altText,
+      showLogo: navbarLogoSettings.showLogo,
+      logoSize: navbarLogoSettings.logoSize,
+      isLoading: isNavbarLogoLoading
+    });
+  }, [navbarLogoSettings, isNavbarLogoLoading]);
 
   const [logoLoaded, setLogoLoaded] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -34,22 +41,37 @@ const Header = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8 animate-fade-in-left">
               <div className="flex items-center space-x-3 logo-container hover-scale">
-                {/* Direct logo display for testing */}
-                <img
-                  src={logoImage}
-                  alt="Flegrea Pizzeria Logo"
-                  className="h-12 w-auto transition-all duration-300 hover:scale-105"
-                  onLoad={() => console.log('✅ Logo loaded successfully')}
-                  onError={(e) => {
-                    console.error('❌ Logo failed to load:', e);
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling.style.display = 'flex';
-                  }}
-                />
+                {/* Database-driven logo display */}
+                {navbarLogoSettings.showLogo && !isNavbarLogoLoading && (
+                  <img
+                    src={navbarLogoSettings.logoUrl}
+                    alt={navbarLogoSettings.altText}
+                    className={`transition-all duration-300 hover:scale-105 ${
+                      navbarLogoSettings.logoSize === 'small' ? 'h-16 w-auto' :
+                      navbarLogoSettings.logoSize === 'large' ? 'h-28 w-auto' :
+                      'h-24 w-auto'
+                    }`}
+                    onLoad={() => console.log('✅ Header logo loaded successfully')}
+                    onError={(e) => {
+                      console.error('❌ Header logo failed to load:', e);
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                )}
+
+                {/* Loading placeholder */}
+                {isNavbarLogoLoading && (
+                  <div className={`bg-gray-200 animate-pulse rounded ${
+                    navbarLogoSettings.logoSize === 'small' ? 'h-16 w-16' :
+                    navbarLogoSettings.logoSize === 'large' ? 'h-28 w-28' :
+                    'h-24 w-24'
+                  }`}></div>
+                )}
 
                 {/* Fallback text logo */}
                 <div className="h-12 hidden items-center px-4 bg-gradient-to-r from-flegrea-burgundy to-flegrea-deep-red text-white rounded-xl font-fredoka font-bold text-lg shadow-lg">
-                  🍕 Flegrea
+                  🍕 Pizzeria Senza Cipolla
                 </div>
               </div>
               <nav className="hidden md:flex space-x-8">

@@ -58,7 +58,7 @@ const Footer = () => {
                 <Pizza className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h3 className="font-fredoka font-bold text-xl text-pizza-cream">Pizzeria Regina 2000</h3>
+                <h3 className="font-fredoka font-bold text-xl text-pizza-cream">Pizzeria Senza Cipolla</h3>
                 <p className="font-pacifico text-pizza-orange">Torino</p>
               </div>
             </div>
@@ -69,7 +69,7 @@ const Footer = () => {
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <MapPin size={16} className="text-pizza-orange" />
-                <p>Corso Regina Margherita, 53/b, 10124, Torino TO, Italia</p>
+                <p>C.so Giulio Cesare, 36, 10152 Torino TO</p>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={16} className="text-pizza-orange" />
@@ -112,7 +112,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Pizzeria Regina 2000 Torino. Tutti i diritti riservati.</p>
+          <p>&copy; 2024 Pizzeria Senza Cipolla Torino. Tutti i diritti riservati.</p>
         </div>
       </div>
     </footer>

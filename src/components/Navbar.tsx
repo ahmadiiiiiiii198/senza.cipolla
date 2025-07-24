@@ -6,13 +6,24 @@ import { Link } from "react-router-dom";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/hooks/use-language";
 import BackgroundMusic from "@/components/BackgroundMusic";
-import { useLogoSettings } from "@/hooks/use-settings";
+import { useNavbarLogoSettings } from "@/hooks/use-settings";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useLanguage();
-  const [logoSettings, , isLogoLoading] = useLogoSettings();
+  const [navbarLogoSettings, , isNavbarLogoLoading] = useNavbarLogoSettings();
+
+  // DEBUG: Log navbar logo settings
+  useEffect(() => {
+    console.log('🔍 [Navbar] Logo settings changed:', {
+      logoUrl: navbarLogoSettings.logoUrl,
+      altText: navbarLogoSettings.altText,
+      showLogo: navbarLogoSettings.showLogo,
+      logoSize: navbarLogoSettings.logoSize,
+      isLoading: isNavbarLogoLoading
+    });
+  }, [navbarLogoSettings, isNavbarLogoLoading]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,20 +53,49 @@ const Navbar = () => {
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-persian-navy bg-opacity-95 text-white py-2 shadow-md" : "bg-persian-navy/80 backdrop-blur-sm py-4"}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
         <a href="/" className="flex items-center gap-2">
-          <div className="relative logo-container">
-            <img
-              src={logoSettings.logoUrl}
-              alt={logoSettings.altText}
-              className="h-10 w-10 sm:h-14 sm:w-14 rounded-full shadow-md border-2 border-persian-gold/30 logo-smooth-load"
-              onLoad={(e) => {
-                e.currentTarget.classList.add('loaded');
-              }}
-            />
-            <div className="absolute -inset-1 rounded-full bg-persian-gold/20 blur-sm -z-10"></div>
-          </div>
+          {navbarLogoSettings.showLogo && (
+            <div className="relative logo-container">
+              {!isNavbarLogoLoading && (
+                <img
+                  src={navbarLogoSettings.logoUrl}
+                  alt={navbarLogoSettings.altText}
+                  className={`rounded-full shadow-md border-2 border-persian-gold/30 logo-smooth-load ${
+                    navbarLogoSettings.logoSize === 'small' ? 'h-8 w-8 sm:h-10 sm:w-10' :
+                    navbarLogoSettings.logoSize === 'large' ? 'h-12 w-12 sm:h-16 sm:w-16' :
+                    'h-10 w-10 sm:h-14 sm:w-14'
+                  }`}
+                  onLoad={(e) => {
+                    e.currentTarget.classList.add('loaded');
+                  }}
+                  onError={(e) => {
+                    console.error('❌ Navbar logo failed to load:', e);
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+              )}
+              {/* Loading placeholder */}
+              {isNavbarLogoLoading && (
+                <div className={`rounded-full bg-persian-gold/20 animate-pulse ${
+                  navbarLogoSettings.logoSize === 'small' ? 'h-8 w-8 sm:h-10 sm:w-10' :
+                  navbarLogoSettings.logoSize === 'large' ? 'h-12 w-12 sm:h-16 sm:w-16' :
+                  'h-10 w-10 sm:h-14 sm:w-14'
+                }`} />
+              )}
+              {/* Fallback text logo */}
+              <div className={`hidden rounded-full bg-persian-gold text-persian-navy flex items-center justify-center font-bold shadow-md border-2 border-persian-gold/30 ${
+                navbarLogoSettings.logoSize === 'small' ? 'h-8 w-8 sm:h-10 sm:w-10 text-sm sm:text-lg' :
+                navbarLogoSettings.logoSize === 'large' ? 'h-12 w-12 sm:h-16 sm:w-16 text-lg sm:text-2xl' :
+                'h-10 w-10 sm:h-14 sm:w-14 text-lg sm:text-xl'
+              }`}>
+                🍕
+              </div>
+              <div className="absolute -inset-1 rounded-full bg-persian-gold/20 blur-sm -z-10"></div>
+            </div>
+          )}
           {/* Only hide the text on mobile, show on desktop */}
           <span className="hidden sm:block text-xl sm:text-2xl font-playfair font-bold text-persian-gold">
-            Francesco Fiori & Piante
+            Pizzeria Regina 2000
           </span>
         </a>
 

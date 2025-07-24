@@ -3,8 +3,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://sixnfemtvmighstbgrbd.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I';
+const SUPABASE_URL = 'https://htdgoceqepvrffblfvns.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0ZGdvY2VxZXB2cmZmYmxmdm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNTUwNzksImV4cCI6MjA2ODYzMTA3OX0.TJqTe3f0-GjFLoFrT64LKbUJWtXU9ht08tX9O8Yp7y8';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -32,7 +32,7 @@ async function initializeSettings() {
       {
         key: 'heroContent',
         value: {
-          heading: "🍕 PIZZERIA Regina 2000",
+          heading: "🍕 PIZZERIA Senza Cipolla",
           subheading: "Autentica pizza napoletana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino",
           backgroundImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
         }
@@ -41,13 +41,13 @@ async function initializeSettings() {
         key: 'logoSettings',
         value: {
           logoUrl: "/pizzeria-regina-logo.png",
-          altText: "Pizzeria Regina 2000 Torino Logo"
+          altText: "Pizzeria Senza Cipolla Torino Logo"
         }
       },
       {
         key: 'contactContent',
         value: {
-          address: "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia",
+          address: "C.so Giulio Cesare, 36, 10152 Torino TO",
           phone: "0110769211",
           email: "anilamyzyri@gmail.com",
           mapUrl: "https://maps.google.com",

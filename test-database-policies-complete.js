@@ -88,7 +88,7 @@ console.log('');
 console.log('⚙️ TECHNICAL IMPLEMENTATION:');
 console.log('');
 console.log('🗄️ Database Configuration:');
-console.log('  ✅ Project: sixnfemtvmighstbgrbd');
+console.log('  ✅ Project: htdgoceqepvrffblfvns');
 console.log('  ✅ Region: eu-north-1');
 console.log('  ✅ RLS: Enabled on all tables');
 console.log('  ✅ Policies: Public access for admin operations');

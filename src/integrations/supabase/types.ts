@@ -125,28 +125,49 @@ export type Database = {
           created_at: string
           id: string
           order_id: string
-          price: number
+          price: number | null
+          product_price: number
+          unit_price: number | null
+          subtotal: number
           product_id: string
           product_name: string
           quantity: number
+          special_requests: string | null
+          size: string | null
+          toppings: string[] | null
+          metadata: Json | null
         }
         Insert: {
           created_at?: string
           id?: string
           order_id: string
-          price: number
+          price?: number | null
+          product_price: number
+          unit_price?: number | null
+          subtotal: number
           product_id: string
           product_name: string
           quantity: number
+          special_requests?: string | null
+          size?: string | null
+          toppings?: string[] | null
+          metadata?: Json | null
         }
         Update: {
           created_at?: string
           id?: string
           order_id?: string
-          price?: number
+          price?: number | null
+          product_price?: number
+          unit_price?: number | null
+          subtotal?: number
           product_id?: string
           product_name?: string
           quantity?: number
+          special_requests?: string | null
+          size?: string | null
+          toppings?: string[] | null
+          metadata?: Json | null
         }
         Relationships: [
           {
@@ -171,6 +192,7 @@ export type Database = {
           id: string
           is_read: boolean
           notification_type: string
+          message: string
           order_id: string
           read_at: string | null
         }
@@ -179,6 +201,7 @@ export type Database = {
           id?: string
           is_read?: boolean
           notification_type?: string
+          message: string
           order_id: string
           read_at?: string | null
         }
@@ -187,6 +210,7 @@ export type Database = {
           id?: string
           is_read?: boolean
           notification_type?: string
+          message?: string
           order_id?: string
           read_at?: string | null
         }
@@ -242,15 +266,23 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone: string | null
+          customer_address: string | null
+          delivery_type: string | null
+          delivery_fee: number | null
           delivered_at: string | null
+          estimated_delivery_time: string | null
           id: string
           notes: string | null
           order_number: string
+          order_type: string | null
+          order_status: string | null
           paid_amount: number | null
           paid_at: string | null
+          payment_method: string | null
           payment_status: string | null
           shipped_at: string | null
           shipping_address: Json | null
+          special_instructions: string | null
           status: string | null
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
@@ -258,6 +290,7 @@ export type Database = {
           tracking_number: string | null
           updated_at: string
           user_id: string | null
+          metadata: Json | null
         }
         Insert: {
           billing_address?: Json | null
@@ -265,15 +298,23 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone?: string | null
+          customer_address?: string | null
+          delivery_type?: string | null
+          delivery_fee?: number | null
           delivered_at?: string | null
+          estimated_delivery_time?: string | null
           id?: string
           notes?: string | null
           order_number: string
+          order_type?: string | null
+          order_status?: string | null
           paid_amount?: number | null
           paid_at?: string | null
+          payment_method?: string | null
           payment_status?: string | null
           shipped_at?: string | null
           shipping_address?: Json | null
+          special_instructions?: string | null
           status?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -281,6 +322,7 @@ export type Database = {
           tracking_number?: string | null
           updated_at?: string
           user_id?: string | null
+          metadata?: Json | null
         }
         Update: {
           billing_address?: Json | null
@@ -288,15 +330,23 @@ export type Database = {
           customer_email?: string
           customer_name?: string
           customer_phone?: string | null
+          customer_address?: string | null
+          delivery_type?: string | null
+          delivery_fee?: number | null
           delivered_at?: string | null
+          estimated_delivery_time?: string | null
           id?: string
           notes?: string | null
           order_number?: string
+          order_type?: string | null
+          order_status?: string | null
           paid_amount?: number | null
           paid_at?: string | null
+          payment_method?: string | null
           payment_status?: string | null
           shipped_at?: string | null
           shipping_address?: Json | null
+          special_instructions?: string | null
           status?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -304,6 +354,7 @@ export type Database = {
           tracking_number?: string | null
           updated_at?: string
           user_id?: string | null
+          metadata?: Json | null
         }
         Relationships: []
       }
@@ -316,14 +367,21 @@ export type Database = {
           gallery: Json | null
           id: string
           image_url: string | null
+          ingredients: string[] | null
+          allergens: string[] | null
+          is_vegetarian: boolean | null
+          is_vegan: boolean | null
+          is_gluten_free: boolean | null
           is_active: boolean | null
           is_featured: boolean | null
-          labels: Json | null
+          labels: string[] | null
           meta_description: string | null
           meta_title: string | null
           name: string
           price: number
-          slug: string
+          preparation_time: number | null
+          calories: number | null
+          slug: string | null
           sort_order: number | null
           stock_quantity: number | null
           updated_at: string
@@ -336,14 +394,21 @@ export type Database = {
           gallery?: Json | null
           id?: string
           image_url?: string | null
+          ingredients?: string[] | null
+          allergens?: string[] | null
+          is_vegetarian?: boolean | null
+          is_vegan?: boolean | null
+          is_gluten_free?: boolean | null
           is_active?: boolean | null
           is_featured?: boolean | null
-          labels?: Json | null
+          labels?: string[] | null
           meta_description?: string | null
           meta_title?: string | null
           name: string
           price: number
-          slug: string
+          preparation_time?: number | null
+          calories?: number | null
+          slug?: string | null
           sort_order?: number | null
           stock_quantity?: number | null
           updated_at?: string
@@ -356,14 +421,21 @@ export type Database = {
           gallery?: Json | null
           id?: string
           image_url?: string | null
+          ingredients?: string[] | null
+          allergens?: string[] | null
+          is_vegetarian?: boolean | null
+          is_vegan?: boolean | null
+          is_gluten_free?: boolean | null
           is_active?: boolean | null
           is_featured?: boolean | null
-          labels?: Json | null
+          labels?: string[] | null
           meta_description?: string | null
           meta_title?: string | null
           name?: string
           price?: number
-          slug?: string
+          preparation_time?: number | null
+          calories?: number | null
+          slug?: string | null
           sort_order?: number | null
           stock_quantity?: number | null
           updated_at?: string
@@ -486,6 +558,144 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          id: string
+          customer_name: string
+          customer_email: string | null
+          rating: number | null
+          comment_text: string
+          is_approved: boolean | null
+          is_active: boolean | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          customer_name: string
+          customer_email?: string | null
+          rating?: number | null
+          comment_text: string
+          is_approved?: boolean | null
+          is_active?: boolean | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          customer_name?: string
+          customer_email?: string | null
+          rating?: number | null
+          comment_text?: string
+          is_approved?: boolean | null
+          is_active?: boolean | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      gallery_images: {
+        Row: {
+          id: string
+          title: string | null
+          description: string | null
+          image_url: string
+          thumbnail_url: string | null
+          category: string | null
+          sort_order: number | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title?: string | null
+          description?: string | null
+          image_url: string
+          thumbnail_url?: string | null
+          category?: string | null
+          sort_order?: number | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string | null
+          description?: string | null
+          image_url?: string
+          thumbnail_url?: string | null
+          category?: string | null
+          sort_order?: number | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          phone: string | null
+          default_address: string | null
+          preferences: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          phone?: string | null
+          default_address?: string | null
+          preferences?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          phone?: string | null
+          default_address?: string | null
+          preferences?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      youtube_videos: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          video_url: string
+          thumbnail_url: string | null
+          is_active: boolean | null
+          sort_order: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          video_url: string
+          thumbnail_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          video_url?: string
+          thumbnail_url?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string
         }
         Relationships: []
       }

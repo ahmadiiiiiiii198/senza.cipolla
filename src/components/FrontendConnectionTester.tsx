@@ -197,7 +197,7 @@ const FrontendConnectionTester = () => {
         {
           key: 'contactContent',
           value: {
-            address: "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia",
+            address: "C.so Giulio Cesare, 36, 10152 Torino TO",
             phone: "0110769211",
             email: "anilamyzyri@gmail.com",
             hours: "Lun-Dom: 18:00-24:00"

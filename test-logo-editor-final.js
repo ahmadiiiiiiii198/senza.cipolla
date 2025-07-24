@@ -102,7 +102,7 @@ console.log('');
 console.log('⚙️ TECHNICAL IMPLEMENTATION:');
 console.log('');
 console.log('🔗 Database Layer:');
-console.log('  ✅ Supabase client: sixnfemtvmighstbgrbd.supabase.co');
+console.log('  ✅ Supabase client: htdgoceqepvrffblfvns.supabase.co');
 console.log('  ✅ Settings table: Proper schema without value_type');
 console.log('  ✅ logoSettings record: Created and accessible');
 console.log('  ✅ JSON storage: Objects stored directly in value column');

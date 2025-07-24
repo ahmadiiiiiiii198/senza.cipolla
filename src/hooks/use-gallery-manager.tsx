@@ -38,7 +38,7 @@ export const useGalleryManager = () => {
           title: String(item.title || 'Gallery Image'),
           description: String(item.description || ''),
           order: Number(item.sort_order || 0),
-          is_featured: Boolean(item.is_active || false),
+          is_featured: Boolean(item.is_featured || false),
           created_at: String(item.created_at || new Date().toISOString()),
           updated_at: String(item.created_at || new Date().toISOString())
         }));
@@ -135,12 +135,15 @@ export const useGalleryManager = () => {
           id: uuidv4(),
           title: image.title || `Gallery Image ${index + 1}`,
           description: image.description || '',
-          image_url: image.url,
+          image_url: image.url || image.src || '', // Handle both url and src fields
           category: 'main',
-          sort_order: index + 1,
+          sort_order: image.order || (index + 1),
           is_active: true,
+          is_featured: Boolean(image.is_featured || image.featured || false),
           created_at: new Date().toISOString()
         }));
+
+        console.log('[GalleryManager] Preparing to insert gallery records:', galleryRecords);
 
         const { error: insertError } = await supabase
           .from('gallery_images')

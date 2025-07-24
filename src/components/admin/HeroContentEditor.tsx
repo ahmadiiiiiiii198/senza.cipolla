@@ -12,7 +12,7 @@ const HeroContentEditor = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [heroContent, updateHeroContent, isLoading] = useHeroContent();
   const [localContent, setLocalContent] = useState({
-    heading: '🍕 PIZZERIA Regina 2000',
+    heading: '🍕 PIZZERIA Senza Cipolla',
     subheading: 'Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
     backgroundImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
     heroImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
@@ -72,7 +72,7 @@ const HeroContentEditor = () => {
   const handleReset = () => {
     if (heroContent) {
       setLocalContent({
-        heading: heroContent.heading || '🍕 PIZZERIA Regina 2000',
+        heading: heroContent.heading || '🍕 PIZZERIA Senza Cipolla',
         subheading: heroContent.subheading || 'Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino',
         backgroundImage: heroContent.backgroundImage || 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
         heroImage: heroContent.heroImage || 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
@@ -179,7 +179,7 @@ const HeroContentEditor = () => {
               <span className="text-sm font-medium text-green-800">Local Video Active</span>
             </div>
             <p className="text-sm text-green-700 mb-2">
-              <strong>Current:</strong> 20250509_211620.mp4
+              <strong>Current:</strong> 20250525_141332.mp4
             </p>
             <p className="text-xs text-green-600">
               ✅ Using local video file to save database storage space. Video is served from the public folder.

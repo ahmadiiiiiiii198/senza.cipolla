@@ -38,11 +38,7 @@ const WeOffer = () => {
 
   const [offerContent, setOfferContent] = useState(defaultOfferContent);
 
-  const [imagesLoaded, setImagesLoaded] = useState({
-    1: false,
-    2: false,
-    3: false
-  });
+  const [imagesLoaded, setImagesLoaded] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const setupContentAndRealtime = async () => {
@@ -54,10 +50,21 @@ const WeOffer = () => {
 
         if (loadedContent && loadedContent.offers && Array.isArray(loadedContent.offers)) {
           setOfferContent(loadedContent);
+          // Initialize imagesLoaded state for all offers
+          const initialImagesLoaded = {};
+          loadedContent.offers.forEach(offer => {
+            initialImagesLoaded[offer.id] = false;
+          });
+          setImagesLoaded(initialImagesLoaded);
           console.log('✅ [WeOffer] Content loaded successfully:', loadedContent);
         } else {
           console.warn('⚠️ [WeOffer] Invalid content structure, using defaults');
-          // Keep default content
+          // Keep default content and initialize imagesLoaded
+          const initialImagesLoaded = {};
+          defaultOfferContent.offers.forEach(offer => {
+            initialImagesLoaded[offer.id] = false;
+          });
+          setImagesLoaded(initialImagesLoaded);
         }
 
         // Set up real-time listener for admin changes
@@ -75,6 +82,12 @@ const WeOffer = () => {
             console.log('🔔 [WeOffer] Real-time update received from admin');
             if (payload.new?.value) {
               setOfferContent(payload.new.value);
+              // Update imagesLoaded state for new offers
+              const newImagesLoaded = {};
+              payload.new.value.offers.forEach(offer => {
+                newImagesLoaded[offer.id] = false;
+              });
+              setImagesLoaded(newImagesLoaded);
               console.log('✅ [WeOffer] Content updated from real-time change');
             }
           })

@@ -36,11 +36,11 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [contactContent, setContactContent] = useState<ContactContent>({
-    address: "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia",
+    address: "C.so Giulio Cesare, 36, 10152 Torino TO",
     phone: "0110769211",
     email: "anilamyzyri@gmail.com",
     mapUrl: "https://maps.google.com",
-    hours: "Lun-Gio: 12:00-14:30, 18:00-00:00\nVen: 12:00-14:30, 18:30-02:00\nSab: 18:30-02:00\nDom: 12:00-14:30, 18:00-00:00"
+    hours: "lunedì: 11-03\nmartedì: 11-03\nmercoledì: 11-03\ngiovedì: 11-03\nvenerdì: 11-03\nsabato: 11-03\ndomenica: 11-03"
   });
   
   // Load contact content from database

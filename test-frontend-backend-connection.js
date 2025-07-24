@@ -7,10 +7,10 @@ console.log('');
 
 // Project Configuration
 console.log('📋 PROJECT CONFIGURATION:');
-console.log('✅ Frontend Project: sixnfemtvmighstbgrbd');
-console.log('✅ Frontend URL: https://sixnfemtvmighstbgrbd.supabase.co');
-console.log('✅ Database Project: sixnfemtvmighstbgrbd (CORRECT MATCH)');
-console.log('✅ Storage Project: sixnfemtvmighstbgrbd (CORRECT MATCH)');
+console.log('✅ Frontend Project: htdgoceqepvrffblfvns');
+console.log('✅ Frontend URL: https://htdgoceqepvrffblfvns.supabase.co');
+console.log('✅ Database Project: htdgoceqepvrffblfvns (CORRECT MATCH)');
+console.log('✅ Storage Project: htdgoceqepvrffblfvns (CORRECT MATCH)');
 console.log('');
 
 // Database Status
@@ -111,7 +111,7 @@ console.log('');
 
 // Database Connection Test
 console.log('🔗 DATABASE CONNECTION TEST:');
-console.log('✅ Project: sixnfemtvmighstbgrbd');
+console.log('✅ Project: htdgoceqepvrffblfvns');
 console.log('✅ Region: eu-north-1');
 console.log('✅ Status: ACTIVE_HEALTHY');
 console.log('✅ Storage: uploads bucket created');

@@ -122,7 +122,7 @@ class SettingsService {
           {
             key: 'contactContent',
             value: {
-              address: "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia",
+              address: "C.so Giulio Cesare, 36, 10152 Torino TO",
               phone: "0110769211",
               email: "anilamyzyri@gmail.com",
               mapUrl: "https://maps.google.com",
@@ -143,8 +143,17 @@ class SettingsService {
           {
             key: 'logoSettings',
             value: {
-              logoUrl: "/pizzeria-regina-logo.png",
-              altText: "Pizzeria Regina 2000 Torino Logo"
+              logoUrl: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f355.png",
+              altText: "Pizzeria Senza Cipolla Torino Logo"
+            }
+          },
+          {
+            key: 'navbarLogoSettings',
+            value: {
+              logoUrl: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f355.png",
+              altText: "Pizzeria Regina 2000 Navbar Logo",
+              showLogo: true,
+              logoSize: "medium"
             }
           },
           {
@@ -245,10 +254,16 @@ class SettingsService {
     try {
       console.log(`🔍 [SettingsService] Fetching ${key} from DATABASE ONLY (no localStorage)`);
 
-      // First check cache to avoid unnecessary network requests
-      if (this.settingsCache[key]) {
-        console.log(`📋 [SettingsService] Found ${key} in memory cache`);
-        return this.settingsCache[key] as T;
+      // FORCE FRESH FETCH FOR NAVBAR LOGO TO BYPASS CACHE ISSUES
+      if (key === 'navbarLogoSettings') {
+        console.log(`🔄 [SettingsService] FORCE FRESH FETCH for ${key} (bypassing cache)`);
+        // Skip cache check for navbar logo to ensure fresh data
+      } else {
+        // First check cache to avoid unnecessary network requests
+        if (this.settingsCache[key]) {
+          console.log(`📋 [SettingsService] Found ${key} in memory cache`);
+          return this.settingsCache[key] as T;
+        }
       }
 
       // Fetch DIRECTLY from Supabase database (skip localStorage completely)
@@ -276,6 +291,15 @@ class SettingsService {
       this.settingsCache[key] = result.data.value;
       console.log(`✅ [SettingsService] Successfully fetched ${key} from database`);
       console.log(`📄 [SettingsService] ${key} data:`, JSON.stringify(result.data.value, null, 2));
+
+      // EXTRA DEBUG FOR NAVBAR LOGO
+      if (key === 'navbarLogoSettings') {
+        console.log(`🔍 [SettingsService] NAVBAR LOGO DEBUG:`);
+        console.log(`   🖼️  Logo URL: ${result.data.value.logoUrl}`);
+        console.log(`   📝 Alt Text: ${result.data.value.altText}`);
+        console.log(`   👁️  Show Logo: ${result.data.value.showLogo}`);
+        console.log(`   📏 Logo Size: ${result.data.value.logoSize}`);
+      }
 
       return result.data.value as T;
     } catch (error) {
@@ -406,6 +430,12 @@ class SettingsService {
         throw supabaseError; // Don't continue if database update fails
       }
 
+      // Clear cache for this key to ensure fresh data on next fetch
+      this.clearCache(key);
+
+      // Update cache with new value
+      this.settingsCache[key] = value;
+
       // Notify subscribers
       this.notifySubscribers(key, value);
 
@@ -413,6 +443,17 @@ class SettingsService {
     } catch (error) {
       console.error(`❌ [SettingsService] Error updating setting ${key}:`, error);
       return false;
+    }
+  }
+
+  // Clear cache for a specific key or all keys
+  clearCache(key?: string) {
+    if (key) {
+      delete this.settingsCache[key];
+      console.log(`🗑️ [SettingsService] Cleared cache for ${key}`);
+    } else {
+      this.settingsCache = {};
+      console.log(`🗑️ [SettingsService] Cleared all cache`);
     }
   }
 

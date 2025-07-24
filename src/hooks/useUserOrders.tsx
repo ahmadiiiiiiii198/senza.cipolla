@@ -21,9 +21,13 @@ interface Order {
     product_name: string;
     quantity: number;
     product_price: number;
+    unit_price?: number;
+    price?: number; // For backward compatibility
     subtotal: number;
     special_requests?: string;
-    toppings?: string;
+    toppings?: string | string[];
+    size?: string;
+    metadata?: any;
   }>;
 }
 
@@ -83,9 +87,13 @@ export const useUserOrders = (): UseUserOrdersReturn => {
             product_name,
             quantity,
             product_price,
+            unit_price,
+            price,
             subtotal,
             special_requests,
-            toppings
+            toppings,
+            size,
+            metadata
           )
         `)
         .eq('user_id', user.id)

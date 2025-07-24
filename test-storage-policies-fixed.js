@@ -74,7 +74,7 @@ console.log('');
 console.log('⚙️ TECHNICAL IMPLEMENTATION:');
 console.log('');
 console.log('🗄️ Database Setup:');
-console.log('  ✅ Project: sixnfemtvmighstbgrbd');
+console.log('  ✅ Project: htdgoceqepvrffblfvns');
 console.log('  ✅ Storage bucket: uploads (public)');
 console.log('  ✅ Hero content: settings table, heroContent key');
 console.log('  ✅ Structure: heading, subheading, backgroundImage');

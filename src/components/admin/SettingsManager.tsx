@@ -50,20 +50,20 @@ interface PizzeriaSettings {
 const SettingsManager = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState<PizzeriaSettings>({
-    restaurant_name: 'Pizzeria Regina 2000 Torino',
-    address: 'Corso Regina Margherita, 53/b, 10124, Torino TO, Italia',
+    restaurant_name: 'Pizzeria Senza Cipolla Torino',
+    address: 'C.so Giulio Cesare, 36, 10152 Torino TO',
     phone: '+39 011 123 4567',
-    email: 'info@pizzeriaregina2000.it',
-    website: 'https://pizzeriaregina2000.it',
+    email: 'info@pizzeriasenzacipolla.it',
+    website: 'https://pizzeriasenzacipolla.it',
     delivery_fee: 3.50,
     minimum_order: 15.00,
     delivery_radius: 5,
     stripe_enabled: true,
     cash_on_delivery: true,
     notification_sound: true,
-    notification_email: 'orders@pizzeriaregina2000.it',
-    meta_title: 'Pizzeria Regina 2000 Torino - Autentica Pizza Italiana',
-    meta_description: 'Pizzeria Regina 2000 a Torino offre autentica pizza italiana dal 2000. Ordina online per consegna a domicilio o ritiro.',
+    notification_email: 'orders@pizzeriasenzacipolla.it',
+    meta_title: 'Pizzeria Senza Cipolla Torino - Autentica Pizza Italiana',
+    meta_description: 'Pizzeria Senza Cipolla a Torino offre autentica pizza italiana. Ordina online per consegna a domicilio o ritiro.',
     meta_keywords: 'pizza, pizzeria, torino, consegna, italiana, regina 2000'
   });
   const [isLoading, setIsLoading] = useState(true);

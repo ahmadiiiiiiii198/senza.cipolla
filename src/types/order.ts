@@ -4,11 +4,14 @@ export interface OrderItem {
   id: string;
   product_name: string;
   quantity: number;
-  product_price?: number; // For compatibility with useUserOrders
-  unit_price?: number;    // For compatibility with use-persistent-order
+  product_price: number;
+  unit_price?: number;
+  price?: number; // For backward compatibility
   subtotal: number;
   special_requests?: string;
   toppings?: string | string[]; // Support both formats
+  size?: string;
+  metadata?: any;
 }
 
 export interface Order {
@@ -17,15 +20,22 @@ export interface Order {
   customer_name: string;
   customer_email: string;
   customer_phone?: string;
-  customer_address?: string; // Made optional for compatibility
+  customer_address?: string;
+  delivery_type?: string;
+  delivery_fee?: number;
   total_amount: number;
   status: string;
   order_status?: string;
   payment_status: string;
+  payment_method?: string;
+  special_instructions?: string;
+  estimated_delivery_time?: string;
+  delivered_at?: string;
+  metadata?: any;
   created_at: string;
   updated_at: string;
   notes?: string;
-  order_items?: OrderItem[]; // Made optional for compatibility
+  order_items?: OrderItem[];
 }
 
 export interface StoredOrderInfo {
@@ -65,7 +75,7 @@ export interface UsePersistentOrderReturn {
 
 // Helper function to normalize order item price
 export const getOrderItemPrice = (item: OrderItem): number => {
-  return item.product_price || item.unit_price || 0;
+  return item.product_price || item.unit_price || item.price || 0;
 };
 
 // Helper function to normalize toppings

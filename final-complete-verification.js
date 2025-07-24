@@ -3,15 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'fs';
 
 // The CORRECT database (confirmed via MCP)
-const CORRECT_DB_URL = 'https://sixnfemtvmighstbgrbd.supabase.co';
-const CORRECT_DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I';
+const CORRECT_DB_URL = 'https://htdgoceqepvrffblfvns.supabase.co';
+const CORRECT_DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0ZGdvY2VxZXB2cmZmYmxmdm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNTUwNzksImV4cCI6MjA2ODYzMTA3OX0.TJqTe3f0-GjFLoFrT64LKbUJWtXU9ht08tX9O8Yp7y8';
 
 const supabase = createClient(CORRECT_DB_URL, CORRECT_DB_KEY);
 
 async function finalCompleteVerification() {
   console.log('🎯 FINAL COMPLETE VERIFICATION');
   console.log('='.repeat(60));
-  console.log('✅ Using MCP-verified correct database: sixnfemtvmighstbgrbd');
+  console.log('✅ Using MCP-verified correct database: htdgoceqepvrffblfvns');
   console.log('');
   
   // 1. MCP Database Verification
@@ -54,8 +54,8 @@ async function finalCompleteVerification() {
     console.log(`   ✅ Products: ${productCount} items`);
     
     // Check if branding is correct
-    const isCorrectLogo = logoData.value.altText.includes('Pizzeria Regina 2000');
-    const isCorrectHero = heroData.value.heading.includes('PIZZERIA Regina 2000');
+    const isCorrectLogo = logoData.value.altText.includes('Pizzeria Senza Cipolla');
+    const isCorrectHero = heroData.value.heading.includes('PIZZERIA Senza Cipolla');
     
     if (!isCorrectLogo || !isCorrectHero) {
       console.log('   ❌ WRONG BRANDING DETECTED!');
@@ -84,10 +84,11 @@ async function finalCompleteVerification() {
   for (const file of criticalFiles) {
     try {
       const content = readFileSync(file, 'utf8');
-      const hasCorrectDB = content.includes('sixnfemtvmighstbgrbd');
-      const hasWrongDB = content.includes('ijhuoolcnxbdvpqmqofo') || 
+      const hasCorrectDB = content.includes('htdgoceqepvrffblfvns');
+      const hasWrongDB = content.includes('ijhuoolcnxbdvpqmqofo') ||
                          content.includes('despodpgvkszyexvcbft') ||
-                         content.includes('yytnyqsfofivcxbsexvs');
+                         content.includes('yytnyqsfofivcxbsexvs') ||
+                         content.includes('sixnfemtvmighstbgrbd');
       
       if (hasCorrectDB && !hasWrongDB) {
         console.log(`   ✅ ${file}: CORRECT`);
@@ -125,7 +126,7 @@ async function finalCompleteVerification() {
       const hasWrongURL = content.includes('despodpgvkszyexvcbft') ||
                           content.includes('Francesco Fiori');
       const hasPizzeriaLogo = content.includes('pizzeria-regina-logo.png') ||
-                              content.includes('Pizzeria Regina 2000');
+                              content.includes('Pizzeria Senza Cipolla');
       
       if (!hasWrongURL && hasPizzeriaLogo) {
         console.log(`   ✅ ${file}: CORRECT`);
@@ -148,7 +149,7 @@ async function finalCompleteVerification() {
   
   if (allFilesCorrect && allComponentsCorrect) {
     console.log('✅ ALL SYSTEMS CORRECT!');
-    console.log('✅ Database: sixnfemtvmighstbgrbd (verified via MCP)');
+    console.log('✅ Database: htdgoceqepvrffblfvns (verified via MCP)');
     console.log('✅ Branding: Pizzeria Regina 2000 Torino');
     console.log('✅ Code Files: All using correct database');
     console.log('✅ Components: All using correct branding');

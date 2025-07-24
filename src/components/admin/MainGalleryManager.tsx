@@ -62,7 +62,7 @@ const MainGalleryManager = () => {
             id: String(item.id || `img-${index}`),
             src: String(item.image_url || ''),
             alt: String(item.title || 'Gallery Image'),
-            featured: Boolean(item.is_active || false),
+            featured: Boolean(item.is_featured || false),
             order: item.sort_order || index
           };
           console.log('🖼️ [MainGallery] Processed image:', image);
@@ -179,6 +179,7 @@ const MainGalleryManager = () => {
           category: 'main',
           sort_order: index + 1,
           is_active: true,
+          is_featured: Boolean(image.featured || false),
           created_at: new Date().toISOString()
         }));
 
@@ -394,6 +395,7 @@ const MainGalleryManager = () => {
           category: 'main',
           sort_order: index + 1,
           is_active: true,
+          is_featured: false,
           created_at: new Date().toISOString()
         };
       });

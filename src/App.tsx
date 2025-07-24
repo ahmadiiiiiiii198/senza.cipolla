@@ -35,6 +35,7 @@ import AuthSeparationTest from "./components/AuthSeparationTest";
 import MyOrders from "./pages/MyOrders";
 import UnifiedOrderTracker from "./components/UnifiedOrderTracker";
 import ComponentLoadingTest from "./tests/ComponentLoadingTest";
+import LogoTest from "./pages/LogoTest";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -143,6 +144,11 @@ const App = () => (
               <Route path="/test-components" element={
                 <ErrorBoundary componentName="ComponentLoadingTest">
                   <ComponentLoadingTest />
+                </ErrorBoundary>
+              } />
+              <Route path="/logo-test" element={
+                <ErrorBoundary componentName="LogoTest">
+                  <LogoTest />
                 </ErrorBoundary>
               } />
               <Route path="*" element={<NotFound />} />

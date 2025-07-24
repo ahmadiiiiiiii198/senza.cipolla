@@ -137,6 +137,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       if (error) {
         console.error('Upload error:', error);
+
+        // Check if it's an RLS policy error
+        if (error.message && error.message.includes('row level security policy')) {
+          throw new Error("Upload failed: Storage permissions need to be configured. Please contact the administrator to set up storage policies in Supabase Dashboard.");
+        }
+
         throw new Error(error.message || "Failed to upload file");
       }
 

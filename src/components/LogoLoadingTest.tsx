@@ -29,7 +29,7 @@ const LogoLoadingTest = () => {
       
       // Load logo settings
       const logoData = await settingsService.getSetting('logoSettings', {
-        logoUrl: "/pizzeria-regina-logo.png",
+        logoUrl: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f355.png",
         altText: "Pizzeria Regina 2000 Torino Logo"
       });
       

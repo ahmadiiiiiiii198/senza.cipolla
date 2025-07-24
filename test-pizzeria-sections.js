@@ -1,16 +1,16 @@
 // Comprehensive Pizzeria Website Section Testing
-console.log('🍕 TESTING PIZZERIA REGINA 2000 TORINO - ALL SECTIONS');
+console.log('🍕 TESTING PIZZERIA SENZA CIPOLLA TORINO - ALL SECTIONS');
 console.log('=====================================================');
 
 // Test 1: Hero Section
 console.log('\n🏠 TESTING HERO SECTION...');
 const heroTests = [
   '✅ Pizza background image with overlay',
-  '✅ "PIZZERIA Regina 2000" title with pizza colors',
+  '✅ "PIZZERIA Senza Cipolla" title with pizza colors',
   '✅ "Torino • Autentica Pizza Napoletana" subtitle',
   '✅ Three action buttons: ORDINA PIZZA, CHIAMA ORA, GALLERIA',
   '✅ Pizza-themed floating icons and animations',
-  '✅ Operating hours and "Dal 2000" badges',
+  '✅ Operating hours and restaurant badges',
   '✅ Forno a Legna and Ingredienti Freschi highlights'
 ];
 

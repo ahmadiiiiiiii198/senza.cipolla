@@ -4,14 +4,15 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
 // The CORRECT database (confirmed via MCP)
-const CORRECT_DB_URL = 'https://sixnfemtvmighstbgrbd.supabase.co';
-const CORRECT_DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I';
+const CORRECT_DB_URL = 'https://htdgoceqepvrffblfvns.supabase.co';
+const CORRECT_DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0ZGdvY2VxZXB2cmZmYmxmdm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNTUwNzksImV4cCI6MjA2ODYzMTA3OX0.TJqTe3f0-GjFLoFrT64LKbUJWtXU9ht08tX9O8Yp7y8';
 
 // Wrong databases to check for
 const WRONG_DATABASES = [
   'ijhuoolcnxbdvpqmqofo',
   'yytnyqsfofivcxbsexvs',
-  'despodpgvkszyexvcbft'
+  'despodpgvkszyexvcbft',
+  'sixnfemtvmighstbgrbd'  // Old database - now wrong
 ];
 
 const supabase = createClient(CORRECT_DB_URL, CORRECT_DB_KEY);
@@ -70,7 +71,7 @@ async function comprehensiveAudit() {
   console.log('🔍 COMPREHENSIVE DATABASE AUDIT');
   console.log('='.repeat(60));
   console.log('');
-  console.log('✅ Correct database: sixnfemtvmighstbgrbd');
+  console.log('✅ Correct database: htdgoceqepvrffblfvns');
   console.log('❌ Wrong databases to check for:');
   WRONG_DATABASES.forEach(db => console.log(`   - ${db}`));
   console.log('');
@@ -142,7 +143,7 @@ async function comprehensiveAudit() {
   for (const file of criticalFiles) {
     try {
       const content = readFileSync(file, 'utf8');
-      const hasCorrect = content.includes('sixnfemtvmighstbgrbd');
+      const hasCorrect = content.includes('htdgoceqepvrffblfvns');
       const hasWrong = WRONG_DATABASES.some(db => content.includes(db));
       
       if (hasCorrect && !hasWrong) {

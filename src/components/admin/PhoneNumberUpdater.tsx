@@ -63,7 +63,7 @@ const PhoneNumberUpdater = () => {
         } else {
           // Create new localStorage entry
           const newContact = {
-            address: "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia",
+            address: "C.so Giulio Cesare, 36, 10152 Torino TO",
             phone: newPhoneNumber,
             email: "anilamyzyri@gmail.com",
             mapUrl: "https://maps.google.com",

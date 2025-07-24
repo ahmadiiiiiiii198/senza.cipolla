@@ -130,7 +130,7 @@ const Hero = () => {
               setVideoError(true);
             }}
           >
-            <source src="/20250509_211620.mp4" type="video/mp4" />
+            <source src="/20250525_141332.mp4" type="video/mp4" />
           </video>
         ) : null}
 
@@ -215,7 +215,7 @@ const Hero = () => {
                 {/* Fallback text if logo fails */}
                 <div className="hidden text-center">
                   <Pizza className="h-24 w-24 text-red-500 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-gray-800 font-playfair">Pizzeria Regina 2000</h2>
+                  <h2 className="text-2xl font-bold text-gray-800 font-playfair">Pizzeria Senza Cipolla</h2>
                 </div>
               </div>
             </div>
@@ -309,13 +309,13 @@ const Hero = () => {
               </div>
             </div>
 
-            {/* Regina 2000 - Elegant Typography */}
+            {/* Senza Cipolla - Elegant Typography */}
             <div className="relative mb-6">
               <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif italic text-transparent bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text font-bold tracking-wide drop-shadow-2xl">
-                Regina 2000
+                Senza Cipolla
               </h2>
               <div className="absolute inset-0 text-5xl md:text-7xl lg:text-8xl font-serif italic text-yellow-400/20 blur-sm">
-                Regina 2000
+                Senza Cipolla
               </div>
             </div>
 
@@ -374,13 +374,25 @@ const Hero = () => {
                 ) : (
                   <div className="grid grid-cols-1 gap-1 text-center">
                     <div className="text-yellow-200 font-mono text-sm font-medium">
-                      Lun-Gio: 12:00-14:30, 18:00-00:00
+                      lunedì: 11-03
                     </div>
                     <div className="text-yellow-200 font-mono text-sm font-medium">
-                      Ven-Sab: 12:00-14:30, 18:30-02:00
+                      martedì: 11-03
                     </div>
                     <div className="text-yellow-200 font-mono text-sm font-medium">
-                      Domenica: 12:00-14:30, 18:00-00:00
+                      mercoledì: 11-03
+                    </div>
+                    <div className="text-yellow-200 font-mono text-sm font-medium">
+                      giovedì: 11-03
+                    </div>
+                    <div className="text-yellow-200 font-mono text-sm font-medium">
+                      venerdì: 11-03
+                    </div>
+                    <div className="text-yellow-200 font-mono text-sm font-medium">
+                      sabato: 11-03
+                    </div>
+                    <div className="text-yellow-200 font-mono text-sm font-medium">
+                      domenica: 11-03
                     </div>
                   </div>
                 )}

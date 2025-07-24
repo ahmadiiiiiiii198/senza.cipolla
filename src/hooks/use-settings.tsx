@@ -227,17 +227,28 @@ export function useSetting<T>(key: string, defaultValue: T): [T, (value: T) => P
 // Type-specific hooks for common settings
 // Default settings constants to avoid hoisting issues
 const DEFAULT_LOGO_SETTINGS = {
-  logoUrl: "/pizzeria-regina-logo.png",
-  altText: "Pizzeria Regina 2000 Torino Logo",
+  logoUrl: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f355.png",
+  altText: "Pizzeria Senza Cipolla Torino Logo",
+};
+
+const DEFAULT_NAVBAR_LOGO_SETTINGS = {
+  logoUrl: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f355.png",
+  altText: "Pizzeria Senza Cipolla Navbar Logo",
+  showLogo: true,
+  logoSize: "medium" as "small" | "medium" | "large",
 };
 
 export function useLogoSettings() {
   return useSetting('logoSettings', DEFAULT_LOGO_SETTINGS);
 }
 
+export function useNavbarLogoSettings() {
+  return useSetting('navbarLogoSettings', DEFAULT_NAVBAR_LOGO_SETTINGS);
+}
+
 // Default content constants to avoid hoisting issues
 const DEFAULT_HERO_CONTENT = {
-  heading: "🍕 PIZZERIA Regina 2000",
+  heading: "🍕 PIZZERIA Senza Cipolla",
   subheading: "Autentica pizza italiana preparata con ingredienti freschi e forno a legna tradizionale nel cuore di Torino",
   backgroundImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
   heroImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"

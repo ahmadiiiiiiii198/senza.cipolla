@@ -35,6 +35,7 @@ const ProductsAdmin = lazy(() => import('./ProductsAdmin').catch(() => ({ defaul
 const ContentEditor = lazy(() => import('./ContentEditor').catch(() => ({ default: () => <div>Error loading ContentEditor</div> })));
 const HeroContentEditor = lazy(() => import('./HeroContentEditor').catch(() => ({ default: () => <div>Error loading HeroContentEditor</div> })));
 const LogoEditor = lazy(() => import('./LogoEditor').catch(() => ({ default: () => <div>Error loading LogoEditor</div> })));
+const NavbarLogoEditor = lazy(() => import('./NavbarLogoEditor').catch(() => ({ default: () => <div>Error loading NavbarLogoEditor</div> })));
 const GalleryManager = lazy(() => import('./GalleryManager').catch(() => ({ default: () => <div>Error loading GalleryManager</div> })));
 const YouTubeManager = lazy(() => import('./YouTubeManager').catch(() => ({ default: () => <div>Error loading YouTubeManager</div> })));
 const CommentsManager = lazy(() => import('./CommentsManager').catch(() => ({ default: () => <div>Error loading CommentsManager</div> })));
@@ -624,15 +625,35 @@ const PizzeriaAdminPanel = () => {
                       <div className="bg-purple-500 p-2 rounded-lg mr-3">
                         <Image className="h-6 w-6 text-white" />
                       </div>
-                      Gestione Logo
+                      Gestione Logo Principale
                     </CardTitle>
                     <CardDescription className="text-purple-600">
-                      Carica e modifica il logo della pizzeria (immagine sinistra)
+                      Carica e modifica il logo principale della pizzeria (hero, footer, ecc.)
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
                     <Suspense fallback={<LoadingSpinner />}>
                       <LogoEditor />
+                    </Suspense>
+                  </CardContent>
+                </Card>
+
+                {/* Navbar Logo Management */}
+                <Card className="bg-white rounded-2xl shadow-xl border border-gray-200">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-2xl border-b border-blue-200">
+                    <CardTitle className="flex items-center text-blue-800">
+                      <div className="bg-blue-500 p-2 rounded-lg mr-3">
+                        <Image className="h-6 w-6 text-white" />
+                      </div>
+                      Gestione Logo Navbar
+                    </CardTitle>
+                    <CardDescription className="text-blue-600">
+                      Configura il logo che appare nella barra di navigazione superiore
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <NavbarLogoEditor />
                     </Suspense>
                   </CardContent>
                 </Card>

@@ -77,14 +77,22 @@ class ProductService {
         // Ensure required fields have defaults
         description: product.description || '',
         image_url: product.image_url || '',
+        slug: product.slug || '',
         is_active: product.is_active ?? true,
         is_featured: product.is_featured ?? false,
+        is_vegetarian: product.is_vegetarian ?? false,
+        is_vegan: product.is_vegan ?? false,
+        is_gluten_free: product.is_gluten_free ?? false,
         stock_quantity: product.stock_quantity ?? 0,
         compare_price: typeof product.compare_price === 'string' ? parseFloat(product.compare_price) : (product.compare_price ?? 0),
         sort_order: product.sort_order ?? 0,
+        preparation_time: product.preparation_time ?? 15,
+        calories: product.calories ?? null,
         meta_title: product.meta_title || '',
         meta_description: product.meta_description || '',
-        labels: Array.isArray(product.labels) ? product.labels : []
+        labels: Array.isArray(product.labels) ? product.labels : [],
+        ingredients: Array.isArray(product.ingredients) ? product.ingredients : [],
+        allergens: Array.isArray(product.allergens) ? product.allergens : []
       }));
 
       return transformedProducts;

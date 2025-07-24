@@ -195,30 +195,16 @@ class PizzeriaHoursService {
    * Get all formatted hours for display
    */
   async getAllFormattedHours(): Promise<string> {
-    const hours = await this.getPizzeriaHours();
-    const dayNames = {
-      monday: 'Lun',
-      tuesday: 'Mar',
-      wednesday: 'Mer',
-      thursday: 'Gio',
-      friday: 'Ven',
-      saturday: 'Sab',
-      sunday: 'Dom'
-    };
-
-    const formattedDays: string[] = [];
-    
-    Object.entries(hours).forEach(([day, dayHours]) => {
-      const dayName = dayNames[day as keyof typeof dayNames];
-      if (dayHours.isOpen) {
-        const periodsText = dayHours.periods.map(period => 
-          `${period.openTime}-${period.closeTime}`
-        ).join(', ');
-        formattedDays.push(`${dayName}: ${periodsText}`);
-      } else {
-        formattedDays.push(`${dayName}: Chiuso`);
-      }
-    });
+    // Return hardcoded "11-03" format for all days as requested
+    const formattedDays = [
+      'lunedì: 11-03',
+      'martedì: 11-03',
+      'mercoledì: 11-03',
+      'giovedì: 11-03',
+      'venerdì: 11-03',
+      'sabato: 11-03',
+      'domenica: 11-03'
+    ];
 
     return formattedDays.join('\n');
   }

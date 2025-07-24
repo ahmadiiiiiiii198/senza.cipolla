@@ -112,7 +112,7 @@ console.log('');
 
 // Database Connection Test
 console.log('🔗 DATABASE CONNECTION:');
-console.log('✅ Project ID: sixnfemtvmighstbgrbd');
+console.log('✅ Project ID: htdgoceqepvrffblfvns');
 console.log('✅ Region: eu-north-1');
 console.log('✅ Storage bucket: uploads (public)');
 console.log('✅ Tables: settings, categories, products, gallery_images');
