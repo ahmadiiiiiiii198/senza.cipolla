@@ -94,6 +94,14 @@ const SettingsManager = () => {
       }, {} as any);
 
       if (settingsObj) {
+        // CRITICAL FIX: Load contact info from contactContent if available
+        if (settingsObj.contactContent) {
+          const contactContent = settingsObj.contactContent;
+          settingsObj.address = contactContent.address || settingsObj.address;
+          settingsObj.phone = contactContent.phone || settingsObj.phone;
+          settingsObj.email = contactContent.email || settingsObj.email;
+        }
+
         setSettings(prev => ({ ...prev, ...settingsObj }));
       }
     } catch (error) {
@@ -122,6 +130,29 @@ const SettingsManager = () => {
 
         if (error) throw error;
       }
+
+      // CRITICAL FIX: Also update the contactContent key that frontend components use
+      const contactContent = {
+        address: settings.address,
+        phone: settings.phone,
+        email: settings.email,
+        hours: "Lun-Dom: 18:30 - 22:30", // Default hours, can be made configurable later
+        mapUrl: "https://maps.google.com"
+      };
+
+      const { error: contactError } = await supabase
+        .from('settings')
+        .upsert({
+          key: 'contactContent',
+          value: contactContent
+        }, { onConflict: 'key' });
+
+      if (contactError) {
+        console.error('Error updating contactContent:', contactError);
+        throw contactError;
+      }
+
+      console.log('✅ Settings saved and contactContent updated for frontend compatibility');
 
       toast({
         title: "Successo",

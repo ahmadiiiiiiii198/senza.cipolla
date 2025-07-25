@@ -31,6 +31,29 @@ const Footer = () => {
     };
 
     loadContactHours();
+
+    // Set up real-time listener for contact content changes
+    const timestamp = Date.now();
+    const channelName = `footer-contact-updates-${timestamp}`;
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'settings',
+        filter: 'key=eq.contactContent'
+      }, async (payload) => {
+        console.log('🔔 [Footer] Real-time contact content update received from admin');
+        if (payload.new?.value?.hours) {
+          setContactHours(payload.new.value.hours);
+          console.log('✅ [Footer] Contact hours updated from real-time change');
+        }
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   return (

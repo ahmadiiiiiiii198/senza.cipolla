@@ -91,6 +91,32 @@ const Contact = () => {
     if (dateInput) {
       dateInput.min = today;
     }
+
+    // Set up real-time listener for contact content changes
+    const timestamp = Date.now();
+    const channelName = `contact-updates-${timestamp}`;
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'settings',
+        filter: 'key=eq.contactContent'
+      }, async (payload) => {
+        console.log('🔔 [Contact] Real-time contact content update received from admin');
+        if (payload.new?.value) {
+          setContactContent(prev => ({
+            ...prev,
+            ...payload.new.value
+          }));
+          console.log('✅ [Contact] Contact content updated from real-time change');
+        }
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

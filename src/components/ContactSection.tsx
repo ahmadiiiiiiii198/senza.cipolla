@@ -57,6 +57,34 @@ const ContactSection = () => {
   // Load contact info from database
   useEffect(() => {
     loadContactInfo();
+
+    // Set up real-time listener for contact content changes
+    const timestamp = Date.now();
+    const channelName = `contact-section-updates-${timestamp}`;
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'settings',
+        filter: 'key=eq.contactContent'
+      }, async (payload) => {
+        console.log('🔔 [ContactSection] Real-time contact content update received from admin');
+        if (payload.new?.value) {
+          setContactInfo({
+            address: payload.new.value.address || contactInfo.address,
+            phone: payload.new.value.phone || contactInfo.phone,
+            email: payload.new.value.email || contactInfo.email,
+            hours: payload.new.value.hours || contactInfo.hours
+          });
+          console.log('✅ [ContactSection] Contact content updated from real-time change');
+        }
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const loadContactInfo = async () => {
