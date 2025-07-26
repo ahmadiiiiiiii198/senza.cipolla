@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import ProductCard from './ProductCard';
 import OrderOptionsModal from './OrderOptionsModal';
+import VideoBackground from './VideoBackground';
 
 import { Product, ProductsByCategory } from '@/types/category';
 import { useStockManagement } from '@/hooks/useStockManagement';
@@ -275,13 +276,20 @@ const Products = () => {
 
   return (
     <>
-      <section id="products" className="py-20 bg-gradient-to-br from-pizza-cream via-white to-pizza-orange/10 overflow-hidden relative">
-        {/* Pizza-themed background decorations */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-10 left-10 w-20 h-20 bg-pizza-red rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute bottom-10 right-10 w-32 h-32 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
-          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pizza-green rounded-full blur-xl animate-pulse animation-delay-4000"></div>
-        </div>
+      <VideoBackground
+        videoSrc="/video_preview_h264.mp4"
+        className="py-20"
+        overlay={true}
+        overlayOpacity={0.2}
+        overlayColor="rgba(0, 0, 0, 0.3)"
+      >
+        <section id="products" className="relative">
+          {/* Pizza-themed background decorations */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute top-10 left-10 w-20 h-20 bg-pizza-red rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute bottom-10 right-10 w-32 h-32 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
+            <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pizza-green rounded-full blur-xl animate-pulse animation-delay-4000"></div>
+          </div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12 animate-fade-in-up">
@@ -469,7 +477,8 @@ const Products = () => {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+      </VideoBackground>
 
       {/* Order Options Modal */}
       <OrderOptionsModal

@@ -6,6 +6,7 @@ import MobileGalleryView from "./gallery/MobileGalleryView";
 import DesktopGalleryView from "./gallery/DesktopGalleryView";
 import { useGalleryData } from "@/hooks/use-gallery-data";
 import { Button } from "@/components/ui/button";
+import VideoBackground from "./VideoBackground";
 
 const Gallery = () => {
   // Use the improved gallery data hook
@@ -34,19 +35,28 @@ const Gallery = () => {
   const lastUpdatedTimestamp = lastUpdated instanceof Date ? lastUpdated.getTime() : 0;
 
   return (
-    <section id="gallery" className="py-24 bg-gradient-to-br from-pizza-cream via-white to-pizza-orange/10 relative overflow-hidden">
-      {/* Pizza-themed background decorations */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-pizza-orange/10 blur-3xl animate-pulse"></div>
-      <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-pizza-red/10 blur-3xl animate-pulse animation-delay-2000"></div>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-pizza-green/5 blur-3xl animate-pulse animation-delay-4000"></div>
+    <VideoBackground
+      videoSrc="/video_preview_h264.mp4"
+      className="py-24"
+      overlay={true}
+      overlayOpacity={0.2}
+      overlayColor="rgba(0, 0, 0, 0.3)"
+    >
+      <section id="gallery" className="relative">
+        {/* Pizza-themed background decorations */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-pizza-red rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pizza-green rounded-full blur-xl animate-pulse animation-delay-4000"></div>
+        </div>
 
-      {/* Floating pizza icons */}
-      <div className="absolute top-20 right-20 text-pizza-orange/20 animate-float">
-        <Images size={40} />
-      </div>
-      <div className="absolute bottom-20 left-20 text-pizza-red/20 animate-float animation-delay-2000">
-        <Images size={30} />
-      </div>
+        {/* Floating pizza icons */}
+        <div className="absolute top-20 right-20 text-pizza-orange/20 animate-float">
+          <Images size={40} />
+        </div>
+        <div className="absolute bottom-20 left-20 text-pizza-red/20 animate-float animation-delay-2000">
+          <Images size={30} />
+        </div>
 
       <div className="container mx-auto px-4 relative z-10">
         <h2 className="text-4xl md:text-5xl text-center font-fredoka font-bold mb-4 text-pizza-dark animate-on-scroll" data-animation-id="gallery-heading">
@@ -136,7 +146,8 @@ const Gallery = () => {
           </>
         )}
       </div>
-    </section>
+      </section>
+    </VideoBackground>
   );
 };
 

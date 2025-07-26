@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Pizza, ChefHat, Clock, Star, Flower } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { supabase } from '@/integrations/supabase/client';
+import VideoBackground from './VideoBackground';
 
 const About = () => {
   const { language, t } = useLanguage();
@@ -230,13 +231,20 @@ const About = () => {
     : (content[language] || content.it);
 
   return (
-    <section id="about" className="py-20 bg-gradient-to-br from-pizza-cream via-white to-pizza-orange/10 relative overflow-hidden">
-      {/* Pizza-themed background decorations */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-pizza-red rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-40 h-40 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pizza-green rounded-full blur-xl animate-pulse animation-delay-4000"></div>
-      </div>
+    <VideoBackground
+      videoSrc="/video_preview_h264.mp4"
+      className="py-20"
+      overlay={true}
+      overlayOpacity={0.2}
+      overlayColor="rgba(0, 0, 0, 0.3)"
+    >
+      <section id="about" className="relative">
+        {/* Pizza-themed background decorations */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-pizza-red rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pizza-green rounded-full blur-xl animate-pulse animation-delay-4000"></div>
+        </div>
 
 
 
@@ -329,7 +337,8 @@ const About = () => {
           </div>
         </div>
       </div>
-    </section>
+      </section>
+    </VideoBackground>
   );
 };
 

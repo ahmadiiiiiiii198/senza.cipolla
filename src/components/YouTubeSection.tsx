@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Video, Youtube } from 'lucide-react';
 import { youtubeService, YouTubeVideo } from '@/services/youtubeService';
+import VideoBackground from './VideoBackground';
 
 const YouTubeSection = () => {
   const [currentVideo, setCurrentVideo] = useState<YouTubeVideo | null>(null);
@@ -70,8 +71,15 @@ const YouTubeSection = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-red-50 via-white to-orange-50">
-      <div className="container mx-auto px-4">
+    <VideoBackground
+      videoSrc="/video_preview_h264.mp4"
+      className="py-20"
+      overlay={true}
+      overlayOpacity={0.2}
+      overlayColor="rgba(0, 0, 0, 0.3)"
+    >
+      <section id="youtube" className="relative">
+        <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16 animate-fade-in-up">
           <div className="flex items-center justify-center space-x-3 mb-6">
@@ -151,32 +159,107 @@ const YouTubeSection = () => {
           
           {/* Video Info */}
           <div className="mt-8 text-center animate-fade-in-up animate-stagger-2">
-            {/* Pizza Design Animation - No Text */}
-            <div className="flex items-center justify-center space-x-6 md:space-x-12 py-6">
-              {/* Animated Pizza Elements */}
-              <div className="relative">
-                <div className="text-5xl md:text-6xl animate-pizza-spin">🍕</div>
-                <div className="absolute -top-2 -right-2 text-xl md:text-2xl animate-bounce">🔥</div>
+            {/* Real Kebab Images with Smoke Effects */}
+            <div className="flex items-center justify-center space-x-4 md:space-x-8 py-8">
+
+              {/* Real Kebab Image 1 - Grilling Action */}
+              <div className="relative group">
+                <div className="w-24 h-32 md:w-32 md:h-40 rounded-xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all duration-300">
+                  <img
+                    src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?fm=jpg&q=80&w=400&ixlib=rb-4.1.0"
+                    alt="Grilled meat and vegetable kebabs on the grill"
+                    className="w-full h-full object-cover animate-subtle-pulse"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1583060095186-852adde6b819?fm=jpg&q=80&w=400&ixlib=rb-4.1.0";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+                </div>
+
+                {/* Realistic Smoke Effects */}
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="w-1 h-8 bg-gradient-to-t from-gray-500 via-gray-400 to-transparent rounded-full animate-kebab-smoke opacity-80"></div>
+                  <div className="w-1 h-6 bg-gradient-to-t from-gray-400 via-gray-300 to-transparent rounded-full animate-kebab-smoke animation-delay-300 ml-1 opacity-60"></div>
+                  <div className="w-1 h-10 bg-gradient-to-t from-gray-600 via-gray-400 to-transparent rounded-full animate-kebab-smoke animation-delay-600 -ml-1 opacity-70"></div>
+                </div>
+
+                {/* Glow Effect */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-orange-500/20 via-transparent to-transparent animate-grill-glow"></div>
               </div>
 
-              <div className="flex flex-col items-center space-y-2">
-                <div className="text-3xl md:text-4xl animate-pizza-ingredients-dance">🍅</div>
-                <div className="text-2xl md:text-3xl animate-pizza-ingredients-dance animation-delay-1000">🧀</div>
+              {/* Real Kebab Image 2 - Close-up Grilled */}
+              <div className="relative group">
+                <div className="w-24 h-32 md:w-32 md:h-40 rounded-xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all duration-300">
+                  <img
+                    src="https://images.unsplash.com/photo-1603360946369-dc9bb6258143?fm=jpg&q=80&w=400&ixlib=rb-4.1.0"
+                    alt="Grilled meat with vegetables on white plate"
+                    className="w-full h-full object-cover animate-subtle-pulse animation-delay-500"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1532636875304-0c89119d9b4d?fm=jpg&q=80&w=400&ixlib=rb-4.1.0";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+                </div>
+
+                {/* Realistic Smoke Effects */}
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="w-1 h-9 bg-gradient-to-t from-gray-600 via-gray-400 to-transparent rounded-full animate-kebab-smoke animation-delay-200 opacity-75"></div>
+                  <div className="w-1 h-7 bg-gradient-to-t from-gray-500 via-gray-300 to-transparent rounded-full animate-kebab-smoke animation-delay-500 ml-1 opacity-65"></div>
+                  <div className="w-1 h-11 bg-gradient-to-t from-gray-700 via-gray-500 to-transparent rounded-full animate-kebab-smoke animation-delay-800 -ml-1 opacity-55"></div>
+                </div>
+
+                {/* Glow Effect */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-red-500/20 via-transparent to-transparent animate-grill-glow animation-delay-1000"></div>
               </div>
 
-              <div className="relative">
-                <div className="text-4xl md:text-5xl animate-pizza-ingredients-dance animation-delay-2000">🌿</div>
-                <div className="absolute -bottom-1 -left-1 text-xl md:text-2xl animate-sparkle-twinkle">✨</div>
+              {/* Real Kebab Image 3 - Cooking Process */}
+              <div className="relative group">
+                <div className="w-24 h-32 md:w-32 md:h-40 rounded-xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all duration-300">
+                  <img
+                    src="https://images.unsplash.com/photo-1633436375795-12b3b339712f?fm=jpg&q=80&w=400&ixlib=rb-4.1.0"
+                    alt="Plate of grilled meat and vegetables"
+                    className="w-full h-full object-cover animate-subtle-pulse animation-delay-1000"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1595777216528-071e0127ccbf?fm=jpg&q=80&w=400&ixlib=rb-4.1.0";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+                </div>
+
+                {/* Intense Smoke Effects */}
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="w-1 h-10 bg-gradient-to-t from-gray-600 via-gray-400 to-transparent rounded-full animate-kebab-smoke animation-delay-400 opacity-85"></div>
+                  <div className="w-1 h-8 bg-gradient-to-t from-gray-500 via-gray-300 to-transparent rounded-full animate-kebab-smoke animation-delay-700 ml-1 opacity-70"></div>
+                  <div className="w-1 h-12 bg-gradient-to-t from-gray-700 via-gray-500 to-transparent rounded-full animate-kebab-smoke animation-delay-1000 -ml-1 opacity-60"></div>
+                </div>
+
+                {/* Glow Effect */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-yellow-500/20 via-transparent to-transparent animate-grill-glow animation-delay-2000"></div>
               </div>
 
-              <div className="flex flex-col items-center space-y-2">
-                <div className="text-3xl md:text-4xl animate-chef-cooking">👨‍🍳</div>
-                <div className="text-2xl md:text-3xl animate-pizza-ingredients-dance animation-delay-4000">🥄</div>
-              </div>
+              {/* Real Kebab Image 4 - Professional Grilling */}
+              <div className="relative group">
+                <div className="w-24 h-32 md:w-32 md:h-40 rounded-xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all duration-300">
+                  <img
+                    src="https://images.unsplash.com/photo-1684864115205-242c064363e6?fm=jpg&q=80&w=400&ixlib=rb-4.1.0"
+                    alt="Person cutting meat on grill"
+                    className="w-full h-full object-cover animate-subtle-pulse animation-delay-1500"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1561651823-34feb02250e4?fm=jpg&q=80&w=400&ixlib=rb-4.1.0";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+                </div>
 
-              <div className="relative">
-                <div className="text-5xl md:text-6xl animate-pizza-spin animation-delay-2000">🍕</div>
-                <div className="absolute -top-2 -left-2 text-xl md:text-2xl animate-sparkle-twinkle animation-delay-1000">⭐</div>
+                {/* Professional Smoke Effects */}
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="w-1 h-11 bg-gradient-to-t from-gray-700 via-gray-500 to-transparent rounded-full animate-kebab-smoke animation-delay-600 opacity-90"></div>
+                  <div className="w-1 h-9 bg-gradient-to-t from-gray-600 via-gray-400 to-transparent rounded-full animate-kebab-smoke animation-delay-900 ml-1 opacity-75"></div>
+                  <div className="w-1 h-13 bg-gradient-to-t from-gray-800 via-gray-600 to-transparent rounded-full animate-kebab-smoke animation-delay-1200 -ml-1 opacity-65"></div>
+                </div>
+
+                {/* Glow Effect */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-orange-600/20 via-transparent to-transparent animate-grill-glow animation-delay-3000"></div>
               </div>
             </div>
             
@@ -250,7 +333,8 @@ const YouTubeSection = () => {
           </div>
         </div>
       </div>
-    </section>
+      </section>
+    </VideoBackground>
   );
 };
 
