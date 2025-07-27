@@ -104,13 +104,6 @@ const Hero = () => {
             }
             /* Mobile-optimized video display */
             object-cover object-center
-            sm:object-cover sm:object-center
-            md:object-cover md:object-center
-            lg:object-cover lg:object-center
-            /* Ensure video scales properly on mobile */
-            min-w-full min-h-full
-            /* Better mobile positioning */
-            transform scale-105 sm:scale-100
             /* Apply mobile-specific CSS class */
             hero-video-mobile
             `}

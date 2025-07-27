@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import ProductCard from './ProductCard';
 import OrderOptionsModal from './OrderOptionsModal';
-import VideoBackground from './VideoBackground';
+
 
 import { Product, ProductsByCategory } from '@/types/category';
 import { useStockManagement } from '@/hooks/useStockManagement';
@@ -276,26 +276,54 @@ const Products = () => {
 
   return (
     <>
-      <VideoBackground
-        videoSrc="/video_preview_h264.mp4"
-        className="py-20"
-        overlay={true}
-        overlayOpacity={0.2}
-        overlayColor="rgba(0, 0, 0, 0.3)"
+      <div
+        className="relative py-20"
+        style={{
+          backgroundImage: 'url("/background01.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'scroll',
+          minHeight: '100vh',
+          width: '100%'
+        }}
       >
+        {/* Overlay */}
+        <div
+          className="absolute inset-0 z-10"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            opacity: 0.2
+          }}
+        ></div>
         <section id="products" className="relative">
           {/* Pizza-themed background decorations */}
           <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-10 left-10 w-20 h-20 bg-pizza-red rounded-full blur-xl animate-pulse"></div>
-            <div className="absolute bottom-10 right-10 w-32 h-32 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
+            <div className="absolute top-10 left-10 w-32 h-32 bg-pizza-red rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute bottom-10 right-10 w-40 h-40 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
             <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pizza-green rounded-full blur-xl animate-pulse animation-delay-4000"></div>
+          </div>
+
+          {/* Floating pizza icons */}
+          <div className="absolute top-20 right-20 text-pizza-orange/20 animate-float">
+            <ChefHat size={50} />
+          </div>
+          <div className="absolute bottom-20 left-20 text-pizza-red/20 animate-float animation-delay-2000">
+            <Pizza size={40} />
           </div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12 animate-fade-in-up">
-            <h2 className="text-4xl md:text-5xl font-bold text-pizza-dark mb-4 font-fredoka animate-scale-in">
-              🍕 {heading || "Le Nostre Pizze"}
-            </h2>
+            <div className="mb-8">
+              <div className="flex items-center justify-center space-x-4 mb-6">
+                <Pizza className="text-pizza-red animate-pizza-spin" size={48} />
+                <ChefHat className="text-pizza-orange animate-tomato-bounce" size={48} />
+                <Pizza className="text-pizza-green animate-pizza-spin animation-delay-2000" size={48} />
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-pizza-dark mb-6 font-fredoka">
+                🍕 {heading || "Le Nostre Pizze"}
+              </h2>
+            </div>
             <p className="text-xl text-pizza-brown max-w-2xl mx-auto font-roboto animate-fade-in-up animate-stagger-1">
               {subheading || "Autentica pizza italiana preparata con ingredienti freschi e di qualità"}
             </p>
@@ -478,7 +506,7 @@ const Products = () => {
           </div>
         </div>
         </section>
-      </VideoBackground>
+      </div>
 
       {/* Order Options Modal */}
       <OrderOptionsModal

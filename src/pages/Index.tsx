@@ -45,7 +45,7 @@ const Index = () => {
         </div>
       </ErrorBoundary>
       <ErrorBoundary componentName="Products">
-        <div className="animate-fade-in-right animate-stagger-5">
+        <div>
           <Products />
         </div>
       </ErrorBoundary>
