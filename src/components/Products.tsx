@@ -285,23 +285,25 @@ const Products = () => {
           backgroundRepeat: 'no-repeat',
           backgroundAttachment: 'scroll',
           minHeight: '100vh',
-          width: '100%'
+          width: '100%',
+          filter: 'none',
+          zIndex: 1
         }}
       >
-        {/* Overlay */}
+        {/* Light overlay for text readability */}
         <div
           className="absolute inset-0 z-10"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            opacity: 0.2
+            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+            opacity: 0.1
           }}
         ></div>
         <section id="products" className="relative">
-          {/* Pizza-themed background decorations */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-pizza-red rounded-full blur-xl animate-pulse"></div>
-            <div className="absolute bottom-10 right-10 w-40 h-40 bg-pizza-orange rounded-full blur-xl animate-pulse animation-delay-2000"></div>
-            <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-pizza-green rounded-full blur-xl animate-pulse animation-delay-4000"></div>
+          {/* Subtle background decorations - removed blur to show background clearly */}
+          <div className="absolute inset-0 opacity-2">
+            <div className="absolute top-10 left-10 w-16 h-16 bg-pizza-red/10 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-10 right-10 w-20 h-20 bg-pizza-orange/10 rounded-full animate-pulse animation-delay-2000"></div>
+            <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-pizza-green/10 rounded-full animate-pulse animation-delay-4000"></div>
           </div>
 
           {/* Floating pizza icons */}
@@ -312,7 +314,7 @@ const Products = () => {
             <Pizza size={40} />
           </div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-20">
           <div className="text-center mb-12 animate-fade-in-up">
             <div className="mb-8">
               <div className="flex items-center justify-center space-x-4 mb-6">
