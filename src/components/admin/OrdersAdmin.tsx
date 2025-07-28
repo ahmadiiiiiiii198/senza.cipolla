@@ -370,11 +370,17 @@ const OrdersAdmin = () => {
             duration: 5000,
           });
 
-          // Trigger audio notification if available
-          if ((window as any).audioNotifier) {
-            console.log('🔊 Triggering audio notification from OrdersAdmin');
-            (window as any).audioNotifier.startContinuousRinging();
-          }
+          // Audio notification is handled by OrderNotificationSystem component
+          console.log('🔊 [OrdersAdmin] New order detected - OrderNotificationSystem will handle audio');
+
+          // Trigger a custom event that OrderNotificationSystem can listen to
+          window.dispatchEvent(new CustomEvent('newOrderReceived', {
+            detail: {
+              orderNumber: payload.new.order_number,
+              customerName: payload.new.customer_name,
+              totalAmount: payload.new.total_amount
+            }
+          }));
         }
       )
       .on('postgres_changes',

@@ -54,10 +54,15 @@ const OrderNotificationSystem = () => {
         // Try to create audio element
         const audio = new Audio();
         audio.loop = true;
-        audio.volume = 0.8;
+        audio.volume = 1.0; // Maximum volume for better audibility
 
-        // Try to load notification sound
-        audio.src = '/notification-sound.mp3';
+        // Use a reliable beep sound directly instead of trying to load external file
+        console.log('🔊 [OrderNotification] Creating reliable beep sound...');
+
+        // Create a simple beep sound using data URL (more reliable than external file)
+        const beepDataUrl = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT';
+
+        audio.src = beepDataUrl;
 
         // Populate header controls
         populateHeaderControls();
@@ -620,6 +625,19 @@ const OrderNotificationSystem = () => {
         )
         .subscribe();
 
+      // Listen for custom events from OrdersAdmin
+      const handleNewOrderEvent = (event: CustomEvent) => {
+        console.log('🚨 [OrderNotification] Custom new order event received:', event.detail);
+        // Force fetch notifications and start sound
+        fetchNotifications();
+        if (isSoundEnabled && !isPlaying) {
+          console.log('🔊 [OrderNotification] Starting sound from custom event');
+          startNotificationSound();
+        }
+      };
+
+      window.addEventListener('newOrderReceived', handleNewOrderEvent as EventListener);
+
       // Poll for notifications every 30 seconds as backup
       intervalRef.current = setInterval(() => {
         console.log('📡 [OrderNotification] Polling for notifications...');
@@ -731,6 +749,24 @@ const OrderNotificationSystem = () => {
                  'STOP AUDIO'}
               </span>
             </div>
+          </button>
+
+          {/* Manual Test Button */}
+          <button
+            onClick={() => {
+              console.log('🧪 [OrderNotification] Manual test button clicked');
+              if (!isPlaying) {
+                console.log('🔊 [OrderNotification] Starting test sound...');
+                startNotificationSound();
+              } else {
+                console.log('🔇 [OrderNotification] Stopping test sound...');
+                forceStopSound();
+              }
+            }}
+            className="mt-2 px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-sm rounded-lg font-medium shadow-lg transition-all duration-300"
+            title="Test notification sound manually"
+          >
+            🧪 TEST SOUND
           </button>
         </div>
       )}
