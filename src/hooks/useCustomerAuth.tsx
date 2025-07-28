@@ -222,6 +222,8 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const signUp = async (email: string, password: string, profileData: { fullName: string; phone?: string; address?: string }) => {
     try {
       setLoading(true);
+      console.log('🔐 [SIGN-UP] Starting registration for:', email);
+      console.log('🔐 [SIGN-UP] Profile data:', profileData);
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -235,21 +237,46 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         },
       });
 
+      console.log('🔐 [SIGN-UP] Supabase response:', { data, error });
+
       if (error) {
+        console.error('🔐 [SIGN-UP] Registration error:', error);
+        console.error('🔐 [SIGN-UP] Error details:', {
+          message: error.message,
+          status: error.status,
+          code: error.code || 'no-code'
+        });
         return { success: false, error: error.message };
       }
 
       if (data.user && !data.session) {
         // Email confirmation required
+        console.log('🔐 [SIGN-UP] User created but no session - email confirmation required');
         toast({
           title: 'Conferma la tua email',
-          description: 'Ti abbiamo inviato un link di conferma. Controlla la tua email.',
+          description: 'Ti abbiamo inviato un link di conferma. Controlla la tua email e clicca sul link per attivare il tuo account.',
+          duration: 8000, // Show longer for important message
+        });
+      } else if (data.user && data.session) {
+        console.log('🔐 [SIGN-UP] User created with session - auto-confirmed');
+        toast({
+          title: 'Registrazione completata!',
+          description: 'Account creato con successo. Benvenuto!',
+        });
+      } else {
+        // Fallback case
+        console.log('🔐 [SIGN-UP] Registration successful but unclear state');
+        toast({
+          title: 'Registrazione in corso',
+          description: 'Controlla la tua email per confermare l\'account.',
+          duration: 8000,
         });
       }
 
       return { success: true };
     } catch (error) {
-      return { success: false, error: 'Errore durante la registrazione' };
+      console.error('🔐 [SIGN-UP] Unexpected error:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Errore durante la registrazione' };
     } finally {
       setLoading(false);
     }

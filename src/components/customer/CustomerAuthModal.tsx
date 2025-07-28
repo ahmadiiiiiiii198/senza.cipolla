@@ -122,10 +122,8 @@ const CustomerAuthModal: React.FC<CustomerAuthModalProps> = ({
       });
 
       if (result.success) {
-        toast({
-          title: 'Registrazione completata!',
-          description: 'Controlla la tua email per confermare l\'account',
-        });
+        // Don't show toast here as it's handled in the signUp function
+        // Just close modal and reset form
         onClose();
         setRegisterData({
           fullName: '',

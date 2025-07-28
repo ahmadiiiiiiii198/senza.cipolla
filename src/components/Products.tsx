@@ -283,38 +283,23 @@ const Products = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'scroll',
+          backgroundAttachment: 'fixed',
           minHeight: '100vh',
           width: '100%',
           filter: 'none',
+          WebkitFilter: 'none',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
           zIndex: 1
         }}
       >
-        {/* Light overlay for text readability */}
-        <div
-          className="absolute inset-0 z-10"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.1)',
-            opacity: 0.1
-          }}
-        ></div>
+        {/* Light overlay for text readability - removed to show background clearly */}
         <section id="products" className="relative">
-          {/* Subtle background decorations - removed blur to show background clearly */}
-          <div className="absolute inset-0 opacity-2">
-            <div className="absolute top-10 left-10 w-16 h-16 bg-pizza-red/10 rounded-full animate-pulse"></div>
-            <div className="absolute bottom-10 right-10 w-20 h-20 bg-pizza-orange/10 rounded-full animate-pulse animation-delay-2000"></div>
-            <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-pizza-green/10 rounded-full animate-pulse animation-delay-4000"></div>
-          </div>
+          {/* Background decorations removed to show background image clearly */}
 
-          {/* Floating pizza icons */}
-          <div className="absolute top-20 right-20 text-pizza-orange/20 animate-float">
-            <ChefHat size={50} />
-          </div>
-          <div className="absolute bottom-20 left-20 text-pizza-red/20 animate-float animation-delay-2000">
-            <Pizza size={40} />
-          </div>
+          {/* Floating pizza icons removed to show background clearly */}
 
-        <div className="container mx-auto px-4 relative z-20">
+        <div className="container mx-auto px-4 relative z-20" style={{ backgroundColor: 'transparent' }}>
           <div className="text-center mb-12 animate-fade-in-up">
             <div className="mb-8">
               <div className="flex items-center justify-center space-x-4 mb-6">
@@ -347,7 +332,7 @@ const Products = () => {
                 placeholder="Cerca pizze, bevande, dolci... 🔍"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="w-full pl-12 pr-12 py-4 bg-white/90 backdrop-blur-sm border-2 border-pizza-orange/20 rounded-2xl text-pizza-dark placeholder-pizza-brown/60 focus:outline-none focus:border-pizza-orange focus:ring-4 focus:ring-pizza-orange/20 transition-all duration-300 shadow-lg hover:shadow-xl font-roboto text-lg"
+                className="w-full pl-12 pr-12 py-4 bg-white/95 border-2 border-pizza-orange/20 rounded-2xl text-pizza-dark placeholder-pizza-brown/60 focus:outline-none focus:border-pizza-orange focus:ring-4 focus:ring-pizza-orange/20 transition-all duration-300 shadow-lg hover:shadow-xl font-roboto text-lg"
               />
               {searchTerm && (
                 <button

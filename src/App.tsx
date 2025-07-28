@@ -36,6 +36,7 @@ import MyOrders from "./pages/MyOrders";
 import UnifiedOrderTracker from "./components/UnifiedOrderTracker";
 import ComponentLoadingTest from "./tests/ComponentLoadingTest";
 import LogoTest from "./pages/LogoTest";
+import EmailConfirmation from "./pages/EmailConfirmation";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -139,6 +140,11 @@ const App = () => (
               <Route path="/my-orders" element={
                 <ErrorBoundary componentName="MyOrders">
                   <MyOrders />
+                </ErrorBoundary>
+              } />
+              <Route path="/auth/confirm" element={
+                <ErrorBoundary componentName="EmailConfirmation">
+                  <EmailConfirmation />
                 </ErrorBoundary>
               } />
               <Route path="/test-components" element={

@@ -235,8 +235,8 @@ const About = () => {
       videoSrc="/video_preview_h264.mp4"
       className="py-20"
       overlay={true}
-      overlayOpacity={0.2}
-      overlayColor="rgba(0, 0, 0, 0.3)"
+      overlayOpacity={0.15}
+      overlayColor="rgba(255, 255, 255, 0.1)"
     >
       <section id="about" className="relative">
         {/* Pizza-themed background decorations */}
@@ -273,10 +273,10 @@ const About = () => {
               <h3 className="text-2xl md:text-3xl font-semibold text-pizza-dark mb-6 font-pacifico flex items-center">
                 🍕 {currentContent.storyTitle}
               </h3>
-              <p className="text-pizza-brown mb-6 leading-relaxed font-roboto text-lg">
+              <p className="text-pizza-dark mb-6 leading-relaxed font-roboto text-lg">
                 {currentContent.paragraph1}
               </p>
-              <p className="text-pizza-brown mb-6 leading-relaxed font-roboto text-lg">
+              <p className="text-pizza-dark mb-6 leading-relaxed font-roboto text-lg">
                 {currentContent.paragraph2}
               </p>
 
@@ -287,7 +287,7 @@ const About = () => {
                 </h4>
                 <ul className="space-y-3">
                   {currentContent.services.map((service, index) => (
-                    <li key={index} className="flex items-start gap-3 text-pizza-brown font-roboto">
+                    <li key={index} className="flex items-start gap-3 text-pizza-dark font-roboto">
                       <div className="w-3 h-3 bg-gradient-to-r from-pizza-red to-pizza-orange rounded-full mt-2 flex-shrink-0 animate-pulse"></div>
                       <span className="text-lg">{service}</span>
                     </li>

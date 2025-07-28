@@ -193,9 +193,11 @@ class PizzeriaHoursService {
 
   /**
    * Get all formatted hours for display
+   * NOTE: This returns hardcoded display hours for frontend consistency
+   * The actual business logic uses businessHoursService for order validation
    */
   async getAllFormattedHours(): Promise<string> {
-    // Return hardcoded "11-03" format for all days as requested
+    // Return hardcoded "11-03" format for all days as requested for display
     const formattedDays = [
       'lunedì: 11-03',
       'martedì: 11-03',
@@ -207,6 +209,25 @@ class PizzeriaHoursService {
     ];
 
     return formattedDays.join('\n');
+  }
+
+  /**
+   * Get simple formatted hours for display (single line format)
+   * NOTE: This returns hardcoded display hours for frontend consistency
+   */
+  async getSimpleFormattedHours(): Promise<string> {
+    // Return hardcoded "11-03" format for all days as requested for display
+    const formattedDays = [
+      'lun: 11-03',
+      'mar: 11-03',
+      'mer: 11-03',
+      'gio: 11-03',
+      'ven: 11-03',
+      'sab: 11-03',
+      'dom: 11-03'
+    ];
+
+    return formattedDays.join(', ');
   }
 }
 

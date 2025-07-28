@@ -30,11 +30,25 @@ class BusinessHoursService {
   private lastFetch: number = 0;
   private readonly CACHE_DURATION = 30 * 1000; // 30 seconds for faster updates
 
+  constructor() {
+    // Clear cache on initialization to ensure fresh data after database fix
+    this.clearCache();
+  }
+
+  /**
+   * Clear the cache to force fresh data fetch
+   */
+  clearCache(): void {
+    this.cachedHours = null;
+    this.lastFetch = 0;
+    console.log('🧹 [BusinessHours] Cache cleared - will fetch fresh data');
+  }
+
   // Create a separate, non-authenticated Supabase client for business hours
   // This ensures business hours work regardless of user authentication state
   private readonly publicSupabase = createClient(
-    'https://sixnfemtvmighstbgrbd.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpeG5mZW10dm1pZ2hzdGJncmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyOTIxODQsImV4cCI6MjA2Njg2ODE4NH0.eOV2DYqcMV1rbmw8wa6xB7MBSpXaoUhnSyuv_j5mg4I',
+    'https://htdgoceqepvrffblfvns.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0ZGdvY2VxZXB2cmZmYmxmdm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNTUwNzksImV4cCI6MjA2ODYzMTA3OX0.TJqTe3f0-GjFLoFrT64LKbUJWtXU9ht08tX9O8Yp7y8',
     {
       auth: {
         persistSession: false, // Don't persist sessions for this client
@@ -291,10 +305,21 @@ class BusinessHoursService {
 
   /**
    * Get formatted hours string for display
+   * NOTE: This returns hardcoded display hours for frontend consistency
+   * The actual business logic uses getBusinessHours() for order validation
    */
   async getFormattedHours(): Promise<string> {
-    // Return hardcoded "11-03" format for all days as requested
-    return 'lunedì: 11-03, martedì: 11-03, mercoledì: 11-03, giovedì: 11-03, venerdì: 11-03, sabato: 11-03, domenica: 11-03';
+    // Return hardcoded "11-03" format for all days as requested for display
+    return 'lunedì: 11-03\nmartedì: 11-03\nmercoledì: 11-03\ngiovedì: 11-03\nvenerdì: 11-03\nsabato: 11-03\ndomenica: 11-03';
+  }
+
+  /**
+   * Get formatted hours string for display (single line format)
+   * NOTE: This returns hardcoded display hours for frontend consistency
+   */
+  async getSimpleFormattedHours(): Promise<string> {
+    // Return hardcoded "11-03" format for all days as requested for display
+    return 'lun: 11-03, mar: 11-03, mer: 11-03, gio: 11-03, ven: 11-03, sab: 11-03, dom: 11-03';
   }
 
   /**
