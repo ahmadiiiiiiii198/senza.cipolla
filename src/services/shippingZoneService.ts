@@ -47,7 +47,7 @@ class ShippingZoneService {
       maxDeliveryDistance: 15, // 15km default
       deliveryFee: 5.00,
       freeDeliveryThreshold: 50.00,
-      googleMapsApiKey: ''
+      googleMapsApiKey: 'AIzaSyBkHCjFa0GKD7lJThAyFnSaeCXFDsBtJhs'
     };
     this.deliveryZones = [];
     // Initialize asynchronously but track the promise

@@ -29,7 +29,7 @@ const ShippingZoneManager = () => {
     maxDeliveryDistance: 15,
     deliveryFee: 5.00,
     freeDeliveryThreshold: 50.00,
-    googleMapsApiKey: ''
+    googleMapsApiKey: 'AIzaSyBkHCjFa0GKD7lJThAyFnSaeCXFDsBtJhs'
   });
   
   const [deliveryZones, setDeliveryZones] = useState<DeliveryZone[]>([]);
