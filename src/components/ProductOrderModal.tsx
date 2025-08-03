@@ -128,16 +128,21 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
       console.log('✅ Order item created');
 
       // Create notification
-      await supabase
+      const { error: notificationError } = await supabase
         .from('order_notifications')
         .insert({
           order_id: order.id,
           notification_type: 'new_order',
-          title: 'Nuovo Ordine!',
           message: `New product order received from ${orderData.customerName} - ${product.name} x${orderData.quantity} - €${totalAmount.toFixed(2)}`,
-          is_read: false,
-          is_acknowledged: false
+          is_read: false
         });
+
+      if (notificationError) {
+        console.error('❌ Failed to create notification:', notificationError);
+        // Don't throw error - notification failure shouldn't stop order creation
+      } else {
+        console.log('✅ Order notification created successfully');
+      }
 
       // ✅ Order saved to database - tracking handled by UnifiedOrderTracker
       console.log('✅ Order created and will be tracked via database-only system');
@@ -482,7 +487,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
     console.log('✅ ProductOrder PayLater: Order item created successfully');
 
     // Create notification
-    await supabase
+    const { error: notificationError } = await supabase
       .from('order_notifications')
       .insert({
         order_id: order.id,
@@ -492,6 +497,13 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
         is_read: false,
         is_acknowledged: false
       });
+
+    if (notificationError) {
+      console.error('❌ Failed to create pay-later notification:', notificationError);
+      // Don't throw error - notification failure shouldn't stop order creation
+    } else {
+      console.log('✅ Pay-later product order notification created successfully');
+    }
 
     // ✅ Order saved to database - tracking handled by UnifiedOrderTracker
     console.log('✅ PayLater order created and will be tracked via database-only system');

@@ -7,11 +7,13 @@ interface OrderNotification {
   id: string;
   order_id: string;
   message: string;
-  notification_type: string; // Fixed: was 'type', now matches DB schema
+  notification_type: string;
   is_read: boolean;
   created_at: string;
-  title?: string; // Added: exists in DB schema
-  metadata?: any; // Added: exists in DB schema
+  title?: string;
+  is_acknowledged?: boolean;
+  metadata?: any;
+  read_at?: string | null;
   order_details?: {
     customer_name: string;
     total_amount: number;
@@ -158,7 +160,9 @@ const OrderNotificationSystem = () => {
           notification_type,
           title,
           is_read,
+          is_acknowledged,
           created_at,
+          read_at,
           metadata
         `)
         .eq('is_read', false)

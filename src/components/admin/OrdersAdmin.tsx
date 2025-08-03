@@ -19,6 +19,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { ensureAdminAuth } from '@/utils/adminDatabaseUtils';
 
 interface OrderItem {
   id: string;
@@ -187,12 +188,33 @@ const OrdersAdmin = () => {
     if (!confirm('Sei sicuro di voler eliminare questo ordine?')) return;
 
     try {
-      const { error } = await supabase
-        .from('orders')
-        .delete()
-        .eq('id', orderId);
+      // Ensure admin authentication for deletion operations
+      const authSuccess = await ensureAdminAuth();
+      if (!authSuccess) {
+        toast({
+          title: "Errore di Autenticazione",
+          description: "Impossibile autenticare per l'eliminazione",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      if (error) throw error;
+      // Try using the database function first for safer deletion
+      const { error: functionError } = await supabase.rpc('delete_order_cascade', {
+        order_uuid: orderId
+      });
+
+      if (functionError) {
+        console.log('Database function failed, trying direct deletion:', functionError.message);
+
+        // Fallback to direct deletion (now that RLS policies allow it)
+        const { error } = await supabase
+          .from('orders')
+          .delete()
+          .eq('id', orderId);
+
+        if (error) throw error;
+      }
 
       toast({
         title: "Successo",
@@ -205,7 +227,7 @@ const OrdersAdmin = () => {
       console.error('Error deleting order:', error);
       toast({
         title: "Errore",
-        description: "Impossibile eliminare l'ordine",
+        description: `Impossibile eliminare l'ordine: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -231,6 +253,17 @@ const OrdersAdmin = () => {
     try {
       setIsLoading(true);
       console.log('🗑️ Starting delete all orders process...');
+
+      // Ensure admin authentication for bulk deletion operations
+      const authSuccess = await ensureAdminAuth();
+      if (!authSuccess) {
+        toast({
+          title: "Errore di Autenticazione",
+          description: "Impossibile autenticare per l'eliminazione di massa",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const orderCount = orders.length;
       let deletedCount = 0;

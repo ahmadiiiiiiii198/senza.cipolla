@@ -27,7 +27,8 @@ import {
   Volume2
 } from 'lucide-react';
 
-// OrderNotificationSystem removed from main admin panel - only in separate ordini section
+// Import OrderNotificationSystem for admin panel notifications
+import OrderNotificationSystem from '../OrderNotificationSystem';
 
 // Lazy load admin components to prevent initialization errors
 const ProductsAdmin = lazy(() => import('./ProductsAdmin').catch(() => ({ default: () => <div>Error loading ProductsAdmin</div> })));
@@ -1107,6 +1108,17 @@ const PizzeriaAdminPanel = () => {
           </div>
         </Tabs>
       </div>
+
+      {/* Order Notification System - Global for Admin Panel */}
+      <Suspense fallback={
+        <div className="fixed top-4 right-4 z-50">
+          <div className="p-3 bg-gray-100 text-gray-600 rounded-full shadow-lg">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        </div>
+      }>
+        <OrderNotificationSystem />
+      </Suspense>
     </div>
   );
 };

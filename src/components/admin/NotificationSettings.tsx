@@ -9,6 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { Bell, Save, RefreshCw, Volume2, Mail, Phone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { adminUpsertSetting } from '@/utils/adminDatabaseUtils';
 
 interface NotificationSettings {
   // Sound Settings
@@ -104,19 +105,12 @@ const NotificationSettings = () => {
   const saveSettings = async () => {
     try {
       setIsSaving(true);
-      
-      const { error } = await supabase
-        .from('settings')
-        .upsert({
-          key: 'notificationSettings',
-          value: settings,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'key'
-        });
 
-      if (error) {
-        throw error;
+      // Use admin database utility to handle authentication automatically
+      const result = await adminUpsertSetting('notificationSettings', settings);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Errore sconosciuto durante il salvataggio');
       }
 
       toast({
@@ -129,7 +123,7 @@ const NotificationSettings = () => {
       console.error('❌ Error saving notification settings:', error);
       toast({
         title: "Errore",
-        description: "Impossibile salvare le impostazioni notifiche",
+        description: error instanceof Error ? error.message : "Impossibile salvare le impostazioni notifiche",
         variant: "destructive",
       });
     } finally {

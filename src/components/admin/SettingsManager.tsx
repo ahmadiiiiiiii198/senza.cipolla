@@ -19,6 +19,7 @@ import {
   Bell
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { adminBatchUpsertSettings, adminUpsertSetting } from '@/utils/adminDatabaseUtils';
 
 interface PizzeriaSettings {
   // Contact Info
@@ -116,19 +117,17 @@ const SettingsManager = () => {
     try {
       setIsSaving(true);
 
-      // Convert settings object to array format for database
+      // Convert settings object to array format for batch upsert
       const settingsArray = Object.entries(settings).map(([key, value]) => ({
         key,
         value: typeof value === 'object' ? value : value // Store objects directly, strings as-is
       }));
 
-      // Upsert each setting
-      for (const setting of settingsArray) {
-        const { error } = await supabase
-          .from('settings')
-          .upsert(setting, { onConflict: 'key' });
+      // Use admin batch upsert utility
+      const batchResult = await adminBatchUpsertSettings(settingsArray);
 
-        if (error) throw error;
+      if (!batchResult.success) {
+        throw new Error(batchResult.error || 'Errore durante il salvataggio delle impostazioni');
       }
 
       // CRITICAL FIX: Also update the contactContent key that frontend components use
@@ -140,16 +139,11 @@ const SettingsManager = () => {
         mapUrl: "https://maps.google.com"
       };
 
-      const { error: contactError } = await supabase
-        .from('settings')
-        .upsert({
-          key: 'contactContent',
-          value: contactContent
-        }, { onConflict: 'key' });
+      const contactResult = await adminUpsertSetting('contactContent', contactContent);
 
-      if (contactError) {
-        console.error('Error updating contactContent:', contactError);
-        throw contactError;
+      if (!contactResult.success) {
+        console.error('Error updating contactContent:', contactResult.error);
+        throw new Error(contactResult.error || 'Errore durante l\'aggiornamento delle informazioni di contatto');
       }
 
       console.log('✅ Settings saved and contactContent updated for frontend compatibility');
@@ -162,7 +156,7 @@ const SettingsManager = () => {
       console.error('Error saving settings:', error);
       toast({
         title: "Errore",
-        description: "Impossibile salvare le impostazioni",
+        description: error instanceof Error ? error.message : "Impossibile salvare le impostazioni",
         variant: "destructive",
       });
     } finally {

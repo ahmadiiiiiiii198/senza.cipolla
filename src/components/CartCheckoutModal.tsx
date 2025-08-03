@@ -215,7 +215,7 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
     console.log('✅ Order items created successfully');
 
     // Create notification
-    await supabase
+    const { error: notificationError } = await supabase
       .from('order_notifications')
       .insert({
         order_id: order.id,
@@ -225,6 +225,13 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
         is_read: false,
         is_acknowledged: false
       });
+
+    if (notificationError) {
+      console.error('❌ Failed to create notification:', notificationError);
+      // Don't throw error - notification failure shouldn't stop order creation
+    } else {
+      console.log('✅ Cart order notification created successfully');
+    }
 
     // 🎯 AUTOMATICALLY SAVE ORDER FOR TRACKING
     console.log('💾 Saving order for tracking:', {

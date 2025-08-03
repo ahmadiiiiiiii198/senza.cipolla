@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Clock, Save, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { businessHoursService } from '@/services/businessHoursService';
+import { adminUpsertSetting } from '@/utils/adminDatabaseUtils';
 
 interface DayHours {
   isOpen: boolean;
@@ -85,20 +86,12 @@ const BusinessHoursManager = () => {
   const saveBusinessHours = async () => {
     try {
       setIsSaving(true);
-      
-      // Save to database
-      const { error } = await supabase
-        .from('settings')
-        .upsert({
-          key: 'businessHours',
-          value: hours,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'key'
-        });
 
-      if (error) {
-        throw error;
+      // Use the admin database utility to handle authentication automatically
+      const result = await adminUpsertSetting('businessHours', hours);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Errore sconosciuto durante il salvataggio');
       }
 
       // Force complete refresh to verify changes immediately
@@ -119,7 +112,7 @@ const BusinessHoursManager = () => {
       console.error('❌ Error saving business hours:', error);
       toast({
         title: "Errore",
-        description: "Impossibile salvare gli orari di apertura",
+        description: error instanceof Error ? error.message : "Impossibile salvare gli orari di apertura",
         variant: "destructive",
       });
     } finally {
