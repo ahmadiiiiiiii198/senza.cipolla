@@ -428,7 +428,7 @@ const Hero = () => {
               {/* Secondary CTA - Call Now */}
               <button
                 onClick={() => {
-                  window.open('tel:0110769211', '_self');
+                  window.open('tel:+393479190907', '_self');
                 }}
                 className="group relative bg-gradient-to-r from-green-600 to-emerald-600 text-white px-12 py-5 rounded-2xl font-bold text-xl hover:from-green-500 hover:to-emerald-500 transform hover:scale-110 transition-all duration-500 shadow-2xl hover:shadow-3xl border-2 border-green-300/60 hover:border-green-200 overflow-hidden"
               >
