@@ -214,21 +214,20 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
     }
     console.log('✅ Order items created successfully');
 
-    // Create notification
+    // Create standardized notification
     const { error: notificationError } = await supabase
       .from('order_notifications')
       .insert({
         order_id: order.id,
         notification_type: 'new_order',
         title: 'Nuovo Ordine!',
-        message: `New cart order received from ${customerData.customerName} - ${cartItems.length} items - €${finalTotal.toFixed(2)}`,
+        message: `New cart order from ${customerData.customerName} - ${cartItems.length} items - €${finalTotal.toFixed(2)}`,
         is_read: false,
         is_acknowledged: false
       });
 
     if (notificationError) {
       console.error('❌ Failed to create notification:', notificationError);
-      // Don't throw error - notification failure shouldn't stop order creation
     } else {
       console.log('✅ Cart order notification created successfully');
     }
@@ -435,14 +434,23 @@ const CartCheckoutModal: React.FC<CartCheckoutModalProps> = ({
     }
     console.log('✅ Pay later order items created successfully');
 
-    // Create notification
-    await supabase
+    // Create standardized notification
+    const { error: notificationError } = await supabase
       .from('order_notifications')
       .insert({
         order_id: order.id,
+        notification_type: 'new_order',
+        title: 'Nuovo Ordine!',
         message: `New pay-later cart order from ${customerData.customerName} - ${cartItems.length} items`,
-        is_read: false
+        is_read: false,
+        is_acknowledged: false
       });
+
+    if (notificationError) {
+      console.error('❌ Failed to create pay-later notification:', notificationError);
+    } else {
+      console.log('✅ Pay-later cart order notification created successfully');
+    }
 
     // 🎯 AUTOMATICALLY SAVE ORDER FOR CLIENT-SPECIFIC TRACKING
     await saveClientOrder({

@@ -200,19 +200,20 @@ const OrderForm = () => {
 
       if (itemError) throw itemError;
 
-      // Create notification
+      // Create standardized notification
       const { error: notificationError } = await supabase
         .from('order_notifications')
         .insert({
           order_id: order.id,
           notification_type: 'new_order',
-          message: `New order received from ${formData.customerName}`,
-          is_read: false
+          title: 'Nuovo Ordine!',
+          message: `New order from ${formData.customerName}`,
+          is_read: false,
+          is_acknowledged: false
         });
 
       if (notificationError) {
         console.error('❌ Failed to create notification:', notificationError);
-        // Don't throw error - notification failure shouldn't stop order creation
       } else {
         console.log('✅ Order notification created successfully');
       }

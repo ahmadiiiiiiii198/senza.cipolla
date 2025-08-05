@@ -127,14 +127,16 @@ const DirectPaymentButton: React.FC<DirectPaymentButtonProps> = ({
 
       console.log('✅ Order item created');
 
-      // Create notification
+      // Create standardized notification
       const { error: notificationError } = await supabase
         .from('order_notifications')
         .insert({
           order_id: order.id,
           notification_type: 'new_order',
-          message: `New product order received from ${orderData.customerName} - ${product.name} x${orderData.quantity} - €${totalAmount.toFixed(2)}`,
-          is_read: false
+          title: 'Nuovo Ordine!',
+          message: `New product order from ${orderData.customerName} - ${product.name} x${orderData.quantity} - €${totalAmount.toFixed(2)}`,
+          is_read: false,
+          is_acknowledged: false
         });
 
       if (notificationError) {
@@ -486,7 +488,7 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
     }
     console.log('✅ ProductOrder PayLater: Order item created successfully');
 
-    // Create notification
+    // Create standardized notification
     const { error: notificationError } = await supabase
       .from('order_notifications')
       .insert({
@@ -500,7 +502,6 @@ const ProductOrderModal: React.FC<ProductOrderModalProps> = ({ product, isOpen, 
 
     if (notificationError) {
       console.error('❌ Failed to create pay-later notification:', notificationError);
-      // Don't throw error - notification failure shouldn't stop order creation
     } else {
       console.log('✅ Pay-later product order notification created successfully');
     }

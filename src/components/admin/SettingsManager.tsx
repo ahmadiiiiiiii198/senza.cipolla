@@ -53,7 +53,7 @@ const SettingsManager = () => {
   const [settings, setSettings] = useState<PizzeriaSettings>({
     restaurant_name: 'Pizzeria Senza Cipolla Torino',
     address: 'C.so Giulio Cesare, 36, 10152 Torino TO',
-    phone: '+39 011 123 4567',
+    phone: '+393479190907',
     email: 'info@pizzeriasenzacipolla.it',
     website: 'https://pizzeriasenzacipolla.it',
     delivery_fee: 3.50,

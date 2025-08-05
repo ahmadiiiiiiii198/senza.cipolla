@@ -10,7 +10,7 @@ const PhoneNumberUpdater = () => {
   const [updateResults, setUpdateResults] = useState<string[]>([]);
   const { toast } = useToast();
 
-  const newPhoneNumber = '0110769211';
+  const newPhoneNumber = '+393479190907';
 
   const updatePhoneNumber = async () => {
     setIsUpdating(true);

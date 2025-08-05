@@ -289,17 +289,23 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
       }
       console.log('✅ SimpleCheckout: Order items created successfully');
 
-      // Create notification
-      await supabase
+      // Create standardized notification
+      const { error: notificationError } = await supabase
         .from('order_notifications')
         .insert({
           order_id: order.id,
           notification_type: 'new_order',
           title: 'Nuovo Ordine!',
-          message: `New order received from ${customerData.customerName} - ${cartItems.length} items - €${calculateTotal().toFixed(2)}`,
+          message: `New order from ${customerData.customerName} - ${cartItems.length} items - €${calculateTotal().toFixed(2)}`,
           is_read: false,
           is_acknowledged: false
         });
+
+      if (notificationError) {
+        console.error('❌ Failed to create notification:', notificationError);
+      } else {
+        console.log('✅ Simple checkout notification created successfully');
+      }
 
       // Prepare Stripe line items
       const stripeItems = cartItems.map(item => {
@@ -501,17 +507,23 @@ const SimpleCheckoutModal: React.FC<SimpleCheckoutModalProps> = ({
       }
       console.log('✅ SimpleCheckout PayLater: Order items created successfully');
 
-      // Create notification
-      await supabase
+      // Create standardized notification
+      const { error: notificationError } = await supabase
         .from('order_notifications')
         .insert({
           order_id: order.id,
           notification_type: 'new_order',
           title: 'Nuovo Ordine!',
-          message: `New pay-later order received from ${customerData.customerName} - ${cartItems.length} items - €${calculateTotal().toFixed(2)}`,
+          message: `New pay-later order from ${customerData.customerName} - ${cartItems.length} items - €${calculateTotal().toFixed(2)}`,
           is_read: false,
           is_acknowledged: false
         });
+
+      if (notificationError) {
+        console.error('❌ Failed to create pay-later notification:', notificationError);
+      } else {
+        console.log('✅ Pay-later simple checkout notification created successfully');
+      }
 
       // ✅ Order saved to database - tracking handled by UnifiedOrderTracker
       console.log('✅ PayLater order created and will be tracked via database-only system');

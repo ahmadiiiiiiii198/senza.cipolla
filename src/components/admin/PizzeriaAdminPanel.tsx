@@ -27,8 +27,8 @@ import {
   Volume2
 } from 'lucide-react';
 
-// Import OrderNotificationSystem for admin panel notifications
-import OrderNotificationSystem from '../OrderNotificationSystem';
+// Import UnifiedNotificationSystem for admin panel notifications
+import UnifiedNotificationSystem from '../UnifiedNotificationSystem';
 
 // Lazy load admin components to prevent initialization errors
 const ProductsAdmin = lazy(() => import('./ProductsAdmin').catch(() => ({ default: () => <div>Error loading ProductsAdmin</div> })));
@@ -1109,7 +1109,7 @@ const PizzeriaAdminPanel = () => {
         </Tabs>
       </div>
 
-      {/* Order Notification System - Global for Admin Panel */}
+      {/* Unified Notification System - Global for Admin Panel */}
       <Suspense fallback={
         <div className="fixed top-4 right-4 z-50">
           <div className="p-3 bg-gray-100 text-gray-600 rounded-full shadow-lg">
@@ -1117,7 +1117,7 @@ const PizzeriaAdminPanel = () => {
           </div>
         </div>
       }>
-        <OrderNotificationSystem />
+        <UnifiedNotificationSystem />
       </Suspense>
     </div>
   );

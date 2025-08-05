@@ -512,7 +512,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 INSERT INTO settings (key, value) VALUES
   ('heroContent', '{"heading": "Pizzeria Regina 2000", "subheading": "Autentica pizza italiana nel cuore di Torino", "backgroundImage": "/hero-pizza-bg.jpg", "heroImage": ""}'),
   ('logoSettings', '{"logoUrl": "/pizzeria-regina-logo.png", "altText": "Pizzeria Regina 2000 Torino Logo"}'),
-  ('contactContent', '{"address": "Corso Regina Margherita, 53/b, 10124, Torino TO, Italia", "phone": "0110769211", "email": "anilamyzyri@gmail.com", "mapUrl": "https://maps.google.com", "hours": "Lun-Dom: 18:30 - 22:30"}'),
+  ('contactContent', '{"address": "C.so Giulio Cesare, 36, 10152 Torino TO", "phone": "+393479190907", "email": "anilamyzyri@gmail.com", "mapUrl": "https://maps.google.com", "hours": "Lun-Dom: 18:30 - 22:30"}'),
   ('restaurantSettings', '{"totalSeats": 50, "reservationDuration": 120, "openingTime": "11:30", "closingTime": "22:00", "languages": ["it", "en", "ar", "fa"], "defaultLanguage": "it"}'),
   ('businessHours', '{"monday": {"isOpen": true, "openTime": "14:30", "closeTime": "22:30"}, "tuesday": {"isOpen": true, "openTime": "14:30", "closeTime": "22:30"}, "wednesday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}, "thursday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}, "friday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}, "saturday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}, "sunday": {"isOpen": true, "openTime": "18:30", "closeTime": "22:30"}}'),
   ('pizzeriaDisplayHours', '{"monday": {"isOpen": true, "periods": [{"openTime": "12:00", "closeTime": "14:30"}, {"openTime": "18:00", "closeTime": "00:00"}]}, "tuesday": {"isOpen": true, "periods": [{"openTime": "12:00", "closeTime": "14:30"}, {"openTime": "18:00", "closeTime": "00:00"}]}, "wednesday": {"isOpen": true, "periods": [{"openTime": "12:00", "closeTime": "14:30"}, {"openTime": "18:00", "closeTime": "00:00"}]}, "thursday": {"isOpen": true, "periods": [{"openTime": "12:00", "closeTime": "14:30"}, {"openTime": "18:00", "closeTime": "00:00"}]}, "friday": {"isOpen": true, "periods": [{"openTime": "12:00", "closeTime": "14:30"}, {"openTime": "18:30", "closeTime": "02:00"}]}, "saturday": {"isOpen": true, "periods": [{"openTime": "18:30", "closeTime": "02:00"}]}, "sunday": {"isOpen": true, "periods": [{"openTime": "12:00", "closeTime": "14:30"}, {"openTime": "18:00", "closeTime": "00:00"}]}}'),
@@ -546,7 +546,7 @@ INSERT INTO settings (key, value) VALUES
   ('opening_hours', '{"monday": {"open": "18:00", "close": "23:00", "closed": false}, "tuesday": {"open": "18:00", "close": "23:00", "closed": false}, "wednesday": {"open": "18:00", "close": "23:00", "closed": false}, "thursday": {"open": "18:00", "close": "23:00", "closed": false}, "friday": {"open": "18:00", "close": "24:00", "closed": false}, "saturday": {"open": "18:00", "close": "24:00", "closed": false}, "sunday": {"open": "18:00", "close": "23:00", "closed": false}}'),
   ('restaurant_name', '"Pizzeria Regina 2000 Torino"'),
   ('address', '"Via Roma 123, 10100 Torino, Italia"'),
-  ('phone', '"+39 011 123 4567"'),
+  ('phone', '"+393479190907"'),
   ('email', '"info@pizzeriaregina2000.it"'),
   ('website', '"https://pizzeriaregina2000.it"'),
   ('chiSiamoImage', '{"image": "", "alt": "Pizzeria Regina 2000 - La nostra storia"}'),

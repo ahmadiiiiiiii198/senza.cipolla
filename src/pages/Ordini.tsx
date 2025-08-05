@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { Pizza, Loader2, ArrowLeft, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import OrdersAdmin from '@/components/admin/OrdersAdmin';
-import OrderNotificationSystem from '@/components/OrderNotificationSystem';
+import UnifiedNotificationSystem from '@/components/UnifiedNotificationSystem';
 import OrdiniHeader from '@/components/OrdiniHeader';
 import AuthenticatedAdminWrapper from '@/components/admin/AuthenticatedAdminWrapper';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -152,7 +152,7 @@ const Ordini = () => {
         </div>
       </div>
 
-      {/* Order Notification System - Only in Ordini Section */}
+      {/* Unified Notification System - Only in Ordini Section */}
       <Suspense fallback={
         <div className="fixed top-4 right-4 z-50">
           <div className="p-3 bg-gray-100 text-gray-600 rounded-full shadow-lg">
@@ -160,7 +160,7 @@ const Ordini = () => {
           </div>
         </div>
       }>
-        <OrderNotificationSystem />
+        <UnifiedNotificationSystem />
       </Suspense>
     </div>
     </AuthenticatedAdminWrapper>

@@ -123,7 +123,7 @@ class SettingsService {
             key: 'contactContent',
             value: {
               address: "C.so Giulio Cesare, 36, 10152 Torino TO",
-              phone: "0110769211",
+              phone: "+393479190907",
               email: "anilamyzyri@gmail.com",
               mapUrl: "https://maps.google.com",
               hours: "Lun-Dom: 08:00 - 19:00"

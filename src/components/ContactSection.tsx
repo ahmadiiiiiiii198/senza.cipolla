@@ -42,7 +42,7 @@ const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     address: 'C.so Giulio Cesare, 36, 10152 Torino TO',
-    phone: '0110769211',
+    phone: '+393479190907',
     email: 'anilamyzyri@gmail.com',
     hours: 'lunedì: 11-03\nmartedì: 11-03\nmercoledì: 11-03\ngiovedì: 11-03\nvenerdì: 11-03\nsabato: 11-03\ndomenica: 11-03'
   });

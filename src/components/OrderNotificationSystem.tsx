@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Bell, X, Check, AlertCircle, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import iosAudioFix from '@/utils/iosAudioFix';
 
 interface OrderNotification {
   id: string;
@@ -25,45 +24,25 @@ const OrderNotificationSystem = () => {
   const [notifications, setNotifications] = useState<OrderNotification[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const subscriptionRef = useRef<any>(null);
 
-  // Web Audio API control variables - moved to component scope for proper cleanup
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const beepIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isBeepPlayingRef = useRef<boolean>(false);
-  const soundIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Initialize audio safely
+  // Initialize audio system
   useEffect(() => {
-    console.log('🚨 [OrderNotification] ===== COMPONENT MOUNTING =====');
-    console.log('🚨 [OrderNotification] Component state on mount:', {
-      isInitialized,
-      isSoundEnabled,
-      isPlaying,
-      notificationsCount: notifications.length,
-      currentURL: window.location.href,
-      timestamp: new Date().toISOString()
-    });
+    console.log('🔊 [OrderNotification] Initializing notification system...');
 
-    const initializeAudio = async () => {
+    const initializeAudio = () => {
       try {
-        console.log('🔊 [OrderNotification] Initializing audio system...');
-
-        // Try to create audio element
+        // Create simple audio element with beep sound
         const audio = new Audio();
         audio.loop = true;
-        audio.volume = 1.0; // Maximum volume for better audibility
+        audio.volume = 0.8;
 
-        // Use a reliable beep sound directly instead of trying to load external file
-        console.log('🔊 [OrderNotification] Creating reliable beep sound...');
-
-        // Create a simple beep sound using data URL (more reliable than external file)
+        // Use a simple beep sound data URL
         const beepDataUrl = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT';
-
         audio.src = beepDataUrl;
 
         // Populate header controls

@@ -78,246 +78,24 @@ interface Notification {
   metadata?: any;
 }
 
-// BULLETPROOF Continuous Audio Notification System
-class ContinuousAudioNotifier {
-  private audioContext: AudioContext | null = null;
+// Simplified audio notifier - notifications now handled by UnifiedNotificationSystem
+class SimpleAudioNotifier {
   private isRinging = false;
-  private timeoutId: NodeJS.Timeout | null = null;
-  private isInitialized = false;
-  private customAudio: HTMLAudioElement | null = null;
-  private activeSound: any = null;
 
   constructor() {
-    this.initializeAudio();
-    this.loadActiveSound();
+    console.log('🔊 [SimpleAudioNotifier] Initialized - notifications handled by UnifiedNotificationSystem');
   }
 
-  private async loadActiveSound() {
-    try {
-      const { data, error } = await supabase
-        .from('notification_sounds')
-        .select('*')
-        .eq('is_active', true)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          console.log('🎵 No active sound found, using default');
-        } else if (error.code === 'PGRST301') {
-          console.log('🎵 Permission denied for notification_sounds, using default');
-        } else {
-          console.error('🎵 Error loading active sound:', error);
-        }
-        this.activeSound = { name: 'Default', sound_type: 'built-in' };
-        return;
-      }
-
-      this.activeSound = data;
-      console.log('🎵 Active sound loaded:', data?.name || 'Default');
-    } catch (error) {
-      console.error('🎵 Error loading active sound:', error);
-      this.activeSound = { name: 'Default', sound_type: 'built-in' };
-    }
-  }
-
-  private initializeAudio() {
-    const initAudio = () => {
-      try {
-        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        this.isInitialized = true;
-        console.log('🔊 Audio system initialized successfully');
-        document.removeEventListener('click', initAudio);
-        document.removeEventListener('touchstart', initAudio);
-      } catch (error) {
-        console.error('❌ Audio initialization failed:', error);
-      }
-    };
-
-    // Initialize on user interaction
-    document.addEventListener('click', initAudio);
-    document.addEventListener('touchstart', initAudio);
-
-    // Try to initialize immediately (might fail due to autoplay policy)
-    try {
-      initAudio();
-    } catch (error) {
-      console.log('⏳ Audio will initialize on first user interaction');
-    }
-  }
+  // Simplified methods - actual notifications handled by UnifiedNotificationSystem
 
   startContinuousRinging() {
-    if (this.isRinging) {
-      console.log('🔊 Already ringing, ignoring duplicate start request');
-      return;
-    }
-
-    console.log('🚨 STARTING CONTINUOUS RINGING');
-    console.log('🎵 Audio initialized:', this.isInitialized);
-    console.log('🎵 Audio context:', !!this.audioContext);
-    console.log('🎵 Active sound:', this.activeSound?.name || 'Built-in phone ring');
-
-    // Force audio initialization if needed
-    if (!this.isInitialized || !this.audioContext) {
-      console.log('⚠️ Audio not initialized, forcing initialization...');
-      this.initializeAudio();
-
-      // Try again after a short delay
-      setTimeout(() => {
-        if (!this.isRinging) {
-          this.startContinuousRinging();
-        }
-      }, 100);
-      return;
-    }
-
+    console.log('🔊 [SimpleAudioNotifier] Start ringing - delegated to UnifiedNotificationSystem');
     this.isRinging = true;
-    this.playRingTone();
-  }
-
-  private playRingTone() {
-    if (!this.isRinging) return;
-
-    try {
-      // Check if we have a custom sound
-      if (this.activeSound && this.activeSound.sound_type === 'custom' && this.activeSound.file_url) {
-        this.playCustomSound();
-      } else {
-        // Play built-in sound
-        if (!this.audioContext) return;
-        this.playDualToneRing();
-      }
-
-      // Schedule next ring cycle - MUCH MORE FREQUENT
-      const interval = this.activeSound?.sound_type === 'custom' ? 3000 : 2000; // SHORTER INTERVALS
-      this.timeoutId = setTimeout(() => {
-        if (this.isRinging) {
-          this.playRingTone();
-        }
-      }, interval);
-
-    } catch (error) {
-      console.error('❌ Audio playback error:', error);
-    }
-  }
-
-  private playCustomSound() {
-    if (!this.activeSound?.file_url) return;
-
-    try {
-      // Stop any existing custom audio
-      if (this.customAudio) {
-        this.customAudio.pause();
-        this.customAudio.currentTime = 0;
-      }
-
-      // Create new audio instance with base64 data
-      this.customAudio = new Audio(this.activeSound.file_url);
-      this.customAudio.volume = 1.0; // MAXIMUM VOLUME
-
-      this.customAudio.onerror = () => {
-        console.error('❌ Custom sound playback failed, falling back to built-in');
-        // Fallback to built-in sound
-        if (this.audioContext) {
-          this.playDualToneRing();
-        }
-      };
-
-      this.customAudio.play().catch(error => {
-        console.error('❌ Custom sound play failed:', error);
-        // Fallback to built-in sound
-        if (this.audioContext) {
-          this.playDualToneRing();
-        }
-      });
-
-    } catch (error) {
-      console.error('❌ Custom sound error:', error);
-      // Fallback to built-in sound
-      if (this.audioContext) {
-        this.playDualToneRing();
-      }
-    }
-  }
-
-  private playDualToneRing() {
-    if (!this.audioContext) return;
-
-    // Create two oscillators for a richer ringing sound
-    const oscillator1 = this.audioContext.createOscillator();
-    const oscillator2 = this.audioContext.createOscillator();
-    const gainNode1 = this.audioContext.createGain();
-    const gainNode2 = this.audioContext.createGain();
-    const masterGain = this.audioContext.createGain();
-
-    // Connect audio nodes
-    oscillator1.connect(gainNode1);
-    oscillator2.connect(gainNode2);
-    gainNode1.connect(masterGain);
-    gainNode2.connect(masterGain);
-    masterGain.connect(this.audioContext.destination);
-
-    // Set EXTREMELY POWERFUL frequencies for MAXIMUM AUDIBILITY
-    oscillator1.frequency.setValueAtTime(1500, this.audioContext.currentTime); // VERY HIGH PIERCING TONE
-    oscillator2.frequency.setValueAtTime(1200, this.audioContext.currentTime); // HIGH PIERCING TONE
-    oscillator1.type = 'sine';
-    oscillator2.type = 'sine';
-
-    const currentTime = this.audioContext.currentTime;
-
-    // Master volume - MAXIMUM VOLUME
-    masterGain.gain.setValueAtTime(1.0, currentTime);
-
-    // AGGRESSIVE ring pattern: CONTINUOUS POWERFUL BURSTS
-    // First ring
-    this.createRingBurst(gainNode1, gainNode2, currentTime, 0);
-    // Second ring
-    this.createRingBurst(gainNode1, gainNode2, currentTime, 0.4);
-    // Third ring
-    this.createRingBurst(gainNode1, gainNode2, currentTime, 0.8);
-    // Fourth ring
-    this.createRingBurst(gainNode1, gainNode2, currentTime, 1.2);
-
-    oscillator1.start(currentTime);
-    oscillator2.start(currentTime);
-    oscillator1.stop(currentTime + 2.5); // LONGER DURATION
-    oscillator2.stop(currentTime + 2.5); // LONGER DURATION
-  }
-
-  private createRingBurst(gainNode1: GainNode, gainNode2: GainNode, startTime: number, offset: number) {
-    const ringStart = startTime + offset;
-    const ringDuration = 0.6;
-
-    // Fade in - MAXIMUM VOLUME
-    gainNode1.gain.setValueAtTime(0, ringStart);
-    gainNode2.gain.setValueAtTime(0, ringStart);
-    gainNode1.gain.linearRampToValueAtTime(1.0, ringStart + 0.05); // MAXIMUM
-    gainNode2.gain.linearRampToValueAtTime(1.0, ringStart + 0.05); // MAXIMUM
-
-    // Hold - MAXIMUM VOLUME
-    gainNode1.gain.setValueAtTime(1.0, ringStart + ringDuration - 0.05); // MAXIMUM
-    gainNode2.gain.setValueAtTime(1.0, ringStart + ringDuration - 0.05); // MAXIMUM
-
-    // Fade out
-    gainNode1.gain.linearRampToValueAtTime(0, ringStart + ringDuration);
-    gainNode2.gain.linearRampToValueAtTime(0, ringStart + ringDuration);
   }
 
   stopRinging() {
-    console.log('🔇 STOPPING CONTINUOUS RINGING');
+    console.log('🔇 [SimpleAudioNotifier] Stop ringing - delegated to UnifiedNotificationSystem');
     this.isRinging = false;
-
-    // Clear timeout
-    if (this.timeoutId) {
-      clearTimeout(this.timeoutId);
-      this.timeoutId = null;
-    }
-
-    // Stop custom audio if playing
-    if (this.customAudio) {
-      this.customAudio.pause();
-      this.customAudio.currentTime = 0;
-      this.customAudio = null;
-    }
   }
 
   get isActive() {
@@ -325,22 +103,15 @@ class ContinuousAudioNotifier {
   }
 
   async refreshActiveSound() {
-    await this.loadActiveSound();
-    console.log('🔄 Active sound refreshed:', this.activeSound?.name || 'Default');
+    console.log('🔄 [SimpleAudioNotifier] Refresh sound - delegated to UnifiedNotificationSystem');
   }
 
-  // Test function
   testRing() {
-    console.log('🧪 Testing ring tone...');
-    this.startContinuousRinging();
-    setTimeout(() => {
-      this.stopRinging();
-      console.log('🧪 Test ring completed');
-    }, 3000);
+    console.log('🧪 [SimpleAudioNotifier] Test ring - delegated to UnifiedNotificationSystem');
   }
 }
 
-const audioNotifier = new ContinuousAudioNotifier();
+const audioNotifier = new SimpleAudioNotifier();
 
 // Expose audio notifier globally for sound management
 (window as any).audioNotifier = audioNotifier;
@@ -517,13 +288,8 @@ const OrderDashboardPro: React.FC = () => {
           duration: 10000,
         });
 
-        if (soundEnabled) {
-          console.log('🔊 Starting continuous ringing for new order...');
-          console.log('🎵 Audio initialized:', audioNotifier.isActive);
-          audioNotifier.startContinuousRinging();
-        } else {
-          console.log('🔇 Sound disabled, skipping audio notification');
-        }
+        // Audio notifications now handled by UnifiedNotificationSystem
+        console.log('🔊 [OrderDashboardPro] New order detected - UnifiedNotificationSystem will handle audio');
       })
       .on('postgres_changes', {
         event: 'UPDATE',
