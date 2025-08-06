@@ -8,7 +8,7 @@ orbs:
 executors:
   node-executor:
     docker:
-      - image: cimg/node:20.11.0
+      - image: cimg/node:20.15.0
     working_directory: ~/project
 
 # Define jobs
@@ -75,17 +75,31 @@ jobs:
       - attach_workspace:
           at: ~/project
       - run:
-          name: Install Netlify CLI
-          command: npm install -g netlify-cli
+          name: Validate Environment Variables
+          command: |
+            echo "🔍 Checking deployment environment variables..."
+            if [ -z "$NETLIFY_SITE_ID" ]; then
+              echo "❌ NETLIFY_SITE_ID is not set"
+              exit 1
+            fi
+            if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+              echo "❌ NETLIFY_AUTH_TOKEN is not set"
+              exit 1
+            fi
+            echo "✅ Environment variables are set"
+            echo "📦 Site ID: $NETLIFY_SITE_ID"
+            echo "🌿 Branch: $CIRCLE_BRANCH"
       - run:
           name: Deploy to Netlify
           command: |
             if [ "${CIRCLE_BRANCH}" = "main" ]; then
               # Production deployment
-              netlify deploy --prod --dir=dist --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
+              echo "🚀 Deploying to Netlify Production..."
+              npx netlify-cli@latest deploy --prod --dir=dist --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
             else
               # Preview deployment
-              netlify deploy --dir=dist --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
+              echo "🔍 Deploying to Netlify Preview..."
+              npx netlify-cli@latest deploy --dir=dist --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
             fi
 
   # Deploy to production (alternative deployment option)
