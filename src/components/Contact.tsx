@@ -200,11 +200,12 @@ const Contact = () => {
   };
   
   return (
-    <section 
-      id="contact" 
-      className="py-24 text-white relative bg-persian-new-pattern" 
-      style={sectionStyle}
-    >
+    <>
+      <section
+        id="contact"
+        className="py-24 text-white relative bg-persian-new-pattern"
+        style={sectionStyle}
+      >
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl text-center font-playfair font-bold mb-2 text-white">
           Contact <span className="text-persian-gold">Us</span>
@@ -299,10 +300,11 @@ const Contact = () => {
       </div>
     </section>
 
-    <OrderOptionsModal
-      isOpen={isOrderModalOpen}
-      onClose={() => setIsOrderModalOpen(false)}
-    />
+      <OrderOptionsModal
+        isOpen={isOrderModalOpen}
+        onClose={() => setIsOrderModalOpen(false)}
+      />
+    </>
   );
 };
 

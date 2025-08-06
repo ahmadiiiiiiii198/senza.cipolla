@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -72,12 +72,12 @@ const ContactSection = () => {
       }, async (payload) => {
         console.log('🔔 [ContactSection] Real-time contact content update received from admin');
         if (payload.new?.value) {
-          setContactInfo({
-            address: payload.new.value.address || contactInfo.address,
-            phone: payload.new.value.phone || contactInfo.phone,
-            email: payload.new.value.email || contactInfo.email,
-            hours: payload.new.value.hours || contactInfo.hours
-          });
+          setContactInfo(prevInfo => ({
+            address: payload.new.value.address || prevInfo.address,
+            phone: payload.new.value.phone || prevInfo.phone,
+            email: payload.new.value.email || prevInfo.email,
+            hours: payload.new.value.hours || prevInfo.hours
+          }));
           console.log('✅ [ContactSection] Contact content updated from real-time change');
         }
       })
@@ -86,9 +86,9 @@ const ContactSection = () => {
     return () => {
       channel.unsubscribe();
     };
-  }, []);
+  }, [loadContactInfo]);
 
-  const loadContactInfo = async () => {
+  const loadContactInfo = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('settings')
@@ -97,17 +97,17 @@ const ContactSection = () => {
         .single();
 
       if (data?.value) {
-        setContactInfo({
-          address: data.value.address || contactInfo.address,
-          phone: data.value.phone || contactInfo.phone,
-          email: data.value.email || contactInfo.email,
-          hours: data.value.hours || contactInfo.hours
-        });
+        setContactInfo(prevInfo => ({
+          address: data.value.address || prevInfo.address,
+          phone: data.value.phone || prevInfo.phone,
+          email: data.value.email || prevInfo.email,
+          hours: data.value.hours || prevInfo.hours
+        }));
       }
     } catch (error) {
       console.error('Error loading contact info:', error);
     }
-  };
+  }, []);
 
   const handleInputChange = (field: keyof ContactFormData, value: string) => {
     setFormData(prev => ({
